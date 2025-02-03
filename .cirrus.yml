@@ -1,0 +1,37 @@
+env:
+  CIRRUS_CLONE_DEPTH: "20"
+  CIRRUS_SHELL: bash
+
+eks_container_definition: &CONTAINER_DEFINITION
+  image: ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:latest
+  cluster_name: ${CIRRUS_CLUSTER_NAME}
+  region: eu-central-1
+  namespace: default
+
+build_task:
+  eks_container:
+    <<: *CONTAINER_DEFINITION
+    cpu: 1
+    memory: 1G
+  env:
+    # Possible values for ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa, sonarsource-public-qa
+    ARTIFACTORY_DEPLOY_REPO: FIXME
+    ARTIFACTORY_DEPLOY_USERNAME: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer username]
+    ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
+    DEPLOY_PULL_REQUEST: "true"
+  build_script:
+    - source cirrus-env BUILD
+    - regular_build_...
+
+promote_task:
+  depends_on:
+    - build
+  eks_container:
+    <<: *CONTAINER_DEFINITION
+    cpu: 1
+    memory: 1G
+  env:
+    ARTIFACTORY_PROMOTE_ACCESS_TOKEN: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promoter access_token]
+    GITHUB_TOKEN: VAULT[development/github/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-promotion token]
+    ARTIFACTS: FIXME # This was for Burgr links, is it still required?
+  script: cirrus_promote_...
