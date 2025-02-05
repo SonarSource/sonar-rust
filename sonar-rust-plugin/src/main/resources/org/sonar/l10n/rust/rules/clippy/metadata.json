@@ -1,0 +1,4622 @@
+[
+  {
+    "key": "absolute_paths",
+    "name": "absolute_paths",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#absolute_paths",
+    "description": "Clippy lint <code>absolute_paths</code>."
+  },
+  {
+    "key": "almost_complete_range",
+    "name": "almost_complete_range",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#almost_complete_range",
+    "description": "Clippy lint <code>almost_complete_range</code>."
+  },
+  {
+    "key": "approx_constant",
+    "name": "approx_constant",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#approx_constant",
+    "description": "Clippy lint <code>approx_constant</code>."
+  },
+  {
+    "key": "arbitrary_source_item_ordering",
+    "name": "arbitrary_source_item_ordering",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#arbitrary_source_item_ordering",
+    "description": "Clippy lint <code>arbitrary_source_item_ordering</code>."
+  },
+  {
+    "key": "arc_with_non_send_sync",
+    "name": "arc_with_non_send_sync",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#arc_with_non_send_sync",
+    "description": "Clippy lint <code>arc_with_non_send_sync</code>."
+  },
+  {
+    "key": "as_conversions",
+    "name": "as_conversions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#as_conversions",
+    "description": "Clippy lint <code>as_conversions</code>."
+  },
+  {
+    "key": "inline_asm_x86_intel_syntax",
+    "name": "inline_asm_x86_intel_syntax",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inline_asm_x86_intel_syntax",
+    "description": "Clippy lint <code>inline_asm_x86_intel_syntax</code>."
+  },
+  {
+    "key": "inline_asm_x86_att_syntax",
+    "name": "inline_asm_x86_att_syntax",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inline_asm_x86_att_syntax",
+    "description": "Clippy lint <code>inline_asm_x86_att_syntax</code>."
+  },
+  {
+    "key": "assertions_on_constants",
+    "name": "assertions_on_constants",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#assertions_on_constants",
+    "description": "Clippy lint <code>assertions_on_constants</code>."
+  },
+  {
+    "key": "assertions_on_result_states",
+    "name": "assertions_on_result_states",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#assertions_on_result_states",
+    "description": "Clippy lint <code>assertions_on_result_states</code>."
+  },
+  {
+    "key": "assigning_clones",
+    "name": "assigning_clones",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#assigning_clones",
+    "description": "Clippy lint <code>assigning_clones</code>."
+  },
+  {
+    "key": "async_yields_async",
+    "name": "async_yields_async",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#async_yields_async",
+    "description": "Clippy lint <code>async_yields_async</code>."
+  },
+  {
+    "key": "await_holding_lock",
+    "name": "await_holding_lock",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#await_holding_lock",
+    "description": "Clippy lint <code>await_holding_lock</code>."
+  },
+  {
+    "key": "await_holding_refcell_ref",
+    "name": "await_holding_refcell_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#await_holding_refcell_ref",
+    "description": "Clippy lint <code>await_holding_refcell_ref</code>."
+  },
+  {
+    "key": "await_holding_invalid_type",
+    "name": "await_holding_invalid_type",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#await_holding_invalid_type",
+    "description": "Clippy lint <code>await_holding_invalid_type</code>."
+  },
+  {
+    "key": "blocks_in_conditions",
+    "name": "blocks_in_conditions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#blocks_in_conditions",
+    "description": "Clippy lint <code>blocks_in_conditions</code>."
+  },
+  {
+    "key": "bool_assert_comparison",
+    "name": "bool_assert_comparison",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bool_assert_comparison",
+    "description": "Clippy lint <code>bool_assert_comparison</code>."
+  },
+  {
+    "key": "bool_to_int_with_if",
+    "name": "bool_to_int_with_if",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bool_to_int_with_if",
+    "description": "Clippy lint <code>bool_to_int_with_if</code>."
+  },
+  {
+    "key": "nonminimal_bool",
+    "name": "nonminimal_bool",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#nonminimal_bool",
+    "description": "Clippy lint <code>nonminimal_bool</code>."
+  },
+  {
+    "key": "overly_complex_bool_expr",
+    "name": "overly_complex_bool_expr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#overly_complex_bool_expr",
+    "description": "Clippy lint <code>overly_complex_bool_expr</code>."
+  },
+  {
+    "key": "borrow_deref_ref",
+    "name": "borrow_deref_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#borrow_deref_ref",
+    "description": "Clippy lint <code>borrow_deref_ref</code>."
+  },
+  {
+    "key": "box_default",
+    "name": "box_default",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#box_default",
+    "description": "Clippy lint <code>box_default</code>."
+  },
+  {
+    "key": "byte_char_slices",
+    "name": "byte_char_slices",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#byte_char_slices",
+    "description": "Clippy lint <code>byte_char_slices</code>."
+  },
+  {
+    "key": "cfg_not_test",
+    "name": "cfg_not_test",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cfg_not_test",
+    "description": "Clippy lint <code>cfg_not_test</code>."
+  },
+  {
+    "key": "checked_conversions",
+    "name": "checked_conversions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#checked_conversions",
+    "description": "Clippy lint <code>checked_conversions</code>."
+  },
+  {
+    "key": "cognitive_complexity",
+    "name": "cognitive_complexity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cognitive_complexity",
+    "description": "Clippy lint <code>cognitive_complexity</code>."
+  },
+  {
+    "key": "collapsible_if",
+    "name": "collapsible_if",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_if",
+    "description": "Clippy lint <code>collapsible_if</code>."
+  },
+  {
+    "key": "collapsible_else_if",
+    "name": "collapsible_else_if",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_else_if",
+    "description": "Clippy lint <code>collapsible_else_if</code>."
+  },
+  {
+    "key": "collection_is_never_read",
+    "name": "collection_is_never_read",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#collection_is_never_read",
+    "description": "Clippy lint <code>collection_is_never_read</code>."
+  },
+  {
+    "key": "comparison_chain",
+    "name": "comparison_chain",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#comparison_chain",
+    "description": "Clippy lint <code>comparison_chain</code>."
+  },
+  {
+    "key": "ifs_same_cond",
+    "name": "ifs_same_cond",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ifs_same_cond",
+    "description": "Clippy lint <code>ifs_same_cond</code>."
+  },
+  {
+    "key": "same_functions_in_if_condition",
+    "name": "same_functions_in_if_condition",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#same_functions_in_if_condition",
+    "description": "Clippy lint <code>same_functions_in_if_condition</code>."
+  },
+  {
+    "key": "if_same_then_else",
+    "name": "if_same_then_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#if_same_then_else",
+    "description": "Clippy lint <code>if_same_then_else</code>."
+  },
+  {
+    "key": "branches_sharing_code",
+    "name": "branches_sharing_code",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#branches_sharing_code",
+    "description": "Clippy lint <code>branches_sharing_code</code>."
+  },
+  {
+    "key": "copy_iterator",
+    "name": "copy_iterator",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#copy_iterator",
+    "description": "Clippy lint <code>copy_iterator</code>."
+  },
+  {
+    "key": "crate_in_macro_def",
+    "name": "crate_in_macro_def",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#crate_in_macro_def",
+    "description": "Clippy lint <code>crate_in_macro_def</code>."
+  },
+  {
+    "key": "create_dir",
+    "name": "create_dir",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#create_dir",
+    "description": "Clippy lint <code>create_dir</code>."
+  },
+  {
+    "key": "dbg_macro",
+    "name": "dbg_macro",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#dbg_macro",
+    "description": "Clippy lint <code>dbg_macro</code>."
+  },
+  {
+    "key": "default_trait_access",
+    "name": "default_trait_access",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#default_trait_access",
+    "description": "Clippy lint <code>default_trait_access</code>."
+  },
+  {
+    "key": "field_reassign_with_default",
+    "name": "field_reassign_with_default",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#field_reassign_with_default",
+    "description": "Clippy lint <code>field_reassign_with_default</code>."
+  },
+  {
+    "key": "default_constructed_unit_structs",
+    "name": "default_constructed_unit_structs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#default_constructed_unit_structs",
+    "description": "Clippy lint <code>default_constructed_unit_structs</code>."
+  },
+  {
+    "key": "default_instead_of_iter_empty",
+    "name": "default_instead_of_iter_empty",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#default_instead_of_iter_empty",
+    "description": "Clippy lint <code>default_instead_of_iter_empty</code>."
+  },
+  {
+    "key": "default_numeric_fallback",
+    "name": "default_numeric_fallback",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#default_numeric_fallback",
+    "description": "Clippy lint <code>default_numeric_fallback</code>."
+  },
+  {
+    "key": "default_union_representation",
+    "name": "default_union_representation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#default_union_representation",
+    "description": "Clippy lint <code>default_union_representation</code>."
+  },
+  {
+    "key": "explicit_deref_methods",
+    "name": "explicit_deref_methods",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#explicit_deref_methods",
+    "description": "Clippy lint <code>explicit_deref_methods</code>."
+  },
+  {
+    "key": "needless_borrow",
+    "name": "needless_borrow",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrow",
+    "description": "Clippy lint <code>needless_borrow</code>."
+  },
+  {
+    "key": "ref_binding_to_reference",
+    "name": "ref_binding_to_reference",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ref_binding_to_reference",
+    "description": "Clippy lint <code>ref_binding_to_reference</code>."
+  },
+  {
+    "key": "explicit_auto_deref",
+    "name": "explicit_auto_deref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#explicit_auto_deref",
+    "description": "Clippy lint <code>explicit_auto_deref</code>."
+  },
+  {
+    "key": "derivable_impls",
+    "name": "derivable_impls",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#derivable_impls",
+    "description": "Clippy lint <code>derivable_impls</code>."
+  },
+  {
+    "key": "derived_hash_with_manual_eq",
+    "name": "derived_hash_with_manual_eq",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#derived_hash_with_manual_eq",
+    "description": "Clippy lint <code>derived_hash_with_manual_eq</code>."
+  },
+  {
+    "key": "derive_ord_xor_partial_ord",
+    "name": "derive_ord_xor_partial_ord",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#derive_ord_xor_partial_ord",
+    "description": "Clippy lint <code>derive_ord_xor_partial_ord</code>."
+  },
+  {
+    "key": "expl_impl_clone_on_copy",
+    "name": "expl_impl_clone_on_copy",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#expl_impl_clone_on_copy",
+    "description": "Clippy lint <code>expl_impl_clone_on_copy</code>."
+  },
+  {
+    "key": "unsafe_derive_deserialize",
+    "name": "unsafe_derive_deserialize",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unsafe_derive_deserialize",
+    "description": "Clippy lint <code>unsafe_derive_deserialize</code>."
+  },
+  {
+    "key": "derive_partial_eq_without_eq",
+    "name": "derive_partial_eq_without_eq",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#derive_partial_eq_without_eq",
+    "description": "Clippy lint <code>derive_partial_eq_without_eq</code>."
+  },
+  {
+    "key": "disallowed_macros",
+    "name": "disallowed_macros",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_macros",
+    "description": "Clippy lint <code>disallowed_macros</code>."
+  },
+  {
+    "key": "disallowed_methods",
+    "name": "disallowed_methods",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_methods",
+    "description": "Clippy lint <code>disallowed_methods</code>."
+  },
+  {
+    "key": "disallowed_names",
+    "name": "disallowed_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_names",
+    "description": "Clippy lint <code>disallowed_names</code>."
+  },
+  {
+    "key": "disallowed_script_idents",
+    "name": "disallowed_script_idents",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_script_idents",
+    "description": "Clippy lint <code>disallowed_script_idents</code>."
+  },
+  {
+    "key": "disallowed_types",
+    "name": "disallowed_types",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_types",
+    "description": "Clippy lint <code>disallowed_types</code>."
+  },
+  {
+    "key": "double_parens",
+    "name": "double_parens",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#double_parens",
+    "description": "Clippy lint <code>double_parens</code>."
+  },
+  {
+    "key": "drop_non_drop",
+    "name": "drop_non_drop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#drop_non_drop",
+    "description": "Clippy lint <code>drop_non_drop</code>."
+  },
+  {
+    "key": "forget_non_drop",
+    "name": "forget_non_drop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#forget_non_drop",
+    "description": "Clippy lint <code>forget_non_drop</code>."
+  },
+  {
+    "key": "mem_forget",
+    "name": "mem_forget",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mem_forget",
+    "description": "Clippy lint <code>mem_forget</code>."
+  },
+  {
+    "key": "duplicate_mod",
+    "name": "duplicate_mod",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#duplicate_mod",
+    "description": "Clippy lint <code>duplicate_mod</code>."
+  },
+  {
+    "key": "else_if_without_else",
+    "name": "else_if_without_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#else_if_without_else",
+    "description": "Clippy lint <code>else_if_without_else</code>."
+  },
+  {
+    "key": "empty_drop",
+    "name": "empty_drop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_drop",
+    "description": "Clippy lint <code>empty_drop</code>."
+  },
+  {
+    "key": "empty_enum",
+    "name": "empty_enum",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_enum",
+    "description": "Clippy lint <code>empty_enum</code>."
+  },
+  {
+    "key": "empty_structs_with_brackets",
+    "name": "empty_structs_with_brackets",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_structs_with_brackets",
+    "description": "Clippy lint <code>empty_structs_with_brackets</code>."
+  },
+  {
+    "key": "empty_enum_variants_with_brackets",
+    "name": "empty_enum_variants_with_brackets",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_enum_variants_with_brackets",
+    "description": "Clippy lint <code>empty_enum_variants_with_brackets</code>."
+  },
+  {
+    "key": "host_endian_bytes",
+    "name": "host_endian_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#host_endian_bytes",
+    "description": "Clippy lint <code>host_endian_bytes</code>."
+  },
+  {
+    "key": "little_endian_bytes",
+    "name": "little_endian_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#little_endian_bytes",
+    "description": "Clippy lint <code>little_endian_bytes</code>."
+  },
+  {
+    "key": "big_endian_bytes",
+    "name": "big_endian_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#big_endian_bytes",
+    "description": "Clippy lint <code>big_endian_bytes</code>."
+  },
+  {
+    "key": "map_entry",
+    "name": "map_entry",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_entry",
+    "description": "Clippy lint <code>map_entry</code>."
+  },
+  {
+    "key": "enum_clike_unportable_variant",
+    "name": "enum_clike_unportable_variant",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#enum_clike_unportable_variant",
+    "description": "Clippy lint <code>enum_clike_unportable_variant</code>."
+  },
+  {
+    "key": "equatable_if_let",
+    "name": "equatable_if_let",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#equatable_if_let",
+    "description": "Clippy lint <code>equatable_if_let</code>."
+  },
+  {
+    "key": "error_impl_error",
+    "name": "error_impl_error",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#error_impl_error",
+    "description": "Clippy lint <code>error_impl_error</code>."
+  },
+  {
+    "key": "boxed_local",
+    "name": "boxed_local",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#boxed_local",
+    "description": "Clippy lint <code>boxed_local</code>."
+  },
+  {
+    "key": "redundant_closure",
+    "name": "redundant_closure",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_closure",
+    "description": "Clippy lint <code>redundant_closure</code>."
+  },
+  {
+    "key": "redundant_closure_for_method_calls",
+    "name": "redundant_closure_for_method_calls",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_closure_for_method_calls",
+    "description": "Clippy lint <code>redundant_closure_for_method_calls</code>."
+  },
+  {
+    "key": "struct_excessive_bools",
+    "name": "struct_excessive_bools",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#struct_excessive_bools",
+    "description": "Clippy lint <code>struct_excessive_bools</code>."
+  },
+  {
+    "key": "fn_params_excessive_bools",
+    "name": "fn_params_excessive_bools",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#fn_params_excessive_bools",
+    "description": "Clippy lint <code>fn_params_excessive_bools</code>."
+  },
+  {
+    "key": "excessive_nesting",
+    "name": "excessive_nesting",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#excessive_nesting",
+    "description": "Clippy lint <code>excessive_nesting</code>."
+  },
+  {
+    "key": "exhaustive_enums",
+    "name": "exhaustive_enums",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#exhaustive_enums",
+    "description": "Clippy lint <code>exhaustive_enums</code>."
+  },
+  {
+    "key": "exhaustive_structs",
+    "name": "exhaustive_structs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#exhaustive_structs",
+    "description": "Clippy lint <code>exhaustive_structs</code>."
+  },
+  {
+    "key": "exit",
+    "name": "exit",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#exit",
+    "description": "Clippy lint <code>exit</code>."
+  },
+  {
+    "key": "explicit_write",
+    "name": "explicit_write",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#explicit_write",
+    "description": "Clippy lint <code>explicit_write</code>."
+  },
+  {
+    "key": "extra_unused_type_parameters",
+    "name": "extra_unused_type_parameters",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#extra_unused_type_parameters",
+    "description": "Clippy lint <code>extra_unused_type_parameters</code>."
+  },
+  {
+    "key": "fallible_impl_from",
+    "name": "fallible_impl_from",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#fallible_impl_from",
+    "description": "Clippy lint <code>fallible_impl_from</code>."
+  },
+  {
+    "key": "field_scoped_visibility_modifiers",
+    "name": "field_scoped_visibility_modifiers",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#field_scoped_visibility_modifiers",
+    "description": "Clippy lint <code>field_scoped_visibility_modifiers</code>."
+  },
+  {
+    "key": "excessive_precision",
+    "name": "excessive_precision",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#excessive_precision",
+    "description": "Clippy lint <code>excessive_precision</code>."
+  },
+  {
+    "key": "lossy_float_literal",
+    "name": "lossy_float_literal",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#lossy_float_literal",
+    "description": "Clippy lint <code>lossy_float_literal</code>."
+  },
+  {
+    "key": "imprecise_flops",
+    "name": "imprecise_flops",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#imprecise_flops",
+    "description": "Clippy lint <code>imprecise_flops</code>."
+  },
+  {
+    "key": "suboptimal_flops",
+    "name": "suboptimal_flops",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suboptimal_flops",
+    "description": "Clippy lint <code>suboptimal_flops</code>."
+  },
+  {
+    "key": "useless_format",
+    "name": "useless_format",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_format",
+    "description": "Clippy lint <code>useless_format</code>."
+  },
+  {
+    "key": "format_in_format_args",
+    "name": "format_in_format_args",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#format_in_format_args",
+    "description": "Clippy lint <code>format_in_format_args</code>."
+  },
+  {
+    "key": "to_string_in_format_args",
+    "name": "to_string_in_format_args",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#to_string_in_format_args",
+    "description": "Clippy lint <code>to_string_in_format_args</code>."
+  },
+  {
+    "key": "uninlined_format_args",
+    "name": "uninlined_format_args",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#uninlined_format_args",
+    "description": "Clippy lint <code>uninlined_format_args</code>."
+  },
+  {
+    "key": "unused_format_specs",
+    "name": "unused_format_specs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_format_specs",
+    "description": "Clippy lint <code>unused_format_specs</code>."
+  },
+  {
+    "key": "recursive_format_impl",
+    "name": "recursive_format_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#recursive_format_impl",
+    "description": "Clippy lint <code>recursive_format_impl</code>."
+  },
+  {
+    "key": "print_in_format_impl",
+    "name": "print_in_format_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#print_in_format_impl",
+    "description": "Clippy lint <code>print_in_format_impl</code>."
+  },
+  {
+    "key": "format_push_string",
+    "name": "format_push_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#format_push_string",
+    "description": "Clippy lint <code>format_push_string</code>."
+  },
+  {
+    "key": "suspicious_assignment_formatting",
+    "name": "suspicious_assignment_formatting",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_assignment_formatting",
+    "description": "Clippy lint <code>suspicious_assignment_formatting</code>."
+  },
+  {
+    "key": "suspicious_unary_op_formatting",
+    "name": "suspicious_unary_op_formatting",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_unary_op_formatting",
+    "description": "Clippy lint <code>suspicious_unary_op_formatting</code>."
+  },
+  {
+    "key": "suspicious_else_formatting",
+    "name": "suspicious_else_formatting",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_else_formatting",
+    "description": "Clippy lint <code>suspicious_else_formatting</code>."
+  },
+  {
+    "key": "possible_missing_comma",
+    "name": "possible_missing_comma",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#possible_missing_comma",
+    "description": "Clippy lint <code>possible_missing_comma</code>."
+  },
+  {
+    "key": "four_forward_slashes",
+    "name": "four_forward_slashes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#four_forward_slashes",
+    "description": "Clippy lint <code>four_forward_slashes</code>."
+  },
+  {
+    "key": "from_over_into",
+    "name": "from_over_into",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#from_over_into",
+    "description": "Clippy lint <code>from_over_into</code>."
+  },
+  {
+    "key": "from_raw_with_void_ptr",
+    "name": "from_raw_with_void_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#from_raw_with_void_ptr",
+    "description": "Clippy lint <code>from_raw_with_void_ptr</code>."
+  },
+  {
+    "key": "from_str_radix_10",
+    "name": "from_str_radix_10",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#from_str_radix_10",
+    "description": "Clippy lint <code>from_str_radix_10</code>."
+  },
+  {
+    "key": "future_not_send",
+    "name": "future_not_send",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#future_not_send",
+    "description": "Clippy lint <code>future_not_send</code>."
+  },
+  {
+    "key": "if_let_mutex",
+    "name": "if_let_mutex",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#if_let_mutex",
+    "description": "Clippy lint <code>if_let_mutex</code>."
+  },
+  {
+    "key": "if_not_else",
+    "name": "if_not_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#if_not_else",
+    "description": "Clippy lint <code>if_not_else</code>."
+  },
+  {
+    "key": "if_then_some_else_none",
+    "name": "if_then_some_else_none",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#if_then_some_else_none",
+    "description": "Clippy lint <code>if_then_some_else_none</code>."
+  },
+  {
+    "key": "ignored_unit_patterns",
+    "name": "ignored_unit_patterns",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ignored_unit_patterns",
+    "description": "Clippy lint <code>ignored_unit_patterns</code>."
+  },
+  {
+    "key": "impl_hash_borrow_with_str_and_bytes",
+    "name": "impl_hash_borrow_with_str_and_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#impl_hash_borrow_with_str_and_bytes",
+    "description": "Clippy lint <code>impl_hash_borrow_with_str_and_bytes</code>."
+  },
+  {
+    "key": "implicit_hasher",
+    "name": "implicit_hasher",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#implicit_hasher",
+    "description": "Clippy lint <code>implicit_hasher</code>."
+  },
+  {
+    "key": "implicit_return",
+    "name": "implicit_return",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#implicit_return",
+    "description": "Clippy lint <code>implicit_return</code>."
+  },
+  {
+    "key": "implicit_saturating_add",
+    "name": "implicit_saturating_add",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#implicit_saturating_add",
+    "description": "Clippy lint <code>implicit_saturating_add</code>."
+  },
+  {
+    "key": "implicit_saturating_sub",
+    "name": "implicit_saturating_sub",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#implicit_saturating_sub",
+    "description": "Clippy lint <code>implicit_saturating_sub</code>."
+  },
+  {
+    "key": "inverted_saturating_sub",
+    "name": "inverted_saturating_sub",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inverted_saturating_sub",
+    "description": "Clippy lint <code>inverted_saturating_sub</code>."
+  },
+  {
+    "key": "implied_bounds_in_impls",
+    "name": "implied_bounds_in_impls",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#implied_bounds_in_impls",
+    "description": "Clippy lint <code>implied_bounds_in_impls</code>."
+  },
+  {
+    "key": "incompatible_msrv",
+    "name": "incompatible_msrv",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#incompatible_msrv",
+    "description": "Clippy lint <code>incompatible_msrv</code>."
+  },
+  {
+    "key": "inconsistent_struct_constructor",
+    "name": "inconsistent_struct_constructor",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inconsistent_struct_constructor",
+    "description": "Clippy lint <code>inconsistent_struct_constructor</code>."
+  },
+  {
+    "key": "index_refutable_slice",
+    "name": "index_refutable_slice",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#index_refutable_slice",
+    "description": "Clippy lint <code>index_refutable_slice</code>."
+  },
+  {
+    "key": "out_of_bounds_indexing",
+    "name": "out_of_bounds_indexing",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#out_of_bounds_indexing",
+    "description": "Clippy lint <code>out_of_bounds_indexing</code>."
+  },
+  {
+    "key": "indexing_slicing",
+    "name": "indexing_slicing",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#indexing_slicing",
+    "description": "Clippy lint <code>indexing_slicing</code>."
+  },
+  {
+    "key": "ineffective_open_options",
+    "name": "ineffective_open_options",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ineffective_open_options",
+    "description": "Clippy lint <code>ineffective_open_options</code>."
+  },
+  {
+    "key": "infinite_iter",
+    "name": "infinite_iter",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#infinite_iter",
+    "description": "Clippy lint <code>infinite_iter</code>."
+  },
+  {
+    "key": "maybe_infinite_iter",
+    "name": "maybe_infinite_iter",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#maybe_infinite_iter",
+    "description": "Clippy lint <code>maybe_infinite_iter</code>."
+  },
+  {
+    "key": "multiple_inherent_impl",
+    "name": "multiple_inherent_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#multiple_inherent_impl",
+    "description": "Clippy lint <code>multiple_inherent_impl</code>."
+  },
+  {
+    "key": "inherent_to_string",
+    "name": "inherent_to_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inherent_to_string",
+    "description": "Clippy lint <code>inherent_to_string</code>."
+  },
+  {
+    "key": "inherent_to_string_shadow_display",
+    "name": "inherent_to_string_shadow_display",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inherent_to_string_shadow_display",
+    "description": "Clippy lint <code>inherent_to_string_shadow_display</code>."
+  },
+  {
+    "key": "init_numbered_fields",
+    "name": "init_numbered_fields",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#init_numbered_fields",
+    "description": "Clippy lint <code>init_numbered_fields</code>."
+  },
+  {
+    "key": "inline_fn_without_body",
+    "name": "inline_fn_without_body",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inline_fn_without_body",
+    "description": "Clippy lint <code>inline_fn_without_body</code>."
+  },
+  {
+    "key": "manual_instant_elapsed",
+    "name": "manual_instant_elapsed",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_instant_elapsed",
+    "description": "Clippy lint <code>manual_instant_elapsed</code>."
+  },
+  {
+    "key": "unchecked_duration_subtraction",
+    "name": "unchecked_duration_subtraction",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unchecked_duration_subtraction",
+    "description": "Clippy lint <code>unchecked_duration_subtraction</code>."
+  },
+  {
+    "key": "int_plus_one",
+    "name": "int_plus_one",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#int_plus_one",
+    "description": "Clippy lint <code>int_plus_one</code>."
+  },
+  {
+    "key": "integer_division_remainder_used",
+    "name": "integer_division_remainder_used",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#integer_division_remainder_used",
+    "description": "Clippy lint <code>integer_division_remainder_used</code>."
+  },
+  {
+    "key": "invalid_upcast_comparisons",
+    "name": "invalid_upcast_comparisons",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#invalid_upcast_comparisons",
+    "description": "Clippy lint <code>invalid_upcast_comparisons</code>."
+  },
+  {
+    "key": "enum_variant_names",
+    "name": "enum_variant_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#enum_variant_names",
+    "description": "Clippy lint <code>enum_variant_names</code>."
+  },
+  {
+    "key": "module_name_repetitions",
+    "name": "module_name_repetitions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#module_name_repetitions",
+    "description": "Clippy lint <code>module_name_repetitions</code>."
+  },
+  {
+    "key": "module_inception",
+    "name": "module_inception",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#module_inception",
+    "description": "Clippy lint <code>module_inception</code>."
+  },
+  {
+    "key": "struct_field_names",
+    "name": "struct_field_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#struct_field_names",
+    "description": "Clippy lint <code>struct_field_names</code>."
+  },
+  {
+    "key": "items_after_statements",
+    "name": "items_after_statements",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#items_after_statements",
+    "description": "Clippy lint <code>items_after_statements</code>."
+  },
+  {
+    "key": "items_after_test_module",
+    "name": "items_after_test_module",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#items_after_test_module",
+    "description": "Clippy lint <code>items_after_test_module</code>."
+  },
+  {
+    "key": "iter_not_returning_iterator",
+    "name": "iter_not_returning_iterator",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_not_returning_iterator",
+    "description": "Clippy lint <code>iter_not_returning_iterator</code>."
+  },
+  {
+    "key": "iter_over_hash_type",
+    "name": "iter_over_hash_type",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_over_hash_type",
+    "description": "Clippy lint <code>iter_over_hash_type</code>."
+  },
+  {
+    "key": "iter_without_into_iter",
+    "name": "iter_without_into_iter",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_without_into_iter",
+    "description": "Clippy lint <code>iter_without_into_iter</code>."
+  },
+  {
+    "key": "into_iter_without_iter",
+    "name": "into_iter_without_iter",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#into_iter_without_iter",
+    "description": "Clippy lint <code>into_iter_without_iter</code>."
+  },
+  {
+    "key": "large_const_arrays",
+    "name": "large_const_arrays",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_const_arrays",
+    "description": "Clippy lint <code>large_const_arrays</code>."
+  },
+  {
+    "key": "large_enum_variant",
+    "name": "large_enum_variant",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_enum_variant",
+    "description": "Clippy lint <code>large_enum_variant</code>."
+  },
+  {
+    "key": "large_futures",
+    "name": "large_futures",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_futures",
+    "description": "Clippy lint <code>large_futures</code>."
+  },
+  {
+    "key": "large_include_file",
+    "name": "large_include_file",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_include_file",
+    "description": "Clippy lint <code>large_include_file</code>."
+  },
+  {
+    "key": "large_stack_arrays",
+    "name": "large_stack_arrays",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_stack_arrays",
+    "description": "Clippy lint <code>large_stack_arrays</code>."
+  },
+  {
+    "key": "large_stack_frames",
+    "name": "large_stack_frames",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_stack_frames",
+    "description": "Clippy lint <code>large_stack_frames</code>."
+  },
+  {
+    "key": "legacy_numeric_constants",
+    "name": "legacy_numeric_constants",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#legacy_numeric_constants",
+    "description": "Clippy lint <code>legacy_numeric_constants</code>."
+  },
+  {
+    "key": "len_zero",
+    "name": "len_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#len_zero",
+    "description": "Clippy lint <code>len_zero</code>."
+  },
+  {
+    "key": "len_without_is_empty",
+    "name": "len_without_is_empty",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#len_without_is_empty",
+    "description": "Clippy lint <code>len_without_is_empty</code>."
+  },
+  {
+    "key": "comparison_to_empty",
+    "name": "comparison_to_empty",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#comparison_to_empty",
+    "description": "Clippy lint <code>comparison_to_empty</code>."
+  },
+  {
+    "key": "useless_let_if_seq",
+    "name": "useless_let_if_seq",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_let_if_seq",
+    "description": "Clippy lint <code>useless_let_if_seq</code>."
+  },
+  {
+    "key": "let_underscore_must_use",
+    "name": "let_underscore_must_use",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_underscore_must_use",
+    "description": "Clippy lint <code>let_underscore_must_use</code>."
+  },
+  {
+    "key": "let_underscore_lock",
+    "name": "let_underscore_lock",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_underscore_lock",
+    "description": "Clippy lint <code>let_underscore_lock</code>."
+  },
+  {
+    "key": "let_underscore_future",
+    "name": "let_underscore_future",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_underscore_future",
+    "description": "Clippy lint <code>let_underscore_future</code>."
+  },
+  {
+    "key": "let_underscore_untyped",
+    "name": "let_underscore_untyped",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_underscore_untyped",
+    "description": "Clippy lint <code>let_underscore_untyped</code>."
+  },
+  {
+    "key": "let_with_type_underscore",
+    "name": "let_with_type_underscore",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_with_type_underscore",
+    "description": "Clippy lint <code>let_with_type_underscore</code>."
+  },
+  {
+    "key": "needless_lifetimes",
+    "name": "needless_lifetimes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_lifetimes",
+    "description": "Clippy lint <code>needless_lifetimes</code>."
+  },
+  {
+    "key": "extra_unused_lifetimes",
+    "name": "extra_unused_lifetimes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#extra_unused_lifetimes",
+    "description": "Clippy lint <code>extra_unused_lifetimes</code>."
+  },
+  {
+    "key": "lines_filter_map_ok",
+    "name": "lines_filter_map_ok",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#lines_filter_map_ok",
+    "description": "Clippy lint <code>lines_filter_map_ok</code>."
+  },
+  {
+    "key": "unreadable_literal",
+    "name": "unreadable_literal",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unreadable_literal",
+    "description": "Clippy lint <code>unreadable_literal</code>."
+  },
+  {
+    "key": "mistyped_literal_suffixes",
+    "name": "mistyped_literal_suffixes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mistyped_literal_suffixes",
+    "description": "Clippy lint <code>mistyped_literal_suffixes</code>."
+  },
+  {
+    "key": "inconsistent_digit_grouping",
+    "name": "inconsistent_digit_grouping",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inconsistent_digit_grouping",
+    "description": "Clippy lint <code>inconsistent_digit_grouping</code>."
+  },
+  {
+    "key": "unusual_byte_groupings",
+    "name": "unusual_byte_groupings",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unusual_byte_groupings",
+    "description": "Clippy lint <code>unusual_byte_groupings</code>."
+  },
+  {
+    "key": "large_digit_groups",
+    "name": "large_digit_groups",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_digit_groups",
+    "description": "Clippy lint <code>large_digit_groups</code>."
+  },
+  {
+    "key": "decimal_literal_representation",
+    "name": "decimal_literal_representation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#decimal_literal_representation",
+    "description": "Clippy lint <code>decimal_literal_representation</code>."
+  },
+  {
+    "key": "literal_string_with_formatting_args",
+    "name": "literal_string_with_formatting_args",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#literal_string_with_formatting_args",
+    "description": "Clippy lint <code>literal_string_with_formatting_args</code>."
+  },
+  {
+    "key": "macro_metavars_in_unsafe",
+    "name": "macro_metavars_in_unsafe",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#macro_metavars_in_unsafe",
+    "description": "Clippy lint <code>macro_metavars_in_unsafe</code>."
+  },
+  {
+    "key": "macro_use_imports",
+    "name": "macro_use_imports",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#macro_use_imports",
+    "description": "Clippy lint <code>macro_use_imports</code>."
+  },
+  {
+    "key": "main_recursion",
+    "name": "main_recursion",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#main_recursion",
+    "description": "Clippy lint <code>main_recursion</code>."
+  },
+  {
+    "key": "manual_assert",
+    "name": "manual_assert",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_assert",
+    "description": "Clippy lint <code>manual_assert</code>."
+  },
+  {
+    "key": "manual_async_fn",
+    "name": "manual_async_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_async_fn",
+    "description": "Clippy lint <code>manual_async_fn</code>."
+  },
+  {
+    "key": "manual_bits",
+    "name": "manual_bits",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_bits",
+    "description": "Clippy lint <code>manual_bits</code>."
+  },
+  {
+    "key": "manual_clamp",
+    "name": "manual_clamp",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_clamp",
+    "description": "Clippy lint <code>manual_clamp</code>."
+  },
+  {
+    "key": "manual_div_ceil",
+    "name": "manual_div_ceil",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_div_ceil",
+    "description": "Clippy lint <code>manual_div_ceil</code>."
+  },
+  {
+    "key": "manual_is_infinite",
+    "name": "manual_is_infinite",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_infinite",
+    "description": "Clippy lint <code>manual_is_infinite</code>."
+  },
+  {
+    "key": "manual_is_finite",
+    "name": "manual_is_finite",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_finite",
+    "description": "Clippy lint <code>manual_is_finite</code>."
+  },
+  {
+    "key": "manual_hash_one",
+    "name": "manual_hash_one",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_hash_one",
+    "description": "Clippy lint <code>manual_hash_one</code>."
+  },
+  {
+    "key": "manual_ignore_case_cmp",
+    "name": "manual_ignore_case_cmp",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_ignore_case_cmp",
+    "description": "Clippy lint <code>manual_ignore_case_cmp</code>."
+  },
+  {
+    "key": "manual_is_ascii_check",
+    "name": "manual_is_ascii_check",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_ascii_check",
+    "description": "Clippy lint <code>manual_is_ascii_check</code>."
+  },
+  {
+    "key": "manual_is_power_of_two",
+    "name": "manual_is_power_of_two",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_power_of_two",
+    "description": "Clippy lint <code>manual_is_power_of_two</code>."
+  },
+  {
+    "key": "manual_let_else",
+    "name": "manual_let_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_let_else",
+    "description": "Clippy lint <code>manual_let_else</code>."
+  },
+  {
+    "key": "manual_main_separator_str",
+    "name": "manual_main_separator_str",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_main_separator_str",
+    "description": "Clippy lint <code>manual_main_separator_str</code>."
+  },
+  {
+    "key": "manual_non_exhaustive",
+    "name": "manual_non_exhaustive",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_non_exhaustive",
+    "description": "Clippy lint <code>manual_non_exhaustive</code>."
+  },
+  {
+    "key": "manual_option_as_slice",
+    "name": "manual_option_as_slice",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_option_as_slice",
+    "description": "Clippy lint <code>manual_option_as_slice</code>."
+  },
+  {
+    "key": "manual_range_patterns",
+    "name": "manual_range_patterns",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_range_patterns",
+    "description": "Clippy lint <code>manual_range_patterns</code>."
+  },
+  {
+    "key": "manual_rem_euclid",
+    "name": "manual_rem_euclid",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_rem_euclid",
+    "description": "Clippy lint <code>manual_rem_euclid</code>."
+  },
+  {
+    "key": "manual_retain",
+    "name": "manual_retain",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_retain",
+    "description": "Clippy lint <code>manual_retain</code>."
+  },
+  {
+    "key": "manual_rotate",
+    "name": "manual_rotate",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_rotate",
+    "description": "Clippy lint <code>manual_rotate</code>."
+  },
+  {
+    "key": "manual_slice_size_calculation",
+    "name": "manual_slice_size_calculation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_slice_size_calculation",
+    "description": "Clippy lint <code>manual_slice_size_calculation</code>."
+  },
+  {
+    "key": "manual_string_new",
+    "name": "manual_string_new",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_string_new",
+    "description": "Clippy lint <code>manual_string_new</code>."
+  },
+  {
+    "key": "manual_strip",
+    "name": "manual_strip",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_strip",
+    "description": "Clippy lint <code>manual_strip</code>."
+  },
+  {
+    "key": "manual_unwrap_or_default",
+    "name": "manual_unwrap_or_default",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_unwrap_or_default",
+    "description": "Clippy lint <code>manual_unwrap_or_default</code>."
+  },
+  {
+    "key": "option_map_unit_fn",
+    "name": "option_map_unit_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_map_unit_fn",
+    "description": "Clippy lint <code>option_map_unit_fn</code>."
+  },
+  {
+    "key": "result_map_unit_fn",
+    "name": "result_map_unit_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#result_map_unit_fn",
+    "description": "Clippy lint <code>result_map_unit_fn</code>."
+  },
+  {
+    "key": "match_result_ok",
+    "name": "match_result_ok",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_result_ok",
+    "description": "Clippy lint <code>match_result_ok</code>."
+  },
+  {
+    "key": "mem_replace_option_with_none",
+    "name": "mem_replace_option_with_none",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_option_with_none",
+    "description": "Clippy lint <code>mem_replace_option_with_none</code>."
+  },
+  {
+    "key": "mem_replace_with_uninit",
+    "name": "mem_replace_with_uninit",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_with_uninit",
+    "description": "Clippy lint <code>mem_replace_with_uninit</code>."
+  },
+  {
+    "key": "mem_replace_with_default",
+    "name": "mem_replace_with_default",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_with_default",
+    "description": "Clippy lint <code>mem_replace_with_default</code>."
+  },
+  {
+    "key": "min_ident_chars",
+    "name": "min_ident_chars",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#min_ident_chars",
+    "description": "Clippy lint <code>min_ident_chars</code>."
+  },
+  {
+    "key": "min_max",
+    "name": "min_max",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#min_max",
+    "description": "Clippy lint <code>min_max</code>."
+  },
+  {
+    "key": "toplevel_ref_arg",
+    "name": "toplevel_ref_arg",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#toplevel_ref_arg",
+    "description": "Clippy lint <code>toplevel_ref_arg</code>."
+  },
+  {
+    "key": "used_underscore_binding",
+    "name": "used_underscore_binding",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#used_underscore_binding",
+    "description": "Clippy lint <code>used_underscore_binding</code>."
+  },
+  {
+    "key": "used_underscore_items",
+    "name": "used_underscore_items",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#used_underscore_items",
+    "description": "Clippy lint <code>used_underscore_items</code>."
+  },
+  {
+    "key": "short_circuit_statement",
+    "name": "short_circuit_statement",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#short_circuit_statement",
+    "description": "Clippy lint <code>short_circuit_statement</code>."
+  },
+  {
+    "key": "mismatching_type_param_order",
+    "name": "mismatching_type_param_order",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mismatching_type_param_order",
+    "description": "Clippy lint <code>mismatching_type_param_order</code>."
+  },
+  {
+    "key": "missing_assert_message",
+    "name": "missing_assert_message",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_assert_message",
+    "description": "Clippy lint <code>missing_assert_message</code>."
+  },
+  {
+    "key": "missing_asserts_for_indexing",
+    "name": "missing_asserts_for_indexing",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_asserts_for_indexing",
+    "description": "Clippy lint <code>missing_asserts_for_indexing</code>."
+  },
+  {
+    "key": "missing_const_for_fn",
+    "name": "missing_const_for_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_const_for_fn",
+    "description": "Clippy lint <code>missing_const_for_fn</code>."
+  },
+  {
+    "key": "missing_const_for_thread_local",
+    "name": "missing_const_for_thread_local",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_const_for_thread_local",
+    "description": "Clippy lint <code>missing_const_for_thread_local</code>."
+  },
+  {
+    "key": "missing_docs_in_private_items",
+    "name": "missing_docs_in_private_items",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_docs_in_private_items",
+    "description": "Clippy lint <code>missing_docs_in_private_items</code>."
+  },
+  {
+    "key": "missing_enforced_import_renames",
+    "name": "missing_enforced_import_renames",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_enforced_import_renames",
+    "description": "Clippy lint <code>missing_enforced_import_renames</code>."
+  },
+  {
+    "key": "missing_fields_in_debug",
+    "name": "missing_fields_in_debug",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_fields_in_debug",
+    "description": "Clippy lint <code>missing_fields_in_debug</code>."
+  },
+  {
+    "key": "missing_inline_in_public_items",
+    "name": "missing_inline_in_public_items",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_inline_in_public_items",
+    "description": "Clippy lint <code>missing_inline_in_public_items</code>."
+  },
+  {
+    "key": "missing_trait_methods",
+    "name": "missing_trait_methods",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_trait_methods",
+    "description": "Clippy lint <code>missing_trait_methods</code>."
+  },
+  {
+    "key": "mixed_read_write_in_expression",
+    "name": "mixed_read_write_in_expression",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mixed_read_write_in_expression",
+    "description": "Clippy lint <code>mixed_read_write_in_expression</code>."
+  },
+  {
+    "key": "diverging_sub_expression",
+    "name": "diverging_sub_expression",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#diverging_sub_expression",
+    "description": "Clippy lint <code>diverging_sub_expression</code>."
+  },
+  {
+    "key": "mod_module_files",
+    "name": "mod_module_files",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mod_module_files",
+    "description": "Clippy lint <code>mod_module_files</code>."
+  },
+  {
+    "key": "self_named_module_files",
+    "name": "self_named_module_files",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#self_named_module_files",
+    "description": "Clippy lint <code>self_named_module_files</code>."
+  },
+  {
+    "key": "multi_assignments",
+    "name": "multi_assignments",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#multi_assignments",
+    "description": "Clippy lint <code>multi_assignments</code>."
+  },
+  {
+    "key": "multiple_bound_locations",
+    "name": "multiple_bound_locations",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#multiple_bound_locations",
+    "description": "Clippy lint <code>multiple_bound_locations</code>."
+  },
+  {
+    "key": "multiple_unsafe_ops_per_block",
+    "name": "multiple_unsafe_ops_per_block",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#multiple_unsafe_ops_per_block",
+    "description": "Clippy lint <code>multiple_unsafe_ops_per_block</code>."
+  },
+  {
+    "key": "mutable_key_type",
+    "name": "mutable_key_type",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mutable_key_type",
+    "description": "Clippy lint <code>mutable_key_type</code>."
+  },
+  {
+    "key": "mut_mut",
+    "name": "mut_mut",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mut_mut",
+    "description": "Clippy lint <code>mut_mut</code>."
+  },
+  {
+    "key": "unnecessary_mut_passed",
+    "name": "unnecessary_mut_passed",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_mut_passed",
+    "description": "Clippy lint <code>unnecessary_mut_passed</code>."
+  },
+  {
+    "key": "debug_assert_with_mut_call",
+    "name": "debug_assert_with_mut_call",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#debug_assert_with_mut_call",
+    "description": "Clippy lint <code>debug_assert_with_mut_call</code>."
+  },
+  {
+    "key": "mutex_atomic",
+    "name": "mutex_atomic",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mutex_atomic",
+    "description": "Clippy lint <code>mutex_atomic</code>."
+  },
+  {
+    "key": "mutex_integer",
+    "name": "mutex_integer",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mutex_integer",
+    "description": "Clippy lint <code>mutex_integer</code>."
+  },
+  {
+    "key": "needless_arbitrary_self_type",
+    "name": "needless_arbitrary_self_type",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_arbitrary_self_type",
+    "description": "Clippy lint <code>needless_arbitrary_self_type</code>."
+  },
+  {
+    "key": "needless_bool",
+    "name": "needless_bool",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_bool",
+    "description": "Clippy lint <code>needless_bool</code>."
+  },
+  {
+    "key": "bool_comparison",
+    "name": "bool_comparison",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bool_comparison",
+    "description": "Clippy lint <code>bool_comparison</code>."
+  },
+  {
+    "key": "needless_bool_assign",
+    "name": "needless_bool_assign",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_bool_assign",
+    "description": "Clippy lint <code>needless_bool_assign</code>."
+  },
+  {
+    "key": "needless_borrowed_reference",
+    "name": "needless_borrowed_reference",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrowed_reference",
+    "description": "Clippy lint <code>needless_borrowed_reference</code>."
+  },
+  {
+    "key": "needless_borrows_for_generic_args",
+    "name": "needless_borrows_for_generic_args",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_borrows_for_generic_args",
+    "description": "Clippy lint <code>needless_borrows_for_generic_args</code>."
+  },
+  {
+    "key": "needless_continue",
+    "name": "needless_continue",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_continue",
+    "description": "Clippy lint <code>needless_continue</code>."
+  },
+  {
+    "key": "needless_else",
+    "name": "needless_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_else",
+    "description": "Clippy lint <code>needless_else</code>."
+  },
+  {
+    "key": "needless_for_each",
+    "name": "needless_for_each",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_for_each",
+    "description": "Clippy lint <code>needless_for_each</code>."
+  },
+  {
+    "key": "needless_if",
+    "name": "needless_if",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_if",
+    "description": "Clippy lint <code>needless_if</code>."
+  },
+  {
+    "key": "needless_late_init",
+    "name": "needless_late_init",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_late_init",
+    "description": "Clippy lint <code>needless_late_init</code>."
+  },
+  {
+    "key": "needless_maybe_sized",
+    "name": "needless_maybe_sized",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_maybe_sized",
+    "description": "Clippy lint <code>needless_maybe_sized</code>."
+  },
+  {
+    "key": "needless_parens_on_range_literals",
+    "name": "needless_parens_on_range_literals",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_parens_on_range_literals",
+    "description": "Clippy lint <code>needless_parens_on_range_literals</code>."
+  },
+  {
+    "key": "needless_pass_by_ref_mut",
+    "name": "needless_pass_by_ref_mut",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_pass_by_ref_mut",
+    "description": "Clippy lint <code>needless_pass_by_ref_mut</code>."
+  },
+  {
+    "key": "needless_pass_by_value",
+    "name": "needless_pass_by_value",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_pass_by_value",
+    "description": "Clippy lint <code>needless_pass_by_value</code>."
+  },
+  {
+    "key": "needless_question_mark",
+    "name": "needless_question_mark",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_question_mark",
+    "description": "Clippy lint <code>needless_question_mark</code>."
+  },
+  {
+    "key": "needless_update",
+    "name": "needless_update",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_update",
+    "description": "Clippy lint <code>needless_update</code>."
+  },
+  {
+    "key": "neg_cmp_op_on_partial_ord",
+    "name": "neg_cmp_op_on_partial_ord",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#neg_cmp_op_on_partial_ord",
+    "description": "Clippy lint <code>neg_cmp_op_on_partial_ord</code>."
+  },
+  {
+    "key": "neg_multiply",
+    "name": "neg_multiply",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#neg_multiply",
+    "description": "Clippy lint <code>neg_multiply</code>."
+  },
+  {
+    "key": "new_without_default",
+    "name": "new_without_default",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#new_without_default",
+    "description": "Clippy lint <code>new_without_default</code>."
+  },
+  {
+    "key": "no_effect",
+    "name": "no_effect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#no_effect",
+    "description": "Clippy lint <code>no_effect</code>."
+  },
+  {
+    "key": "no_effect_underscore_binding",
+    "name": "no_effect_underscore_binding",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#no_effect_underscore_binding",
+    "description": "Clippy lint <code>no_effect_underscore_binding</code>."
+  },
+  {
+    "key": "unnecessary_operation",
+    "name": "unnecessary_operation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_operation",
+    "description": "Clippy lint <code>unnecessary_operation</code>."
+  },
+  {
+    "key": "no_mangle_with_rust_abi",
+    "name": "no_mangle_with_rust_abi",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#no_mangle_with_rust_abi",
+    "description": "Clippy lint <code>no_mangle_with_rust_abi</code>."
+  },
+  {
+    "key": "non_canonical_clone_impl",
+    "name": "non_canonical_clone_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_canonical_clone_impl",
+    "description": "Clippy lint <code>non_canonical_clone_impl</code>."
+  },
+  {
+    "key": "non_canonical_partial_ord_impl",
+    "name": "non_canonical_partial_ord_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_canonical_partial_ord_impl",
+    "description": "Clippy lint <code>non_canonical_partial_ord_impl</code>."
+  },
+  {
+    "key": "declare_interior_mutable_const",
+    "name": "declare_interior_mutable_const",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#declare_interior_mutable_const",
+    "description": "Clippy lint <code>declare_interior_mutable_const</code>."
+  },
+  {
+    "key": "borrow_interior_mutable_const",
+    "name": "borrow_interior_mutable_const",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#borrow_interior_mutable_const",
+    "description": "Clippy lint <code>borrow_interior_mutable_const</code>."
+  },
+  {
+    "key": "similar_names",
+    "name": "similar_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#similar_names",
+    "description": "Clippy lint <code>similar_names</code>."
+  },
+  {
+    "key": "many_single_char_names",
+    "name": "many_single_char_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#many_single_char_names",
+    "description": "Clippy lint <code>many_single_char_names</code>."
+  },
+  {
+    "key": "just_underscores_and_digits",
+    "name": "just_underscores_and_digits",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#just_underscores_and_digits",
+    "description": "Clippy lint <code>just_underscores_and_digits</code>."
+  },
+  {
+    "key": "non_octal_unix_permissions",
+    "name": "non_octal_unix_permissions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_octal_unix_permissions",
+    "description": "Clippy lint <code>non_octal_unix_permissions</code>."
+  },
+  {
+    "key": "non_send_fields_in_send_ty",
+    "name": "non_send_fields_in_send_ty",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_send_fields_in_send_ty",
+    "description": "Clippy lint <code>non_send_fields_in_send_ty</code>."
+  },
+  {
+    "key": "non_std_lazy_statics",
+    "name": "non_std_lazy_statics",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_std_lazy_statics",
+    "description": "Clippy lint <code>non_std_lazy_statics</code>."
+  },
+  {
+    "key": "non_zero_suggestions",
+    "name": "non_zero_suggestions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_zero_suggestions",
+    "description": "Clippy lint <code>non_zero_suggestions</code>."
+  },
+  {
+    "key": "nonstandard_macro_braces",
+    "name": "nonstandard_macro_braces",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#nonstandard_macro_braces",
+    "description": "Clippy lint <code>nonstandard_macro_braces</code>."
+  },
+  {
+    "key": "octal_escapes",
+    "name": "octal_escapes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#octal_escapes",
+    "description": "Clippy lint <code>octal_escapes</code>."
+  },
+  {
+    "key": "only_used_in_recursion",
+    "name": "only_used_in_recursion",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#only_used_in_recursion",
+    "description": "Clippy lint <code>only_used_in_recursion</code>."
+  },
+  {
+    "key": "option_env_unwrap",
+    "name": "option_env_unwrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_env_unwrap",
+    "description": "Clippy lint <code>option_env_unwrap</code>."
+  },
+  {
+    "key": "option_if_let_else",
+    "name": "option_if_let_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_if_let_else",
+    "description": "Clippy lint <code>option_if_let_else</code>."
+  },
+  {
+    "key": "panic_in_result_fn",
+    "name": "panic_in_result_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#panic_in_result_fn",
+    "description": "Clippy lint <code>panic_in_result_fn</code>."
+  },
+  {
+    "key": "panic",
+    "name": "panic",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#panic",
+    "description": "Clippy lint <code>panic</code>."
+  },
+  {
+    "key": "unimplemented",
+    "name": "unimplemented",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unimplemented",
+    "description": "Clippy lint <code>unimplemented</code>."
+  },
+  {
+    "key": "todo",
+    "name": "todo",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#todo",
+    "description": "Clippy lint <code>todo</code>."
+  },
+  {
+    "key": "unreachable",
+    "name": "unreachable",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unreachable",
+    "description": "Clippy lint <code>unreachable</code>."
+  },
+  {
+    "key": "panicking_overflow_checks",
+    "name": "panicking_overflow_checks",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#panicking_overflow_checks",
+    "description": "Clippy lint <code>panicking_overflow_checks</code>."
+  },
+  {
+    "key": "partial_pub_fields",
+    "name": "partial_pub_fields",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#partial_pub_fields",
+    "description": "Clippy lint <code>partial_pub_fields</code>."
+  },
+  {
+    "key": "partialeq_ne_impl",
+    "name": "partialeq_ne_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#partialeq_ne_impl",
+    "description": "Clippy lint <code>partialeq_ne_impl</code>."
+  },
+  {
+    "key": "partialeq_to_none",
+    "name": "partialeq_to_none",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#partialeq_to_none",
+    "description": "Clippy lint <code>partialeq_to_none</code>."
+  },
+  {
+    "key": "trivially_copy_pass_by_ref",
+    "name": "trivially_copy_pass_by_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#trivially_copy_pass_by_ref",
+    "description": "Clippy lint <code>trivially_copy_pass_by_ref</code>."
+  },
+  {
+    "key": "large_types_passed_by_value",
+    "name": "large_types_passed_by_value",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#large_types_passed_by_value",
+    "description": "Clippy lint <code>large_types_passed_by_value</code>."
+  },
+  {
+    "key": "pathbuf_init_then_push",
+    "name": "pathbuf_init_then_push",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pathbuf_init_then_push",
+    "description": "Clippy lint <code>pathbuf_init_then_push</code>."
+  },
+  {
+    "key": "pattern_type_mismatch",
+    "name": "pattern_type_mismatch",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pattern_type_mismatch",
+    "description": "Clippy lint <code>pattern_type_mismatch</code>."
+  },
+  {
+    "key": "permissions_set_readonly_false",
+    "name": "permissions_set_readonly_false",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#permissions_set_readonly_false",
+    "description": "Clippy lint <code>permissions_set_readonly_false</code>."
+  },
+  {
+    "key": "pointers_in_nomem_asm_block",
+    "name": "pointers_in_nomem_asm_block",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pointers_in_nomem_asm_block",
+    "description": "Clippy lint <code>pointers_in_nomem_asm_block</code>."
+  },
+  {
+    "key": "precedence",
+    "name": "precedence",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#precedence",
+    "description": "Clippy lint <code>precedence</code>."
+  },
+  {
+    "key": "precedence_bits",
+    "name": "precedence_bits",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#precedence_bits",
+    "description": "Clippy lint <code>precedence_bits</code>."
+  },
+  {
+    "key": "ptr_arg",
+    "name": "ptr_arg",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ptr_arg",
+    "description": "Clippy lint <code>ptr_arg</code>."
+  },
+  {
+    "key": "cmp_null",
+    "name": "cmp_null",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cmp_null",
+    "description": "Clippy lint <code>cmp_null</code>."
+  },
+  {
+    "key": "mut_from_ref",
+    "name": "mut_from_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mut_from_ref",
+    "description": "Clippy lint <code>mut_from_ref</code>."
+  },
+  {
+    "key": "invalid_null_ptr_usage",
+    "name": "invalid_null_ptr_usage",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#invalid_null_ptr_usage",
+    "description": "Clippy lint <code>invalid_null_ptr_usage</code>."
+  },
+  {
+    "key": "ptr_offset_with_cast",
+    "name": "ptr_offset_with_cast",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ptr_offset_with_cast",
+    "description": "Clippy lint <code>ptr_offset_with_cast</code>."
+  },
+  {
+    "key": "pub_underscore_fields",
+    "name": "pub_underscore_fields",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pub_underscore_fields",
+    "description": "Clippy lint <code>pub_underscore_fields</code>."
+  },
+  {
+    "key": "pub_use",
+    "name": "pub_use",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pub_use",
+    "description": "Clippy lint <code>pub_use</code>."
+  },
+  {
+    "key": "question_mark",
+    "name": "question_mark",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#question_mark",
+    "description": "Clippy lint <code>question_mark</code>."
+  },
+  {
+    "key": "question_mark_used",
+    "name": "question_mark_used",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#question_mark_used",
+    "description": "Clippy lint <code>question_mark_used</code>."
+  },
+  {
+    "key": "range_plus_one",
+    "name": "range_plus_one",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#range_plus_one",
+    "description": "Clippy lint <code>range_plus_one</code>."
+  },
+  {
+    "key": "range_minus_one",
+    "name": "range_minus_one",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#range_minus_one",
+    "description": "Clippy lint <code>range_minus_one</code>."
+  },
+  {
+    "key": "reversed_empty_ranges",
+    "name": "reversed_empty_ranges",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#reversed_empty_ranges",
+    "description": "Clippy lint <code>reversed_empty_ranges</code>."
+  },
+  {
+    "key": "manual_range_contains",
+    "name": "manual_range_contains",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_range_contains",
+    "description": "Clippy lint <code>manual_range_contains</code>."
+  },
+  {
+    "key": "needless_raw_strings",
+    "name": "needless_raw_strings",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_raw_strings",
+    "description": "Clippy lint <code>needless_raw_strings</code>."
+  },
+  {
+    "key": "needless_raw_string_hashes",
+    "name": "needless_raw_string_hashes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_raw_string_hashes",
+    "description": "Clippy lint <code>needless_raw_string_hashes</code>."
+  },
+  {
+    "key": "rc_clone_in_vec_init",
+    "name": "rc_clone_in_vec_init",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#rc_clone_in_vec_init",
+    "description": "Clippy lint <code>rc_clone_in_vec_init</code>."
+  },
+  {
+    "key": "read_zero_byte_vec",
+    "name": "read_zero_byte_vec",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#read_zero_byte_vec",
+    "description": "Clippy lint <code>read_zero_byte_vec</code>."
+  },
+  {
+    "key": "redundant_async_block",
+    "name": "redundant_async_block",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_async_block",
+    "description": "Clippy lint <code>redundant_async_block</code>."
+  },
+  {
+    "key": "redundant_clone",
+    "name": "redundant_clone",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_clone",
+    "description": "Clippy lint <code>redundant_clone</code>."
+  },
+  {
+    "key": "redundant_closure_call",
+    "name": "redundant_closure_call",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_closure_call",
+    "description": "Clippy lint <code>redundant_closure_call</code>."
+  },
+  {
+    "key": "redundant_else",
+    "name": "redundant_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_else",
+    "description": "Clippy lint <code>redundant_else</code>."
+  },
+  {
+    "key": "redundant_field_names",
+    "name": "redundant_field_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_field_names",
+    "description": "Clippy lint <code>redundant_field_names</code>."
+  },
+  {
+    "key": "redundant_locals",
+    "name": "redundant_locals",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_locals",
+    "description": "Clippy lint <code>redundant_locals</code>."
+  },
+  {
+    "key": "redundant_pub_crate",
+    "name": "redundant_pub_crate",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_pub_crate",
+    "description": "Clippy lint <code>redundant_pub_crate</code>."
+  },
+  {
+    "key": "redundant_slicing",
+    "name": "redundant_slicing",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_slicing",
+    "description": "Clippy lint <code>redundant_slicing</code>."
+  },
+  {
+    "key": "deref_by_slicing",
+    "name": "deref_by_slicing",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#deref_by_slicing",
+    "description": "Clippy lint <code>deref_by_slicing</code>."
+  },
+  {
+    "key": "redundant_static_lifetimes",
+    "name": "redundant_static_lifetimes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_static_lifetimes",
+    "description": "Clippy lint <code>redundant_static_lifetimes</code>."
+  },
+  {
+    "key": "redundant_type_annotations",
+    "name": "redundant_type_annotations",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_type_annotations",
+    "description": "Clippy lint <code>redundant_type_annotations</code>."
+  },
+  {
+    "key": "ref_option_ref",
+    "name": "ref_option_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ref_option_ref",
+    "description": "Clippy lint <code>ref_option_ref</code>."
+  },
+  {
+    "key": "ref_patterns",
+    "name": "ref_patterns",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ref_patterns",
+    "description": "Clippy lint <code>ref_patterns</code>."
+  },
+  {
+    "key": "deref_addrof",
+    "name": "deref_addrof",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#deref_addrof",
+    "description": "Clippy lint <code>deref_addrof</code>."
+  },
+  {
+    "key": "invalid_regex",
+    "name": "invalid_regex",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#invalid_regex",
+    "description": "Clippy lint <code>invalid_regex</code>."
+  },
+  {
+    "key": "trivial_regex",
+    "name": "trivial_regex",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#trivial_regex",
+    "description": "Clippy lint <code>trivial_regex</code>."
+  },
+  {
+    "key": "regex_creation_in_loops",
+    "name": "regex_creation_in_loops",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#regex_creation_in_loops",
+    "description": "Clippy lint <code>regex_creation_in_loops</code>."
+  },
+  {
+    "key": "repeat_vec_with_capacity",
+    "name": "repeat_vec_with_capacity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#repeat_vec_with_capacity",
+    "description": "Clippy lint <code>repeat_vec_with_capacity</code>."
+  },
+  {
+    "key": "reserve_after_initialization",
+    "name": "reserve_after_initialization",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#reserve_after_initialization",
+    "description": "Clippy lint <code>reserve_after_initialization</code>."
+  },
+  {
+    "key": "return_self_not_must_use",
+    "name": "return_self_not_must_use",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#return_self_not_must_use",
+    "description": "Clippy lint <code>return_self_not_must_use</code>."
+  },
+  {
+    "key": "let_and_return",
+    "name": "let_and_return",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_and_return",
+    "description": "Clippy lint <code>let_and_return</code>."
+  },
+  {
+    "key": "needless_return",
+    "name": "needless_return",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_return",
+    "description": "Clippy lint <code>needless_return</code>."
+  },
+  {
+    "key": "needless_return_with_question_mark",
+    "name": "needless_return_with_question_mark",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_return_with_question_mark",
+    "description": "Clippy lint <code>needless_return_with_question_mark</code>."
+  },
+  {
+    "key": "same_name_method",
+    "name": "same_name_method",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#same_name_method",
+    "description": "Clippy lint <code>same_name_method</code>."
+  },
+  {
+    "key": "self_named_constructors",
+    "name": "self_named_constructors",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#self_named_constructors",
+    "description": "Clippy lint <code>self_named_constructors</code>."
+  },
+  {
+    "key": "semicolon_inside_block",
+    "name": "semicolon_inside_block",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#semicolon_inside_block",
+    "description": "Clippy lint <code>semicolon_inside_block</code>."
+  },
+  {
+    "key": "semicolon_outside_block",
+    "name": "semicolon_outside_block",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#semicolon_outside_block",
+    "description": "Clippy lint <code>semicolon_outside_block</code>."
+  },
+  {
+    "key": "semicolon_if_nothing_returned",
+    "name": "semicolon_if_nothing_returned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#semicolon_if_nothing_returned",
+    "description": "Clippy lint <code>semicolon_if_nothing_returned</code>."
+  },
+  {
+    "key": "serde_api_misuse",
+    "name": "serde_api_misuse",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#serde_api_misuse",
+    "description": "Clippy lint <code>serde_api_misuse</code>."
+  },
+  {
+    "key": "set_contains_or_insert",
+    "name": "set_contains_or_insert",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#set_contains_or_insert",
+    "description": "Clippy lint <code>set_contains_or_insert</code>."
+  },
+  {
+    "key": "shadow_same",
+    "name": "shadow_same",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#shadow_same",
+    "description": "Clippy lint <code>shadow_same</code>."
+  },
+  {
+    "key": "shadow_reuse",
+    "name": "shadow_reuse",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#shadow_reuse",
+    "description": "Clippy lint <code>shadow_reuse</code>."
+  },
+  {
+    "key": "shadow_unrelated",
+    "name": "shadow_unrelated",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#shadow_unrelated",
+    "description": "Clippy lint <code>shadow_unrelated</code>."
+  },
+  {
+    "key": "significant_drop_tightening",
+    "name": "significant_drop_tightening",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#significant_drop_tightening",
+    "description": "Clippy lint <code>significant_drop_tightening</code>."
+  },
+  {
+    "key": "single_call_fn",
+    "name": "single_call_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_call_fn",
+    "description": "Clippy lint <code>single_call_fn</code>."
+  },
+  {
+    "key": "single_char_lifetime_names",
+    "name": "single_char_lifetime_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_char_lifetime_names",
+    "description": "Clippy lint <code>single_char_lifetime_names</code>."
+  },
+  {
+    "key": "single_component_path_imports",
+    "name": "single_component_path_imports",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_component_path_imports",
+    "description": "Clippy lint <code>single_component_path_imports</code>."
+  },
+  {
+    "key": "single_range_in_vec_init",
+    "name": "single_range_in_vec_init",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_range_in_vec_init",
+    "description": "Clippy lint <code>single_range_in_vec_init</code>."
+  },
+  {
+    "key": "size_of_in_element_count",
+    "name": "size_of_in_element_count",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#size_of_in_element_count",
+    "description": "Clippy lint <code>size_of_in_element_count</code>."
+  },
+  {
+    "key": "size_of_ref",
+    "name": "size_of_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#size_of_ref",
+    "description": "Clippy lint <code>size_of_ref</code>."
+  },
+  {
+    "key": "slow_vector_initialization",
+    "name": "slow_vector_initialization",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#slow_vector_initialization",
+    "description": "Clippy lint <code>slow_vector_initialization</code>."
+  },
+  {
+    "key": "std_instead_of_core",
+    "name": "std_instead_of_core",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#std_instead_of_core",
+    "description": "Clippy lint <code>std_instead_of_core</code>."
+  },
+  {
+    "key": "std_instead_of_alloc",
+    "name": "std_instead_of_alloc",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#std_instead_of_alloc",
+    "description": "Clippy lint <code>std_instead_of_alloc</code>."
+  },
+  {
+    "key": "alloc_instead_of_core",
+    "name": "alloc_instead_of_core",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#alloc_instead_of_core",
+    "description": "Clippy lint <code>alloc_instead_of_core</code>."
+  },
+  {
+    "key": "manual_pattern_char_comparison",
+    "name": "manual_pattern_char_comparison",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_pattern_char_comparison",
+    "description": "Clippy lint <code>manual_pattern_char_comparison</code>."
+  },
+  {
+    "key": "single_char_pattern",
+    "name": "single_char_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_char_pattern",
+    "description": "Clippy lint <code>single_char_pattern</code>."
+  },
+  {
+    "key": "string_add_assign",
+    "name": "string_add_assign",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_add_assign",
+    "description": "Clippy lint <code>string_add_assign</code>."
+  },
+  {
+    "key": "string_add",
+    "name": "string_add",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_add",
+    "description": "Clippy lint <code>string_add</code>."
+  },
+  {
+    "key": "string_lit_as_bytes",
+    "name": "string_lit_as_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_lit_as_bytes",
+    "description": "Clippy lint <code>string_lit_as_bytes</code>."
+  },
+  {
+    "key": "string_slice",
+    "name": "string_slice",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_slice",
+    "description": "Clippy lint <code>string_slice</code>."
+  },
+  {
+    "key": "string_from_utf8_as_bytes",
+    "name": "string_from_utf8_as_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_from_utf8_as_bytes",
+    "description": "Clippy lint <code>string_from_utf8_as_bytes</code>."
+  },
+  {
+    "key": "str_to_string",
+    "name": "str_to_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#str_to_string",
+    "description": "Clippy lint <code>str_to_string</code>."
+  },
+  {
+    "key": "string_to_string",
+    "name": "string_to_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_to_string",
+    "description": "Clippy lint <code>string_to_string</code>."
+  },
+  {
+    "key": "trim_split_whitespace",
+    "name": "trim_split_whitespace",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#trim_split_whitespace",
+    "description": "Clippy lint <code>trim_split_whitespace</code>."
+  },
+  {
+    "key": "strlen_on_c_strings",
+    "name": "strlen_on_c_strings",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#strlen_on_c_strings",
+    "description": "Clippy lint <code>strlen_on_c_strings</code>."
+  },
+  {
+    "key": "suspicious_operation_groupings",
+    "name": "suspicious_operation_groupings",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_operation_groupings",
+    "description": "Clippy lint <code>suspicious_operation_groupings</code>."
+  },
+  {
+    "key": "suspicious_arithmetic_impl",
+    "name": "suspicious_arithmetic_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_arithmetic_impl",
+    "description": "Clippy lint <code>suspicious_arithmetic_impl</code>."
+  },
+  {
+    "key": "suspicious_op_assign_impl",
+    "name": "suspicious_op_assign_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_op_assign_impl",
+    "description": "Clippy lint <code>suspicious_op_assign_impl</code>."
+  },
+  {
+    "key": "suspicious_xor_used_as_pow",
+    "name": "suspicious_xor_used_as_pow",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_xor_used_as_pow",
+    "description": "Clippy lint <code>suspicious_xor_used_as_pow</code>."
+  },
+  {
+    "key": "manual_swap",
+    "name": "manual_swap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_swap",
+    "description": "Clippy lint <code>manual_swap</code>."
+  },
+  {
+    "key": "almost_swapped",
+    "name": "almost_swapped",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#almost_swapped",
+    "description": "Clippy lint <code>almost_swapped</code>."
+  },
+  {
+    "key": "swap_ptr_to_ref",
+    "name": "swap_ptr_to_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#swap_ptr_to_ref",
+    "description": "Clippy lint <code>swap_ptr_to_ref</code>."
+  },
+  {
+    "key": "tabs_in_doc_comments",
+    "name": "tabs_in_doc_comments",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#tabs_in_doc_comments",
+    "description": "Clippy lint <code>tabs_in_doc_comments</code>."
+  },
+  {
+    "key": "temporary_assignment",
+    "name": "temporary_assignment",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#temporary_assignment",
+    "description": "Clippy lint <code>temporary_assignment</code>."
+  },
+  {
+    "key": "tests_outside_test_module",
+    "name": "tests_outside_test_module",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#tests_outside_test_module",
+    "description": "Clippy lint <code>tests_outside_test_module</code>."
+  },
+  {
+    "key": "to_digit_is_some",
+    "name": "to_digit_is_some",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#to_digit_is_some",
+    "description": "Clippy lint <code>to_digit_is_some</code>."
+  },
+  {
+    "key": "to_string_trait_impl",
+    "name": "to_string_trait_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#to_string_trait_impl",
+    "description": "Clippy lint <code>to_string_trait_impl</code>."
+  },
+  {
+    "key": "trailing_empty_array",
+    "name": "trailing_empty_array",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#trailing_empty_array",
+    "description": "Clippy lint <code>trailing_empty_array</code>."
+  },
+  {
+    "key": "type_repetition_in_bounds",
+    "name": "type_repetition_in_bounds",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#type_repetition_in_bounds",
+    "description": "Clippy lint <code>type_repetition_in_bounds</code>."
+  },
+  {
+    "key": "trait_duplication_in_bounds",
+    "name": "trait_duplication_in_bounds",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#trait_duplication_in_bounds",
+    "description": "Clippy lint <code>trait_duplication_in_bounds</code>."
+  },
+  {
+    "key": "tuple_array_conversions",
+    "name": "tuple_array_conversions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#tuple_array_conversions",
+    "description": "Clippy lint <code>tuple_array_conversions</code>."
+  },
+  {
+    "key": "unconditional_recursion",
+    "name": "unconditional_recursion",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unconditional_recursion",
+    "description": "Clippy lint <code>unconditional_recursion</code>."
+  },
+  {
+    "key": "undocumented_unsafe_blocks",
+    "name": "undocumented_unsafe_blocks",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#undocumented_unsafe_blocks",
+    "description": "Clippy lint <code>undocumented_unsafe_blocks</code>."
+  },
+  {
+    "key": "unnecessary_safety_comment",
+    "name": "unnecessary_safety_comment",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_safety_comment",
+    "description": "Clippy lint <code>unnecessary_safety_comment</code>."
+  },
+  {
+    "key": "invisible_characters",
+    "name": "invisible_characters",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#invisible_characters",
+    "description": "Clippy lint <code>invisible_characters</code>."
+  },
+  {
+    "key": "non_ascii_literal",
+    "name": "non_ascii_literal",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_ascii_literal",
+    "description": "Clippy lint <code>non_ascii_literal</code>."
+  },
+  {
+    "key": "unicode_not_nfc",
+    "name": "unicode_not_nfc",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unicode_not_nfc",
+    "description": "Clippy lint <code>unicode_not_nfc</code>."
+  },
+  {
+    "key": "uninhabited_references",
+    "name": "uninhabited_references",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#uninhabited_references",
+    "description": "Clippy lint <code>uninhabited_references</code>."
+  },
+  {
+    "key": "uninit_vec",
+    "name": "uninit_vec",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec",
+    "description": "Clippy lint <code>uninit_vec</code>."
+  },
+  {
+    "key": "unit_return_expecting_ord",
+    "name": "unit_return_expecting_ord",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unit_return_expecting_ord",
+    "description": "Clippy lint <code>unit_return_expecting_ord</code>."
+  },
+  {
+    "key": "unnecessary_box_returns",
+    "name": "unnecessary_box_returns",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_box_returns",
+    "description": "Clippy lint <code>unnecessary_box_returns</code>."
+  },
+  {
+    "key": "unnecessary_literal_bound",
+    "name": "unnecessary_literal_bound",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_literal_bound",
+    "description": "Clippy lint <code>unnecessary_literal_bound</code>."
+  },
+  {
+    "key": "unnecessary_map_on_constructor",
+    "name": "unnecessary_map_on_constructor",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_map_on_constructor",
+    "description": "Clippy lint <code>unnecessary_map_on_constructor</code>."
+  },
+  {
+    "key": "unnecessary_owned_empty_strings",
+    "name": "unnecessary_owned_empty_strings",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_owned_empty_strings",
+    "description": "Clippy lint <code>unnecessary_owned_empty_strings</code>."
+  },
+  {
+    "key": "unnecessary_self_imports",
+    "name": "unnecessary_self_imports",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_self_imports",
+    "description": "Clippy lint <code>unnecessary_self_imports</code>."
+  },
+  {
+    "key": "unnecessary_semicolon",
+    "name": "unnecessary_semicolon",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_semicolon",
+    "description": "Clippy lint <code>unnecessary_semicolon</code>."
+  },
+  {
+    "key": "unnecessary_struct_initialization",
+    "name": "unnecessary_struct_initialization",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_struct_initialization",
+    "description": "Clippy lint <code>unnecessary_struct_initialization</code>."
+  },
+  {
+    "key": "unnecessary_wraps",
+    "name": "unnecessary_wraps",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_wraps",
+    "description": "Clippy lint <code>unnecessary_wraps</code>."
+  },
+  {
+    "key": "unneeded_struct_pattern",
+    "name": "unneeded_struct_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unneeded_struct_pattern",
+    "description": "Clippy lint <code>unneeded_struct_pattern</code>."
+  },
+  {
+    "key": "unnested_or_patterns",
+    "name": "unnested_or_patterns",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnested_or_patterns",
+    "description": "Clippy lint <code>unnested_or_patterns</code>."
+  },
+  {
+    "key": "unsafe_removed_from_name",
+    "name": "unsafe_removed_from_name",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unsafe_removed_from_name",
+    "description": "Clippy lint <code>unsafe_removed_from_name</code>."
+  },
+  {
+    "key": "unused_async",
+    "name": "unused_async",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_async",
+    "description": "Clippy lint <code>unused_async</code>."
+  },
+  {
+    "key": "unused_io_amount",
+    "name": "unused_io_amount",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_io_amount",
+    "description": "Clippy lint <code>unused_io_amount</code>."
+  },
+  {
+    "key": "unused_peekable",
+    "name": "unused_peekable",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_peekable",
+    "description": "Clippy lint <code>unused_peekable</code>."
+  },
+  {
+    "key": "unused_result_ok",
+    "name": "unused_result_ok",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_result_ok",
+    "description": "Clippy lint <code>unused_result_ok</code>."
+  },
+  {
+    "key": "unused_rounding",
+    "name": "unused_rounding",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_rounding",
+    "description": "Clippy lint <code>unused_rounding</code>."
+  },
+  {
+    "key": "unused_self",
+    "name": "unused_self",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_self",
+    "description": "Clippy lint <code>unused_self</code>."
+  },
+  {
+    "key": "unused_trait_names",
+    "name": "unused_trait_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_trait_names",
+    "description": "Clippy lint <code>unused_trait_names</code>."
+  },
+  {
+    "key": "unused_unit",
+    "name": "unused_unit",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_unit",
+    "description": "Clippy lint <code>unused_unit</code>."
+  },
+  {
+    "key": "unnecessary_unwrap",
+    "name": "unnecessary_unwrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_unwrap",
+    "description": "Clippy lint <code>unnecessary_unwrap</code>."
+  },
+  {
+    "key": "panicking_unwrap",
+    "name": "panicking_unwrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#panicking_unwrap",
+    "description": "Clippy lint <code>panicking_unwrap</code>."
+  },
+  {
+    "key": "unwrap_in_result",
+    "name": "unwrap_in_result",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_in_result",
+    "description": "Clippy lint <code>unwrap_in_result</code>."
+  },
+  {
+    "key": "upper_case_acronyms",
+    "name": "upper_case_acronyms",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#upper_case_acronyms",
+    "description": "Clippy lint <code>upper_case_acronyms</code>."
+  },
+  {
+    "key": "use_self",
+    "name": "use_self",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#use_self",
+    "description": "Clippy lint <code>use_self</code>."
+  },
+  {
+    "key": "useless_conversion",
+    "name": "useless_conversion",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_conversion",
+    "description": "Clippy lint <code>useless_conversion</code>."
+  },
+  {
+    "key": "useless_vec",
+    "name": "useless_vec",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_vec",
+    "description": "Clippy lint <code>useless_vec</code>."
+  },
+  {
+    "key": "vec_init_then_push",
+    "name": "vec_init_then_push",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#vec_init_then_push",
+    "description": "Clippy lint <code>vec_init_then_push</code>."
+  },
+  {
+    "key": "needless_pub_self",
+    "name": "needless_pub_self",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_pub_self",
+    "description": "Clippy lint <code>needless_pub_self</code>."
+  },
+  {
+    "key": "pub_with_shorthand",
+    "name": "pub_with_shorthand",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pub_with_shorthand",
+    "description": "Clippy lint <code>pub_with_shorthand</code>."
+  },
+  {
+    "key": "pub_without_shorthand",
+    "name": "pub_without_shorthand",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#pub_without_shorthand",
+    "description": "Clippy lint <code>pub_without_shorthand</code>."
+  },
+  {
+    "key": "enum_glob_use",
+    "name": "enum_glob_use",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#enum_glob_use",
+    "description": "Clippy lint <code>enum_glob_use</code>."
+  },
+  {
+    "key": "wildcard_imports",
+    "name": "wildcard_imports",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_imports",
+    "description": "Clippy lint <code>wildcard_imports</code>."
+  },
+  {
+    "key": "println_empty_string",
+    "name": "println_empty_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#println_empty_string",
+    "description": "Clippy lint <code>println_empty_string</code>."
+  },
+  {
+    "key": "print_with_newline",
+    "name": "print_with_newline",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#print_with_newline",
+    "description": "Clippy lint <code>print_with_newline</code>."
+  },
+  {
+    "key": "print_stdout",
+    "name": "print_stdout",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#print_stdout",
+    "description": "Clippy lint <code>print_stdout</code>."
+  },
+  {
+    "key": "print_stderr",
+    "name": "print_stderr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#print_stderr",
+    "description": "Clippy lint <code>print_stderr</code>."
+  },
+  {
+    "key": "use_debug",
+    "name": "use_debug",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#use_debug",
+    "description": "Clippy lint <code>use_debug</code>."
+  },
+  {
+    "key": "print_literal",
+    "name": "print_literal",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#print_literal",
+    "description": "Clippy lint <code>print_literal</code>."
+  },
+  {
+    "key": "writeln_empty_string",
+    "name": "writeln_empty_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#writeln_empty_string",
+    "description": "Clippy lint <code>writeln_empty_string</code>."
+  },
+  {
+    "key": "write_with_newline",
+    "name": "write_with_newline",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#write_with_newline",
+    "description": "Clippy lint <code>write_with_newline</code>."
+  },
+  {
+    "key": "write_literal",
+    "name": "write_literal",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#write_literal",
+    "description": "Clippy lint <code>write_literal</code>."
+  },
+  {
+    "key": "zero_divided_by_zero",
+    "name": "zero_divided_by_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zero_divided_by_zero",
+    "description": "Clippy lint <code>zero_divided_by_zero</code>."
+  },
+  {
+    "key": "zero_repeat_side_effects",
+    "name": "zero_repeat_side_effects",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zero_repeat_side_effects",
+    "description": "Clippy lint <code>zero_repeat_side_effects</code>."
+  },
+  {
+    "key": "zero_sized_map_values",
+    "name": "zero_sized_map_values",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zero_sized_map_values",
+    "description": "Clippy lint <code>zero_sized_map_values</code>."
+  },
+  {
+    "key": "zombie_processes",
+    "name": "zombie_processes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zombie_processes",
+    "description": "Clippy lint <code>zombie_processes</code>."
+  },
+  {
+    "key": "inline_always",
+    "name": "inline_always",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inline_always",
+    "description": "Clippy lint <code>inline_always</code>."
+  },
+  {
+    "key": "useless_attribute",
+    "name": "useless_attribute",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_attribute",
+    "description": "Clippy lint <code>useless_attribute</code>."
+  },
+  {
+    "key": "deprecated_semver",
+    "name": "deprecated_semver",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#deprecated_semver",
+    "description": "Clippy lint <code>deprecated_semver</code>."
+  },
+  {
+    "key": "blanket_clippy_restriction_lints",
+    "name": "blanket_clippy_restriction_lints",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#blanket_clippy_restriction_lints",
+    "description": "Clippy lint <code>blanket_clippy_restriction_lints</code>."
+  },
+  {
+    "key": "deprecated_cfg_attr",
+    "name": "deprecated_cfg_attr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#deprecated_cfg_attr",
+    "description": "Clippy lint <code>deprecated_cfg_attr</code>."
+  },
+  {
+    "key": "allow_attributes_without_reason",
+    "name": "allow_attributes_without_reason",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#allow_attributes_without_reason",
+    "description": "Clippy lint <code>allow_attributes_without_reason</code>."
+  },
+  {
+    "key": "allow_attributes",
+    "name": "allow_attributes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#allow_attributes",
+    "description": "Clippy lint <code>allow_attributes</code>."
+  },
+  {
+    "key": "should_panic_without_expect",
+    "name": "should_panic_without_expect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#should_panic_without_expect",
+    "description": "Clippy lint <code>should_panic_without_expect</code>."
+  },
+  {
+    "key": "repr_packed_without_abi",
+    "name": "repr_packed_without_abi",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#repr_packed_without_abi",
+    "description": "Clippy lint <code>repr_packed_without_abi</code>."
+  },
+  {
+    "key": "non_minimal_cfg",
+    "name": "non_minimal_cfg",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#non_minimal_cfg",
+    "description": "Clippy lint <code>non_minimal_cfg</code>."
+  },
+  {
+    "key": "deprecated_clippy_cfg_attr",
+    "name": "deprecated_clippy_cfg_attr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#deprecated_clippy_cfg_attr",
+    "description": "Clippy lint <code>deprecated_clippy_cfg_attr</code>."
+  },
+  {
+    "key": "unnecessary_clippy_cfg",
+    "name": "unnecessary_clippy_cfg",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_clippy_cfg",
+    "description": "Clippy lint <code>unnecessary_clippy_cfg</code>."
+  },
+  {
+    "key": "mixed_attributes_style",
+    "name": "mixed_attributes_style",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mixed_attributes_style",
+    "description": "Clippy lint <code>mixed_attributes_style</code>."
+  },
+  {
+    "key": "duplicated_attributes",
+    "name": "duplicated_attributes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#duplicated_attributes",
+    "description": "Clippy lint <code>duplicated_attributes</code>."
+  },
+  {
+    "key": "cargo_common_metadata",
+    "name": "cargo_common_metadata",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cargo_common_metadata",
+    "description": "Clippy lint <code>cargo_common_metadata</code>."
+  },
+  {
+    "key": "redundant_feature_names",
+    "name": "redundant_feature_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_feature_names",
+    "description": "Clippy lint <code>redundant_feature_names</code>."
+  },
+  {
+    "key": "negative_feature_names",
+    "name": "negative_feature_names",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#negative_feature_names",
+    "description": "Clippy lint <code>negative_feature_names</code>."
+  },
+  {
+    "key": "multiple_crate_versions",
+    "name": "multiple_crate_versions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#multiple_crate_versions",
+    "description": "Clippy lint <code>multiple_crate_versions</code>."
+  },
+  {
+    "key": "wildcard_dependencies",
+    "name": "wildcard_dependencies",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_dependencies",
+    "description": "Clippy lint <code>wildcard_dependencies</code>."
+  },
+  {
+    "key": "lint_groups_priority",
+    "name": "lint_groups_priority",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#lint_groups_priority",
+    "description": "Clippy lint <code>lint_groups_priority</code>."
+  },
+  {
+    "key": "cast_precision_loss",
+    "name": "cast_precision_loss",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_precision_loss",
+    "description": "Clippy lint <code>cast_precision_loss</code>."
+  },
+  {
+    "key": "cast_sign_loss",
+    "name": "cast_sign_loss",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_sign_loss",
+    "description": "Clippy lint <code>cast_sign_loss</code>."
+  },
+  {
+    "key": "cast_possible_truncation",
+    "name": "cast_possible_truncation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_possible_truncation",
+    "description": "Clippy lint <code>cast_possible_truncation</code>."
+  },
+  {
+    "key": "cast_possible_wrap",
+    "name": "cast_possible_wrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_possible_wrap",
+    "description": "Clippy lint <code>cast_possible_wrap</code>."
+  },
+  {
+    "key": "cast_lossless",
+    "name": "cast_lossless",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_lossless",
+    "description": "Clippy lint <code>cast_lossless</code>."
+  },
+  {
+    "key": "unnecessary_cast",
+    "name": "unnecessary_cast",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_cast",
+    "description": "Clippy lint <code>unnecessary_cast</code>."
+  },
+  {
+    "key": "cast_ptr_alignment",
+    "name": "cast_ptr_alignment",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_ptr_alignment",
+    "description": "Clippy lint <code>cast_ptr_alignment</code>."
+  },
+  {
+    "key": "fn_to_numeric_cast",
+    "name": "fn_to_numeric_cast",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#fn_to_numeric_cast",
+    "description": "Clippy lint <code>fn_to_numeric_cast</code>."
+  },
+  {
+    "key": "fn_to_numeric_cast_with_truncation",
+    "name": "fn_to_numeric_cast_with_truncation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#fn_to_numeric_cast_with_truncation",
+    "description": "Clippy lint <code>fn_to_numeric_cast_with_truncation</code>."
+  },
+  {
+    "key": "fn_to_numeric_cast_any",
+    "name": "fn_to_numeric_cast_any",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#fn_to_numeric_cast_any",
+    "description": "Clippy lint <code>fn_to_numeric_cast_any</code>."
+  },
+  {
+    "key": "char_lit_as_u8",
+    "name": "char_lit_as_u8",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#char_lit_as_u8",
+    "description": "Clippy lint <code>char_lit_as_u8</code>."
+  },
+  {
+    "key": "ptr_as_ptr",
+    "name": "ptr_as_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ptr_as_ptr",
+    "description": "Clippy lint <code>ptr_as_ptr</code>."
+  },
+  {
+    "key": "ptr_cast_constness",
+    "name": "ptr_cast_constness",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ptr_cast_constness",
+    "description": "Clippy lint <code>ptr_cast_constness</code>."
+  },
+  {
+    "key": "cast_enum_truncation",
+    "name": "cast_enum_truncation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_enum_truncation",
+    "description": "Clippy lint <code>cast_enum_truncation</code>."
+  },
+  {
+    "key": "cast_slice_different_sizes",
+    "name": "cast_slice_different_sizes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_slice_different_sizes",
+    "description": "Clippy lint <code>cast_slice_different_sizes</code>."
+  },
+  {
+    "key": "cast_enum_constructor",
+    "name": "cast_enum_constructor",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_enum_constructor",
+    "description": "Clippy lint <code>cast_enum_constructor</code>."
+  },
+  {
+    "key": "cast_abs_to_unsigned",
+    "name": "cast_abs_to_unsigned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_abs_to_unsigned",
+    "description": "Clippy lint <code>cast_abs_to_unsigned</code>."
+  },
+  {
+    "key": "as_underscore",
+    "name": "as_underscore",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#as_underscore",
+    "description": "Clippy lint <code>as_underscore</code>."
+  },
+  {
+    "key": "borrow_as_ptr",
+    "name": "borrow_as_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#borrow_as_ptr",
+    "description": "Clippy lint <code>borrow_as_ptr</code>."
+  },
+  {
+    "key": "cast_slice_from_raw_parts",
+    "name": "cast_slice_from_raw_parts",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_slice_from_raw_parts",
+    "description": "Clippy lint <code>cast_slice_from_raw_parts</code>."
+  },
+  {
+    "key": "as_ptr_cast_mut",
+    "name": "as_ptr_cast_mut",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#as_ptr_cast_mut",
+    "description": "Clippy lint <code>as_ptr_cast_mut</code>."
+  },
+  {
+    "key": "cast_nan_to_int",
+    "name": "cast_nan_to_int",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cast_nan_to_int",
+    "description": "Clippy lint <code>cast_nan_to_int</code>."
+  },
+  {
+    "key": "zero_ptr",
+    "name": "zero_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zero_ptr",
+    "description": "Clippy lint <code>zero_ptr</code>."
+  },
+  {
+    "key": "ref_as_ptr",
+    "name": "ref_as_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ref_as_ptr",
+    "description": "Clippy lint <code>ref_as_ptr</code>."
+  },
+  {
+    "key": "as_pointer_underscore",
+    "name": "as_pointer_underscore",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#as_pointer_underscore",
+    "description": "Clippy lint <code>as_pointer_underscore</code>."
+  },
+  {
+    "key": "doc_markdown",
+    "name": "doc_markdown",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#doc_markdown",
+    "description": "Clippy lint <code>doc_markdown</code>."
+  },
+  {
+    "key": "missing_safety_doc",
+    "name": "missing_safety_doc",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_safety_doc",
+    "description": "Clippy lint <code>missing_safety_doc</code>."
+  },
+  {
+    "key": "missing_errors_doc",
+    "name": "missing_errors_doc",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_errors_doc",
+    "description": "Clippy lint <code>missing_errors_doc</code>."
+  },
+  {
+    "key": "missing_panics_doc",
+    "name": "missing_panics_doc",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_panics_doc",
+    "description": "Clippy lint <code>missing_panics_doc</code>."
+  },
+  {
+    "key": "needless_doctest_main",
+    "name": "needless_doctest_main",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_doctest_main",
+    "description": "Clippy lint <code>needless_doctest_main</code>."
+  },
+  {
+    "key": "test_attr_in_doctest",
+    "name": "test_attr_in_doctest",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#test_attr_in_doctest",
+    "description": "Clippy lint <code>test_attr_in_doctest</code>."
+  },
+  {
+    "key": "doc_link_with_quotes",
+    "name": "doc_link_with_quotes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#doc_link_with_quotes",
+    "description": "Clippy lint <code>doc_link_with_quotes</code>."
+  },
+  {
+    "key": "unnecessary_safety_doc",
+    "name": "unnecessary_safety_doc",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_safety_doc",
+    "description": "Clippy lint <code>unnecessary_safety_doc</code>."
+  },
+  {
+    "key": "suspicious_doc_comments",
+    "name": "suspicious_doc_comments",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_doc_comments",
+    "description": "Clippy lint <code>suspicious_doc_comments</code>."
+  },
+  {
+    "key": "empty_docs",
+    "name": "empty_docs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_docs",
+    "description": "Clippy lint <code>empty_docs</code>."
+  },
+  {
+    "key": "doc_lazy_continuation",
+    "name": "doc_lazy_continuation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#doc_lazy_continuation",
+    "description": "Clippy lint <code>doc_lazy_continuation</code>."
+  },
+  {
+    "key": "doc_overindented_list_items",
+    "name": "doc_overindented_list_items",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#doc_overindented_list_items",
+    "description": "Clippy lint <code>doc_overindented_list_items</code>."
+  },
+  {
+    "key": "too_long_first_doc_paragraph",
+    "name": "too_long_first_doc_paragraph",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#too_long_first_doc_paragraph",
+    "description": "Clippy lint <code>too_long_first_doc_paragraph</code>."
+  },
+  {
+    "key": "empty_line_after_outer_attr",
+    "name": "empty_line_after_outer_attr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_line_after_outer_attr",
+    "description": "Clippy lint <code>empty_line_after_outer_attr</code>."
+  },
+  {
+    "key": "empty_line_after_doc_comments",
+    "name": "empty_line_after_doc_comments",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_line_after_doc_comments",
+    "description": "Clippy lint <code>empty_line_after_doc_comments</code>."
+  },
+  {
+    "key": "doc_include_without_cfg",
+    "name": "doc_include_without_cfg",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#doc_include_without_cfg",
+    "description": "Clippy lint <code>doc_include_without_cfg</code>."
+  },
+  {
+    "key": "doc_nested_refdefs",
+    "name": "doc_nested_refdefs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#doc_nested_refdefs",
+    "description": "Clippy lint <code>doc_nested_refdefs</code>."
+  },
+  {
+    "key": "too_many_arguments",
+    "name": "too_many_arguments",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments",
+    "description": "Clippy lint <code>too_many_arguments</code>."
+  },
+  {
+    "key": "too_many_lines",
+    "name": "too_many_lines",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#too_many_lines",
+    "description": "Clippy lint <code>too_many_lines</code>."
+  },
+  {
+    "key": "not_unsafe_ptr_arg_deref",
+    "name": "not_unsafe_ptr_arg_deref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#not_unsafe_ptr_arg_deref",
+    "description": "Clippy lint <code>not_unsafe_ptr_arg_deref</code>."
+  },
+  {
+    "key": "must_use_unit",
+    "name": "must_use_unit",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#must_use_unit",
+    "description": "Clippy lint <code>must_use_unit</code>."
+  },
+  {
+    "key": "double_must_use",
+    "name": "double_must_use",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#double_must_use",
+    "description": "Clippy lint <code>double_must_use</code>."
+  },
+  {
+    "key": "must_use_candidate",
+    "name": "must_use_candidate",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#must_use_candidate",
+    "description": "Clippy lint <code>must_use_candidate</code>."
+  },
+  {
+    "key": "result_unit_err",
+    "name": "result_unit_err",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#result_unit_err",
+    "description": "Clippy lint <code>result_unit_err</code>."
+  },
+  {
+    "key": "result_large_err",
+    "name": "result_large_err",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#result_large_err",
+    "description": "Clippy lint <code>result_large_err</code>."
+  },
+  {
+    "key": "misnamed_getters",
+    "name": "misnamed_getters",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#misnamed_getters",
+    "description": "Clippy lint <code>misnamed_getters</code>."
+  },
+  {
+    "key": "impl_trait_in_params",
+    "name": "impl_trait_in_params",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#impl_trait_in_params",
+    "description": "Clippy lint <code>impl_trait_in_params</code>."
+  },
+  {
+    "key": "renamed_function_params",
+    "name": "renamed_function_params",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#renamed_function_params",
+    "description": "Clippy lint <code>renamed_function_params</code>."
+  },
+  {
+    "key": "ref_option",
+    "name": "ref_option",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ref_option",
+    "description": "Clippy lint <code>ref_option</code>."
+  },
+  {
+    "key": "manual_memcpy",
+    "name": "manual_memcpy",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_memcpy",
+    "description": "Clippy lint <code>manual_memcpy</code>."
+  },
+  {
+    "key": "needless_range_loop",
+    "name": "needless_range_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_range_loop",
+    "description": "Clippy lint <code>needless_range_loop</code>."
+  },
+  {
+    "key": "explicit_iter_loop",
+    "name": "explicit_iter_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#explicit_iter_loop",
+    "description": "Clippy lint <code>explicit_iter_loop</code>."
+  },
+  {
+    "key": "explicit_into_iter_loop",
+    "name": "explicit_into_iter_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#explicit_into_iter_loop",
+    "description": "Clippy lint <code>explicit_into_iter_loop</code>."
+  },
+  {
+    "key": "iter_next_loop",
+    "name": "iter_next_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_next_loop",
+    "description": "Clippy lint <code>iter_next_loop</code>."
+  },
+  {
+    "key": "while_let_loop",
+    "name": "while_let_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#while_let_loop",
+    "description": "Clippy lint <code>while_let_loop</code>."
+  },
+  {
+    "key": "explicit_counter_loop",
+    "name": "explicit_counter_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#explicit_counter_loop",
+    "description": "Clippy lint <code>explicit_counter_loop</code>."
+  },
+  {
+    "key": "empty_loop",
+    "name": "empty_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#empty_loop",
+    "description": "Clippy lint <code>empty_loop</code>."
+  },
+  {
+    "key": "while_let_on_iterator",
+    "name": "while_let_on_iterator",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#while_let_on_iterator",
+    "description": "Clippy lint <code>while_let_on_iterator</code>."
+  },
+  {
+    "key": "for_kv_map",
+    "name": "for_kv_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#for_kv_map",
+    "description": "Clippy lint <code>for_kv_map</code>."
+  },
+  {
+    "key": "never_loop",
+    "name": "never_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#never_loop",
+    "description": "Clippy lint <code>never_loop</code>."
+  },
+  {
+    "key": "mut_range_bound",
+    "name": "mut_range_bound",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mut_range_bound",
+    "description": "Clippy lint <code>mut_range_bound</code>."
+  },
+  {
+    "key": "while_immutable_condition",
+    "name": "while_immutable_condition",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#while_immutable_condition",
+    "description": "Clippy lint <code>while_immutable_condition</code>."
+  },
+  {
+    "key": "while_float",
+    "name": "while_float",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#while_float",
+    "description": "Clippy lint <code>while_float</code>."
+  },
+  {
+    "key": "same_item_push",
+    "name": "same_item_push",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#same_item_push",
+    "description": "Clippy lint <code>same_item_push</code>."
+  },
+  {
+    "key": "single_element_loop",
+    "name": "single_element_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_element_loop",
+    "description": "Clippy lint <code>single_element_loop</code>."
+  },
+  {
+    "key": "manual_flatten",
+    "name": "manual_flatten",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_flatten",
+    "description": "Clippy lint <code>manual_flatten</code>."
+  },
+  {
+    "key": "missing_spin_loop",
+    "name": "missing_spin_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_spin_loop",
+    "description": "Clippy lint <code>missing_spin_loop</code>."
+  },
+  {
+    "key": "manual_find",
+    "name": "manual_find",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_find",
+    "description": "Clippy lint <code>manual_find</code>."
+  },
+  {
+    "key": "unused_enumerate_index",
+    "name": "unused_enumerate_index",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_enumerate_index",
+    "description": "Clippy lint <code>unused_enumerate_index</code>."
+  },
+  {
+    "key": "manual_while_let_some",
+    "name": "manual_while_let_some",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_while_let_some",
+    "description": "Clippy lint <code>manual_while_let_some</code>."
+  },
+  {
+    "key": "infinite_loop",
+    "name": "infinite_loop",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#infinite_loop",
+    "description": "Clippy lint <code>infinite_loop</code>."
+  },
+  {
+    "key": "manual_slice_fill",
+    "name": "manual_slice_fill",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_slice_fill",
+    "description": "Clippy lint <code>manual_slice_fill</code>."
+  },
+  {
+    "key": "single_match",
+    "name": "single_match",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_match",
+    "description": "Clippy lint <code>single_match</code>."
+  },
+  {
+    "key": "single_match_else",
+    "name": "single_match_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_match_else",
+    "description": "Clippy lint <code>single_match_else</code>."
+  },
+  {
+    "key": "match_ref_pats",
+    "name": "match_ref_pats",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_ref_pats",
+    "description": "Clippy lint <code>match_ref_pats</code>."
+  },
+  {
+    "key": "match_bool",
+    "name": "match_bool",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_bool",
+    "description": "Clippy lint <code>match_bool</code>."
+  },
+  {
+    "key": "match_overlapping_arm",
+    "name": "match_overlapping_arm",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_overlapping_arm",
+    "description": "Clippy lint <code>match_overlapping_arm</code>."
+  },
+  {
+    "key": "match_wild_err_arm",
+    "name": "match_wild_err_arm",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_wild_err_arm",
+    "description": "Clippy lint <code>match_wild_err_arm</code>."
+  },
+  {
+    "key": "match_as_ref",
+    "name": "match_as_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_as_ref",
+    "description": "Clippy lint <code>match_as_ref</code>."
+  },
+  {
+    "key": "wildcard_enum_match_arm",
+    "name": "wildcard_enum_match_arm",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_enum_match_arm",
+    "description": "Clippy lint <code>wildcard_enum_match_arm</code>."
+  },
+  {
+    "key": "match_wildcard_for_single_variants",
+    "name": "match_wildcard_for_single_variants",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_wildcard_for_single_variants",
+    "description": "Clippy lint <code>match_wildcard_for_single_variants</code>."
+  },
+  {
+    "key": "wildcard_in_or_patterns",
+    "name": "wildcard_in_or_patterns",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_in_or_patterns",
+    "description": "Clippy lint <code>wildcard_in_or_patterns</code>."
+  },
+  {
+    "key": "infallible_destructuring_match",
+    "name": "infallible_destructuring_match",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#infallible_destructuring_match",
+    "description": "Clippy lint <code>infallible_destructuring_match</code>."
+  },
+  {
+    "key": "match_single_binding",
+    "name": "match_single_binding",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_single_binding",
+    "description": "Clippy lint <code>match_single_binding</code>."
+  },
+  {
+    "key": "rest_pat_in_fully_bound_structs",
+    "name": "rest_pat_in_fully_bound_structs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#rest_pat_in_fully_bound_structs",
+    "description": "Clippy lint <code>rest_pat_in_fully_bound_structs</code>."
+  },
+  {
+    "key": "redundant_pattern_matching",
+    "name": "redundant_pattern_matching",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_pattern_matching",
+    "description": "Clippy lint <code>redundant_pattern_matching</code>."
+  },
+  {
+    "key": "match_like_matches_macro",
+    "name": "match_like_matches_macro",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_like_matches_macro",
+    "description": "Clippy lint <code>match_like_matches_macro</code>."
+  },
+  {
+    "key": "match_same_arms",
+    "name": "match_same_arms",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_same_arms",
+    "description": "Clippy lint <code>match_same_arms</code>."
+  },
+  {
+    "key": "needless_match",
+    "name": "needless_match",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_match",
+    "description": "Clippy lint <code>needless_match</code>."
+  },
+  {
+    "key": "collapsible_match",
+    "name": "collapsible_match",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_match",
+    "description": "Clippy lint <code>collapsible_match</code>."
+  },
+  {
+    "key": "manual_unwrap_or",
+    "name": "manual_unwrap_or",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_unwrap_or",
+    "description": "Clippy lint <code>manual_unwrap_or</code>."
+  },
+  {
+    "key": "match_on_vec_items",
+    "name": "match_on_vec_items",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_on_vec_items",
+    "description": "Clippy lint <code>match_on_vec_items</code>."
+  },
+  {
+    "key": "match_str_case_mismatch",
+    "name": "match_str_case_mismatch",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#match_str_case_mismatch",
+    "description": "Clippy lint <code>match_str_case_mismatch</code>."
+  },
+  {
+    "key": "significant_drop_in_scrutinee",
+    "name": "significant_drop_in_scrutinee",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#significant_drop_in_scrutinee",
+    "description": "Clippy lint <code>significant_drop_in_scrutinee</code>."
+  },
+  {
+    "key": "try_err",
+    "name": "try_err",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#try_err",
+    "description": "Clippy lint <code>try_err</code>."
+  },
+  {
+    "key": "manual_map",
+    "name": "manual_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_map",
+    "description": "Clippy lint <code>manual_map</code>."
+  },
+  {
+    "key": "manual_filter",
+    "name": "manual_filter",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_filter",
+    "description": "Clippy lint <code>manual_filter</code>."
+  },
+  {
+    "key": "redundant_guards",
+    "name": "redundant_guards",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_guards",
+    "description": "Clippy lint <code>redundant_guards</code>."
+  },
+  {
+    "key": "manual_ok_err",
+    "name": "manual_ok_err",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_ok_err",
+    "description": "Clippy lint <code>manual_ok_err</code>."
+  },
+  {
+    "key": "cloned_instead_of_copied",
+    "name": "cloned_instead_of_copied",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cloned_instead_of_copied",
+    "description": "Clippy lint <code>cloned_instead_of_copied</code>."
+  },
+  {
+    "key": "collapsible_str_replace",
+    "name": "collapsible_str_replace",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#collapsible_str_replace",
+    "description": "Clippy lint <code>collapsible_str_replace</code>."
+  },
+  {
+    "key": "iter_overeager_cloned",
+    "name": "iter_overeager_cloned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_overeager_cloned",
+    "description": "Clippy lint <code>iter_overeager_cloned</code>."
+  },
+  {
+    "key": "flat_map_option",
+    "name": "flat_map_option",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#flat_map_option",
+    "description": "Clippy lint <code>flat_map_option</code>."
+  },
+  {
+    "key": "unwrap_used",
+    "name": "unwrap_used",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_used",
+    "description": "Clippy lint <code>unwrap_used</code>."
+  },
+  {
+    "key": "unnecessary_literal_unwrap",
+    "name": "unnecessary_literal_unwrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_literal_unwrap",
+    "description": "Clippy lint <code>unnecessary_literal_unwrap</code>."
+  },
+  {
+    "key": "expect_used",
+    "name": "expect_used",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#expect_used",
+    "description": "Clippy lint <code>expect_used</code>."
+  },
+  {
+    "key": "should_implement_trait",
+    "name": "should_implement_trait",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#should_implement_trait",
+    "description": "Clippy lint <code>should_implement_trait</code>."
+  },
+  {
+    "key": "wrong_self_convention",
+    "name": "wrong_self_convention",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wrong_self_convention",
+    "description": "Clippy lint <code>wrong_self_convention</code>."
+  },
+  {
+    "key": "ok_expect",
+    "name": "ok_expect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ok_expect",
+    "description": "Clippy lint <code>ok_expect</code>."
+  },
+  {
+    "key": "err_expect",
+    "name": "err_expect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#err_expect",
+    "description": "Clippy lint <code>err_expect</code>."
+  },
+  {
+    "key": "unwrap_or_default",
+    "name": "unwrap_or_default",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unwrap_or_default",
+    "description": "Clippy lint <code>unwrap_or_default</code>."
+  },
+  {
+    "key": "map_unwrap_or",
+    "name": "map_unwrap_or",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_unwrap_or",
+    "description": "Clippy lint <code>map_unwrap_or</code>."
+  },
+  {
+    "key": "option_map_or_none",
+    "name": "option_map_or_none",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_map_or_none",
+    "description": "Clippy lint <code>option_map_or_none</code>."
+  },
+  {
+    "key": "result_map_or_into_option",
+    "name": "result_map_or_into_option",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#result_map_or_into_option",
+    "description": "Clippy lint <code>result_map_or_into_option</code>."
+  },
+  {
+    "key": "bind_instead_of_map",
+    "name": "bind_instead_of_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bind_instead_of_map",
+    "description": "Clippy lint <code>bind_instead_of_map</code>."
+  },
+  {
+    "key": "filter_next",
+    "name": "filter_next",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#filter_next",
+    "description": "Clippy lint <code>filter_next</code>."
+  },
+  {
+    "key": "skip_while_next",
+    "name": "skip_while_next",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#skip_while_next",
+    "description": "Clippy lint <code>skip_while_next</code>."
+  },
+  {
+    "key": "map_flatten",
+    "name": "map_flatten",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_flatten",
+    "description": "Clippy lint <code>map_flatten</code>."
+  },
+  {
+    "key": "manual_filter_map",
+    "name": "manual_filter_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_filter_map",
+    "description": "Clippy lint <code>manual_filter_map</code>."
+  },
+  {
+    "key": "manual_find_map",
+    "name": "manual_find_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_find_map",
+    "description": "Clippy lint <code>manual_find_map</code>."
+  },
+  {
+    "key": "filter_map_next",
+    "name": "filter_map_next",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#filter_map_next",
+    "description": "Clippy lint <code>filter_map_next</code>."
+  },
+  {
+    "key": "flat_map_identity",
+    "name": "flat_map_identity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#flat_map_identity",
+    "description": "Clippy lint <code>flat_map_identity</code>."
+  },
+  {
+    "key": "search_is_some",
+    "name": "search_is_some",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#search_is_some",
+    "description": "Clippy lint <code>search_is_some</code>."
+  },
+  {
+    "key": "chars_next_cmp",
+    "name": "chars_next_cmp",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#chars_next_cmp",
+    "description": "Clippy lint <code>chars_next_cmp</code>."
+  },
+  {
+    "key": "or_fun_call",
+    "name": "or_fun_call",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#or_fun_call",
+    "description": "Clippy lint <code>or_fun_call</code>."
+  },
+  {
+    "key": "or_then_unwrap",
+    "name": "or_then_unwrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#or_then_unwrap",
+    "description": "Clippy lint <code>or_then_unwrap</code>."
+  },
+  {
+    "key": "expect_fun_call",
+    "name": "expect_fun_call",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#expect_fun_call",
+    "description": "Clippy lint <code>expect_fun_call</code>."
+  },
+  {
+    "key": "clone_on_copy",
+    "name": "clone_on_copy",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#clone_on_copy",
+    "description": "Clippy lint <code>clone_on_copy</code>."
+  },
+  {
+    "key": "clone_on_ref_ptr",
+    "name": "clone_on_ref_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#clone_on_ref_ptr",
+    "description": "Clippy lint <code>clone_on_ref_ptr</code>."
+  },
+  {
+    "key": "inefficient_to_string",
+    "name": "inefficient_to_string",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inefficient_to_string",
+    "description": "Clippy lint <code>inefficient_to_string</code>."
+  },
+  {
+    "key": "new_ret_no_self",
+    "name": "new_ret_no_self",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#new_ret_no_self",
+    "description": "Clippy lint <code>new_ret_no_self</code>."
+  },
+  {
+    "key": "iterator_step_by_zero",
+    "name": "iterator_step_by_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iterator_step_by_zero",
+    "description": "Clippy lint <code>iterator_step_by_zero</code>."
+  },
+  {
+    "key": "option_filter_map",
+    "name": "option_filter_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_filter_map",
+    "description": "Clippy lint <code>option_filter_map</code>."
+  },
+  {
+    "key": "iter_nth_zero",
+    "name": "iter_nth_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_nth_zero",
+    "description": "Clippy lint <code>iter_nth_zero</code>."
+  },
+  {
+    "key": "iter_nth",
+    "name": "iter_nth",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_nth",
+    "description": "Clippy lint <code>iter_nth</code>."
+  },
+  {
+    "key": "iter_skip_next",
+    "name": "iter_skip_next",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_skip_next",
+    "description": "Clippy lint <code>iter_skip_next</code>."
+  },
+  {
+    "key": "iter_with_drain",
+    "name": "iter_with_drain",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_with_drain",
+    "description": "Clippy lint <code>iter_with_drain</code>."
+  },
+  {
+    "key": "get_last_with_len",
+    "name": "get_last_with_len",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#get_last_with_len",
+    "description": "Clippy lint <code>get_last_with_len</code>."
+  },
+  {
+    "key": "get_unwrap",
+    "name": "get_unwrap",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#get_unwrap",
+    "description": "Clippy lint <code>get_unwrap</code>."
+  },
+  {
+    "key": "extend_with_drain",
+    "name": "extend_with_drain",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#extend_with_drain",
+    "description": "Clippy lint <code>extend_with_drain</code>."
+  },
+  {
+    "key": "string_extend_chars",
+    "name": "string_extend_chars",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_extend_chars",
+    "description": "Clippy lint <code>string_extend_chars</code>."
+  },
+  {
+    "key": "iter_cloned_collect",
+    "name": "iter_cloned_collect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_cloned_collect",
+    "description": "Clippy lint <code>iter_cloned_collect</code>."
+  },
+  {
+    "key": "chars_last_cmp",
+    "name": "chars_last_cmp",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#chars_last_cmp",
+    "description": "Clippy lint <code>chars_last_cmp</code>."
+  },
+  {
+    "key": "useless_asref",
+    "name": "useless_asref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_asref",
+    "description": "Clippy lint <code>useless_asref</code>."
+  },
+  {
+    "key": "unnecessary_fold",
+    "name": "unnecessary_fold",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_fold",
+    "description": "Clippy lint <code>unnecessary_fold</code>."
+  },
+  {
+    "key": "unnecessary_filter_map",
+    "name": "unnecessary_filter_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_filter_map",
+    "description": "Clippy lint <code>unnecessary_filter_map</code>."
+  },
+  {
+    "key": "unnecessary_find_map",
+    "name": "unnecessary_find_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_find_map",
+    "description": "Clippy lint <code>unnecessary_find_map</code>."
+  },
+  {
+    "key": "into_iter_on_ref",
+    "name": "into_iter_on_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#into_iter_on_ref",
+    "description": "Clippy lint <code>into_iter_on_ref</code>."
+  },
+  {
+    "key": "suspicious_map",
+    "name": "suspicious_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_map",
+    "description": "Clippy lint <code>suspicious_map</code>."
+  },
+  {
+    "key": "uninit_assumed_init",
+    "name": "uninit_assumed_init",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#uninit_assumed_init",
+    "description": "Clippy lint <code>uninit_assumed_init</code>."
+  },
+  {
+    "key": "manual_saturating_arithmetic",
+    "name": "manual_saturating_arithmetic",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_saturating_arithmetic",
+    "description": "Clippy lint <code>manual_saturating_arithmetic</code>."
+  },
+  {
+    "key": "zst_offset",
+    "name": "zst_offset",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zst_offset",
+    "description": "Clippy lint <code>zst_offset</code>."
+  },
+  {
+    "key": "filetype_is_file",
+    "name": "filetype_is_file",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#filetype_is_file",
+    "description": "Clippy lint <code>filetype_is_file</code>."
+  },
+  {
+    "key": "option_as_ref_deref",
+    "name": "option_as_ref_deref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_as_ref_deref",
+    "description": "Clippy lint <code>option_as_ref_deref</code>."
+  },
+  {
+    "key": "iter_next_slice",
+    "name": "iter_next_slice",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_next_slice",
+    "description": "Clippy lint <code>iter_next_slice</code>."
+  },
+  {
+    "key": "single_char_add_str",
+    "name": "single_char_add_str",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#single_char_add_str",
+    "description": "Clippy lint <code>single_char_add_str</code>."
+  },
+  {
+    "key": "unnecessary_lazy_evaluations",
+    "name": "unnecessary_lazy_evaluations",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_lazy_evaluations",
+    "description": "Clippy lint <code>unnecessary_lazy_evaluations</code>."
+  },
+  {
+    "key": "map_collect_result_unit",
+    "name": "map_collect_result_unit",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_collect_result_unit",
+    "description": "Clippy lint <code>map_collect_result_unit</code>."
+  },
+  {
+    "key": "from_iter_instead_of_collect",
+    "name": "from_iter_instead_of_collect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#from_iter_instead_of_collect",
+    "description": "Clippy lint <code>from_iter_instead_of_collect</code>."
+  },
+  {
+    "key": "inspect_for_each",
+    "name": "inspect_for_each",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inspect_for_each",
+    "description": "Clippy lint <code>inspect_for_each</code>."
+  },
+  {
+    "key": "filter_map_identity",
+    "name": "filter_map_identity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#filter_map_identity",
+    "description": "Clippy lint <code>filter_map_identity</code>."
+  },
+  {
+    "key": "map_identity",
+    "name": "map_identity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_identity",
+    "description": "Clippy lint <code>map_identity</code>."
+  },
+  {
+    "key": "bytes_nth",
+    "name": "bytes_nth",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bytes_nth",
+    "description": "Clippy lint <code>bytes_nth</code>."
+  },
+  {
+    "key": "implicit_clone",
+    "name": "implicit_clone",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#implicit_clone",
+    "description": "Clippy lint <code>implicit_clone</code>."
+  },
+  {
+    "key": "iter_count",
+    "name": "iter_count",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_count",
+    "description": "Clippy lint <code>iter_count</code>."
+  },
+  {
+    "key": "suspicious_to_owned",
+    "name": "suspicious_to_owned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_to_owned",
+    "description": "Clippy lint <code>suspicious_to_owned</code>."
+  },
+  {
+    "key": "suspicious_splitn",
+    "name": "suspicious_splitn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_splitn",
+    "description": "Clippy lint <code>suspicious_splitn</code>."
+  },
+  {
+    "key": "manual_str_repeat",
+    "name": "manual_str_repeat",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_str_repeat",
+    "description": "Clippy lint <code>manual_str_repeat</code>."
+  },
+  {
+    "key": "manual_split_once",
+    "name": "manual_split_once",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_split_once",
+    "description": "Clippy lint <code>manual_split_once</code>."
+  },
+  {
+    "key": "needless_splitn",
+    "name": "needless_splitn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_splitn",
+    "description": "Clippy lint <code>needless_splitn</code>."
+  },
+  {
+    "key": "unnecessary_to_owned",
+    "name": "unnecessary_to_owned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_to_owned",
+    "description": "Clippy lint <code>unnecessary_to_owned</code>."
+  },
+  {
+    "key": "unnecessary_join",
+    "name": "unnecessary_join",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_join",
+    "description": "Clippy lint <code>unnecessary_join</code>."
+  },
+  {
+    "key": "needless_option_as_deref",
+    "name": "needless_option_as_deref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_option_as_deref",
+    "description": "Clippy lint <code>needless_option_as_deref</code>."
+  },
+  {
+    "key": "is_digit_ascii_radix",
+    "name": "is_digit_ascii_radix",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#is_digit_ascii_radix",
+    "description": "Clippy lint <code>is_digit_ascii_radix</code>."
+  },
+  {
+    "key": "needless_option_take",
+    "name": "needless_option_take",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_option_take",
+    "description": "Clippy lint <code>needless_option_take</code>."
+  },
+  {
+    "key": "no_effect_replace",
+    "name": "no_effect_replace",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#no_effect_replace",
+    "description": "Clippy lint <code>no_effect_replace</code>."
+  },
+  {
+    "key": "obfuscated_if_else",
+    "name": "obfuscated_if_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#obfuscated_if_else",
+    "description": "Clippy lint <code>obfuscated_if_else</code>."
+  },
+  {
+    "key": "iter_on_single_items",
+    "name": "iter_on_single_items",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_on_single_items",
+    "description": "Clippy lint <code>iter_on_single_items</code>."
+  },
+  {
+    "key": "iter_on_empty_collections",
+    "name": "iter_on_empty_collections",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_on_empty_collections",
+    "description": "Clippy lint <code>iter_on_empty_collections</code>."
+  },
+  {
+    "key": "naive_bytecount",
+    "name": "naive_bytecount",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#naive_bytecount",
+    "description": "Clippy lint <code>naive_bytecount</code>."
+  },
+  {
+    "key": "bytes_count_to_len",
+    "name": "bytes_count_to_len",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bytes_count_to_len",
+    "description": "Clippy lint <code>bytes_count_to_len</code>."
+  },
+  {
+    "key": "case_sensitive_file_extension_comparisons",
+    "name": "case_sensitive_file_extension_comparisons",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#case_sensitive_file_extension_comparisons",
+    "description": "Clippy lint <code>case_sensitive_file_extension_comparisons</code>."
+  },
+  {
+    "key": "get_first",
+    "name": "get_first",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#get_first",
+    "description": "Clippy lint <code>get_first</code>."
+  },
+  {
+    "key": "manual_ok_or",
+    "name": "manual_ok_or",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_ok_or",
+    "description": "Clippy lint <code>manual_ok_or</code>."
+  },
+  {
+    "key": "map_clone",
+    "name": "map_clone",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_clone",
+    "description": "Clippy lint <code>map_clone</code>."
+  },
+  {
+    "key": "map_err_ignore",
+    "name": "map_err_ignore",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_err_ignore",
+    "description": "Clippy lint <code>map_err_ignore</code>."
+  },
+  {
+    "key": "mut_mutex_lock",
+    "name": "mut_mutex_lock",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mut_mutex_lock",
+    "description": "Clippy lint <code>mut_mutex_lock</code>."
+  },
+  {
+    "key": "nonsensical_open_options",
+    "name": "nonsensical_open_options",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#nonsensical_open_options",
+    "description": "Clippy lint <code>nonsensical_open_options</code>."
+  },
+  {
+    "key": "suspicious_open_options",
+    "name": "suspicious_open_options",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_open_options",
+    "description": "Clippy lint <code>suspicious_open_options</code>."
+  },
+  {
+    "key": "path_buf_push_overwrite",
+    "name": "path_buf_push_overwrite",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#path_buf_push_overwrite",
+    "description": "Clippy lint <code>path_buf_push_overwrite</code>."
+  },
+  {
+    "key": "range_zip_with_len",
+    "name": "range_zip_with_len",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#range_zip_with_len",
+    "description": "Clippy lint <code>range_zip_with_len</code>."
+  },
+  {
+    "key": "repeat_once",
+    "name": "repeat_once",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#repeat_once",
+    "description": "Clippy lint <code>repeat_once</code>."
+  },
+  {
+    "key": "stable_sort_primitive",
+    "name": "stable_sort_primitive",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#stable_sort_primitive",
+    "description": "Clippy lint <code>stable_sort_primitive</code>."
+  },
+  {
+    "key": "type_id_on_box",
+    "name": "type_id_on_box",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#type_id_on_box",
+    "description": "Clippy lint <code>type_id_on_box</code>."
+  },
+  {
+    "key": "unit_hash",
+    "name": "unit_hash",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unit_hash",
+    "description": "Clippy lint <code>unit_hash</code>."
+  },
+  {
+    "key": "unnecessary_sort_by",
+    "name": "unnecessary_sort_by",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_sort_by",
+    "description": "Clippy lint <code>unnecessary_sort_by</code>."
+  },
+  {
+    "key": "vec_resize_to_zero",
+    "name": "vec_resize_to_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#vec_resize_to_zero",
+    "description": "Clippy lint <code>vec_resize_to_zero</code>."
+  },
+  {
+    "key": "verbose_file_reads",
+    "name": "verbose_file_reads",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#verbose_file_reads",
+    "description": "Clippy lint <code>verbose_file_reads</code>."
+  },
+  {
+    "key": "iter_kv_map",
+    "name": "iter_kv_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_kv_map",
+    "description": "Clippy lint <code>iter_kv_map</code>."
+  },
+  {
+    "key": "seek_from_current",
+    "name": "seek_from_current",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#seek_from_current",
+    "description": "Clippy lint <code>seek_from_current</code>."
+  },
+  {
+    "key": "seek_to_start_instead_of_rewind",
+    "name": "seek_to_start_instead_of_rewind",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#seek_to_start_instead_of_rewind",
+    "description": "Clippy lint <code>seek_to_start_instead_of_rewind</code>."
+  },
+  {
+    "key": "needless_collect",
+    "name": "needless_collect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_collect",
+    "description": "Clippy lint <code>needless_collect</code>."
+  },
+  {
+    "key": "suspicious_command_arg_space",
+    "name": "suspicious_command_arg_space",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_command_arg_space",
+    "description": "Clippy lint <code>suspicious_command_arg_space</code>."
+  },
+  {
+    "key": "clear_with_drain",
+    "name": "clear_with_drain",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#clear_with_drain",
+    "description": "Clippy lint <code>clear_with_drain</code>."
+  },
+  {
+    "key": "manual_next_back",
+    "name": "manual_next_back",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_next_back",
+    "description": "Clippy lint <code>manual_next_back</code>."
+  },
+  {
+    "key": "drain_collect",
+    "name": "drain_collect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#drain_collect",
+    "description": "Clippy lint <code>drain_collect</code>."
+  },
+  {
+    "key": "manual_try_fold",
+    "name": "manual_try_fold",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_try_fold",
+    "description": "Clippy lint <code>manual_try_fold</code>."
+  },
+  {
+    "key": "read_line_without_trim",
+    "name": "read_line_without_trim",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#read_line_without_trim",
+    "description": "Clippy lint <code>read_line_without_trim</code>."
+  },
+  {
+    "key": "string_lit_chars_any",
+    "name": "string_lit_chars_any",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#string_lit_chars_any",
+    "description": "Clippy lint <code>string_lit_chars_any</code>."
+  },
+  {
+    "key": "format_collect",
+    "name": "format_collect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#format_collect",
+    "description": "Clippy lint <code>format_collect</code>."
+  },
+  {
+    "key": "iter_skip_zero",
+    "name": "iter_skip_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_skip_zero",
+    "description": "Clippy lint <code>iter_skip_zero</code>."
+  },
+  {
+    "key": "filter_map_bool_then",
+    "name": "filter_map_bool_then",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#filter_map_bool_then",
+    "description": "Clippy lint <code>filter_map_bool_then</code>."
+  },
+  {
+    "key": "readonly_write_lock",
+    "name": "readonly_write_lock",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#readonly_write_lock",
+    "description": "Clippy lint <code>readonly_write_lock</code>."
+  },
+  {
+    "key": "iter_out_of_bounds",
+    "name": "iter_out_of_bounds",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_out_of_bounds",
+    "description": "Clippy lint <code>iter_out_of_bounds</code>."
+  },
+  {
+    "key": "path_ends_with_ext",
+    "name": "path_ends_with_ext",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#path_ends_with_ext",
+    "description": "Clippy lint <code>path_ends_with_ext</code>."
+  },
+  {
+    "key": "redundant_as_str",
+    "name": "redundant_as_str",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_as_str",
+    "description": "Clippy lint <code>redundant_as_str</code>."
+  },
+  {
+    "key": "waker_clone_wake",
+    "name": "waker_clone_wake",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#waker_clone_wake",
+    "description": "Clippy lint <code>waker_clone_wake</code>."
+  },
+  {
+    "key": "unnecessary_fallible_conversions",
+    "name": "unnecessary_fallible_conversions",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_fallible_conversions",
+    "description": "Clippy lint <code>unnecessary_fallible_conversions</code>."
+  },
+  {
+    "key": "join_absolute_paths",
+    "name": "join_absolute_paths",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#join_absolute_paths",
+    "description": "Clippy lint <code>join_absolute_paths</code>."
+  },
+  {
+    "key": "option_map_or_err_ok",
+    "name": "option_map_or_err_ok",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_map_or_err_ok",
+    "description": "Clippy lint <code>option_map_or_err_ok</code>."
+  },
+  {
+    "key": "result_filter_map",
+    "name": "result_filter_map",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#result_filter_map",
+    "description": "Clippy lint <code>result_filter_map</code>."
+  },
+  {
+    "key": "iter_filter_is_some",
+    "name": "iter_filter_is_some",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_filter_is_some",
+    "description": "Clippy lint <code>iter_filter_is_some</code>."
+  },
+  {
+    "key": "iter_filter_is_ok",
+    "name": "iter_filter_is_ok",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#iter_filter_is_ok",
+    "description": "Clippy lint <code>iter_filter_is_ok</code>."
+  },
+  {
+    "key": "manual_is_variant_and",
+    "name": "manual_is_variant_and",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_is_variant_and",
+    "description": "Clippy lint <code>manual_is_variant_and</code>."
+  },
+  {
+    "key": "str_split_at_newline",
+    "name": "str_split_at_newline",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#str_split_at_newline",
+    "description": "Clippy lint <code>str_split_at_newline</code>."
+  },
+  {
+    "key": "option_as_ref_cloned",
+    "name": "option_as_ref_cloned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_as_ref_cloned",
+    "description": "Clippy lint <code>option_as_ref_cloned</code>."
+  },
+  {
+    "key": "unnecessary_min_or_max",
+    "name": "unnecessary_min_or_max",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_min_or_max",
+    "description": "Clippy lint <code>unnecessary_min_or_max</code>."
+  },
+  {
+    "key": "unnecessary_result_map_or_else",
+    "name": "unnecessary_result_map_or_else",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_result_map_or_else",
+    "description": "Clippy lint <code>unnecessary_result_map_or_else</code>."
+  },
+  {
+    "key": "manual_c_str_literals",
+    "name": "manual_c_str_literals",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_c_str_literals",
+    "description": "Clippy lint <code>manual_c_str_literals</code>."
+  },
+  {
+    "key": "unnecessary_get_then_check",
+    "name": "unnecessary_get_then_check",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_get_then_check",
+    "description": "Clippy lint <code>unnecessary_get_then_check</code>."
+  },
+  {
+    "key": "const_is_empty",
+    "name": "const_is_empty",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#const_is_empty",
+    "description": "Clippy lint <code>const_is_empty</code>."
+  },
+  {
+    "key": "unnecessary_map_or",
+    "name": "unnecessary_map_or",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_map_or",
+    "description": "Clippy lint <code>unnecessary_map_or</code>."
+  },
+  {
+    "key": "needless_character_iteration",
+    "name": "needless_character_iteration",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_character_iteration",
+    "description": "Clippy lint <code>needless_character_iteration</code>."
+  },
+  {
+    "key": "manual_inspect",
+    "name": "manual_inspect",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_inspect",
+    "description": "Clippy lint <code>manual_inspect</code>."
+  },
+  {
+    "key": "unnecessary_first_then_check",
+    "name": "unnecessary_first_then_check",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_first_then_check",
+    "description": "Clippy lint <code>unnecessary_first_then_check</code>."
+  },
+  {
+    "key": "needless_as_bytes",
+    "name": "needless_as_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_as_bytes",
+    "description": "Clippy lint <code>needless_as_bytes</code>."
+  },
+  {
+    "key": "map_all_any_identity",
+    "name": "map_all_any_identity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_all_any_identity",
+    "description": "Clippy lint <code>map_all_any_identity</code>."
+  },
+  {
+    "key": "map_with_unused_argument_over_ranges",
+    "name": "map_with_unused_argument_over_ranges",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_with_unused_argument_over_ranges",
+    "description": "Clippy lint <code>map_with_unused_argument_over_ranges</code>."
+  },
+  {
+    "key": "double_ended_iterator_last",
+    "name": "double_ended_iterator_last",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#double_ended_iterator_last",
+    "description": "Clippy lint <code>double_ended_iterator_last</code>."
+  },
+  {
+    "key": "useless_nonzero_new_unchecked",
+    "name": "useless_nonzero_new_unchecked",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_nonzero_new_unchecked",
+    "description": "Clippy lint <code>useless_nonzero_new_unchecked</code>."
+  },
+  {
+    "key": "manual_repeat_n",
+    "name": "manual_repeat_n",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_repeat_n",
+    "description": "Clippy lint <code>manual_repeat_n</code>."
+  },
+  {
+    "key": "sliced_string_as_bytes",
+    "name": "sliced_string_as_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#sliced_string_as_bytes",
+    "description": "Clippy lint <code>sliced_string_as_bytes</code>."
+  },
+  {
+    "key": "return_and_then",
+    "name": "return_and_then",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#return_and_then",
+    "description": "Clippy lint <code>return_and_then</code>."
+  },
+  {
+    "key": "unneeded_field_pattern",
+    "name": "unneeded_field_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unneeded_field_pattern",
+    "description": "Clippy lint <code>unneeded_field_pattern</code>."
+  },
+  {
+    "key": "duplicate_underscore_argument",
+    "name": "duplicate_underscore_argument",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#duplicate_underscore_argument",
+    "description": "Clippy lint <code>duplicate_underscore_argument</code>."
+  },
+  {
+    "key": "mixed_case_hex_literals",
+    "name": "mixed_case_hex_literals",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mixed_case_hex_literals",
+    "description": "Clippy lint <code>mixed_case_hex_literals</code>."
+  },
+  {
+    "key": "unseparated_literal_suffix",
+    "name": "unseparated_literal_suffix",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unseparated_literal_suffix",
+    "description": "Clippy lint <code>unseparated_literal_suffix</code>."
+  },
+  {
+    "key": "separated_literal_suffix",
+    "name": "separated_literal_suffix",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#separated_literal_suffix",
+    "description": "Clippy lint <code>separated_literal_suffix</code>."
+  },
+  {
+    "key": "zero_prefixed_literal",
+    "name": "zero_prefixed_literal",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#zero_prefixed_literal",
+    "description": "Clippy lint <code>zero_prefixed_literal</code>."
+  },
+  {
+    "key": "builtin_type_shadow",
+    "name": "builtin_type_shadow",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#builtin_type_shadow",
+    "description": "Clippy lint <code>builtin_type_shadow</code>."
+  },
+  {
+    "key": "redundant_pattern",
+    "name": "redundant_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_pattern",
+    "description": "Clippy lint <code>redundant_pattern</code>."
+  },
+  {
+    "key": "unneeded_wildcard_pattern",
+    "name": "unneeded_wildcard_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unneeded_wildcard_pattern",
+    "description": "Clippy lint <code>unneeded_wildcard_pattern</code>."
+  },
+  {
+    "key": "redundant_at_rest_pattern",
+    "name": "redundant_at_rest_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_at_rest_pattern",
+    "description": "Clippy lint <code>redundant_at_rest_pattern</code>."
+  },
+  {
+    "key": "absurd_extreme_comparisons",
+    "name": "absurd_extreme_comparisons",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#absurd_extreme_comparisons",
+    "description": "Clippy lint <code>absurd_extreme_comparisons</code>."
+  },
+  {
+    "key": "arithmetic_side_effects",
+    "name": "arithmetic_side_effects",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#arithmetic_side_effects",
+    "description": "Clippy lint <code>arithmetic_side_effects</code>."
+  },
+  {
+    "key": "float_arithmetic",
+    "name": "float_arithmetic",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#float_arithmetic",
+    "description": "Clippy lint <code>float_arithmetic</code>."
+  },
+  {
+    "key": "assign_op_pattern",
+    "name": "assign_op_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#assign_op_pattern",
+    "description": "Clippy lint <code>assign_op_pattern</code>."
+  },
+  {
+    "key": "misrefactored_assign_op",
+    "name": "misrefactored_assign_op",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#misrefactored_assign_op",
+    "description": "Clippy lint <code>misrefactored_assign_op</code>."
+  },
+  {
+    "key": "bad_bit_mask",
+    "name": "bad_bit_mask",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#bad_bit_mask",
+    "description": "Clippy lint <code>bad_bit_mask</code>."
+  },
+  {
+    "key": "ineffective_bit_mask",
+    "name": "ineffective_bit_mask",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ineffective_bit_mask",
+    "description": "Clippy lint <code>ineffective_bit_mask</code>."
+  },
+  {
+    "key": "verbose_bit_mask",
+    "name": "verbose_bit_mask",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#verbose_bit_mask",
+    "description": "Clippy lint <code>verbose_bit_mask</code>."
+  },
+  {
+    "key": "double_comparisons",
+    "name": "double_comparisons",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#double_comparisons",
+    "description": "Clippy lint <code>double_comparisons</code>."
+  },
+  {
+    "key": "impossible_comparisons",
+    "name": "impossible_comparisons",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#impossible_comparisons",
+    "description": "Clippy lint <code>impossible_comparisons</code>."
+  },
+  {
+    "key": "redundant_comparisons",
+    "name": "redundant_comparisons",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_comparisons",
+    "description": "Clippy lint <code>redundant_comparisons</code>."
+  },
+  {
+    "key": "duration_subsec",
+    "name": "duration_subsec",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#duration_subsec",
+    "description": "Clippy lint <code>duration_subsec</code>."
+  },
+  {
+    "key": "eq_op",
+    "name": "eq_op",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#eq_op",
+    "description": "Clippy lint <code>eq_op</code>."
+  },
+  {
+    "key": "op_ref",
+    "name": "op_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#op_ref",
+    "description": "Clippy lint <code>op_ref</code>."
+  },
+  {
+    "key": "erasing_op",
+    "name": "erasing_op",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#erasing_op",
+    "description": "Clippy lint <code>erasing_op</code>."
+  },
+  {
+    "key": "float_equality_without_abs",
+    "name": "float_equality_without_abs",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#float_equality_without_abs",
+    "description": "Clippy lint <code>float_equality_without_abs</code>."
+  },
+  {
+    "key": "identity_op",
+    "name": "identity_op",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#identity_op",
+    "description": "Clippy lint <code>identity_op</code>."
+  },
+  {
+    "key": "integer_division",
+    "name": "integer_division",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#integer_division",
+    "description": "Clippy lint <code>integer_division</code>."
+  },
+  {
+    "key": "cmp_owned",
+    "name": "cmp_owned",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#cmp_owned",
+    "description": "Clippy lint <code>cmp_owned</code>."
+  },
+  {
+    "key": "float_cmp",
+    "name": "float_cmp",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#float_cmp",
+    "description": "Clippy lint <code>float_cmp</code>."
+  },
+  {
+    "key": "float_cmp_const",
+    "name": "float_cmp_const",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#float_cmp_const",
+    "description": "Clippy lint <code>float_cmp_const</code>."
+  },
+  {
+    "key": "modulo_one",
+    "name": "modulo_one",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#modulo_one",
+    "description": "Clippy lint <code>modulo_one</code>."
+  },
+  {
+    "key": "modulo_arithmetic",
+    "name": "modulo_arithmetic",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#modulo_arithmetic",
+    "description": "Clippy lint <code>modulo_arithmetic</code>."
+  },
+  {
+    "key": "needless_bitwise_bool",
+    "name": "needless_bitwise_bool",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_bitwise_bool",
+    "description": "Clippy lint <code>needless_bitwise_bool</code>."
+  },
+  {
+    "key": "ptr_eq",
+    "name": "ptr_eq",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#ptr_eq",
+    "description": "Clippy lint <code>ptr_eq</code>."
+  },
+  {
+    "key": "self_assignment",
+    "name": "self_assignment",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#self_assignment",
+    "description": "Clippy lint <code>self_assignment</code>."
+  },
+  {
+    "key": "wrong_transmute",
+    "name": "wrong_transmute",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wrong_transmute",
+    "description": "Clippy lint <code>wrong_transmute</code>."
+  },
+  {
+    "key": "useless_transmute",
+    "name": "useless_transmute",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_transmute",
+    "description": "Clippy lint <code>useless_transmute</code>."
+  },
+  {
+    "key": "transmutes_expressible_as_ptr_casts",
+    "name": "transmutes_expressible_as_ptr_casts",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmutes_expressible_as_ptr_casts",
+    "description": "Clippy lint <code>transmutes_expressible_as_ptr_casts</code>."
+  },
+  {
+    "key": "crosspointer_transmute",
+    "name": "crosspointer_transmute",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#crosspointer_transmute",
+    "description": "Clippy lint <code>crosspointer_transmute</code>."
+  },
+  {
+    "key": "transmute_ptr_to_ref",
+    "name": "transmute_ptr_to_ref",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_ptr_to_ref",
+    "description": "Clippy lint <code>transmute_ptr_to_ref</code>."
+  },
+  {
+    "key": "transmute_int_to_char",
+    "name": "transmute_int_to_char",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_int_to_char",
+    "description": "Clippy lint <code>transmute_int_to_char</code>."
+  },
+  {
+    "key": "transmute_bytes_to_str",
+    "name": "transmute_bytes_to_str",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_bytes_to_str",
+    "description": "Clippy lint <code>transmute_bytes_to_str</code>."
+  },
+  {
+    "key": "transmute_int_to_bool",
+    "name": "transmute_int_to_bool",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_int_to_bool",
+    "description": "Clippy lint <code>transmute_int_to_bool</code>."
+  },
+  {
+    "key": "transmute_int_to_float",
+    "name": "transmute_int_to_float",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_int_to_float",
+    "description": "Clippy lint <code>transmute_int_to_float</code>."
+  },
+  {
+    "key": "transmute_int_to_non_zero",
+    "name": "transmute_int_to_non_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_int_to_non_zero",
+    "description": "Clippy lint <code>transmute_int_to_non_zero</code>."
+  },
+  {
+    "key": "transmute_float_to_int",
+    "name": "transmute_float_to_int",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_float_to_int",
+    "description": "Clippy lint <code>transmute_float_to_int</code>."
+  },
+  {
+    "key": "transmute_num_to_bytes",
+    "name": "transmute_num_to_bytes",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_num_to_bytes",
+    "description": "Clippy lint <code>transmute_num_to_bytes</code>."
+  },
+  {
+    "key": "transmute_ptr_to_ptr",
+    "name": "transmute_ptr_to_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_ptr_to_ptr",
+    "description": "Clippy lint <code>transmute_ptr_to_ptr</code>."
+  },
+  {
+    "key": "unsound_collection_transmute",
+    "name": "unsound_collection_transmute",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unsound_collection_transmute",
+    "description": "Clippy lint <code>unsound_collection_transmute</code>."
+  },
+  {
+    "key": "transmute_undefined_repr",
+    "name": "transmute_undefined_repr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_undefined_repr",
+    "description": "Clippy lint <code>transmute_undefined_repr</code>."
+  },
+  {
+    "key": "transmuting_null",
+    "name": "transmuting_null",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmuting_null",
+    "description": "Clippy lint <code>transmuting_null</code>."
+  },
+  {
+    "key": "transmute_null_to_fn",
+    "name": "transmute_null_to_fn",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#transmute_null_to_fn",
+    "description": "Clippy lint <code>transmute_null_to_fn</code>."
+  },
+  {
+    "key": "eager_transmute",
+    "name": "eager_transmute",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#eager_transmute",
+    "description": "Clippy lint <code>eager_transmute</code>."
+  },
+  {
+    "key": "missing_transmute_annotations",
+    "name": "missing_transmute_annotations",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#missing_transmute_annotations",
+    "description": "Clippy lint <code>missing_transmute_annotations</code>."
+  },
+  {
+    "key": "box_collection",
+    "name": "box_collection",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#box_collection",
+    "description": "Clippy lint <code>box_collection</code>."
+  },
+  {
+    "key": "vec_box",
+    "name": "vec_box",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#vec_box",
+    "description": "Clippy lint <code>vec_box</code>."
+  },
+  {
+    "key": "option_option",
+    "name": "option_option",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#option_option",
+    "description": "Clippy lint <code>option_option</code>."
+  },
+  {
+    "key": "linkedlist",
+    "name": "linkedlist",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#linkedlist",
+    "description": "Clippy lint <code>linkedlist</code>."
+  },
+  {
+    "key": "borrowed_box",
+    "name": "borrowed_box",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#borrowed_box",
+    "description": "Clippy lint <code>borrowed_box</code>."
+  },
+  {
+    "key": "redundant_allocation",
+    "name": "redundant_allocation",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#redundant_allocation",
+    "description": "Clippy lint <code>redundant_allocation</code>."
+  },
+  {
+    "key": "rc_buffer",
+    "name": "rc_buffer",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#rc_buffer",
+    "description": "Clippy lint <code>rc_buffer</code>."
+  },
+  {
+    "key": "type_complexity",
+    "name": "type_complexity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#type_complexity",
+    "description": "Clippy lint <code>type_complexity</code>."
+  },
+  {
+    "key": "rc_mutex",
+    "name": "rc_mutex",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#rc_mutex",
+    "description": "Clippy lint <code>rc_mutex</code>."
+  },
+  {
+    "key": "let_unit_value",
+    "name": "let_unit_value",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#let_unit_value",
+    "description": "Clippy lint <code>let_unit_value</code>."
+  },
+  {
+    "key": "unit_cmp",
+    "name": "unit_cmp",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unit_cmp",
+    "description": "Clippy lint <code>unit_cmp</code>."
+  },
+  {
+    "key": "unit_arg",
+    "name": "unit_arg",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unit_arg",
+    "description": "Clippy lint <code>unit_arg</code>."
+  }
+]

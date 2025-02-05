@@ -1,0 +1,11 @@
+{
+  "name": "clippy-metadata",
+  "version": "1.0.0",
+  "description": "Generate JSON rule metadata from Clippy lints",
+  "main": "index.js",
+  "dependencies": {
+    "commander": "13.1.0",
+    "tree-sitter": "0.22.4",
+    "tree-sitter-rust": "0.23.2"
+  }
+}
