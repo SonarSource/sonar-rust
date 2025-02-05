@@ -23,6 +23,7 @@ version = "0.1.0-SNAPSHOT"
 dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:2.16.0.3141")
+    implementation("com.google.code.gson:gson:2.12.1")
     compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:10.1.0.809")
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")
     testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:10.1.0.809")
@@ -46,6 +47,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.jar {
+    dependsOn(tasks.shadowJar)
     manifest {
         attributes(
             mapOf(
@@ -58,6 +60,13 @@ tasks.jar {
             )
         )
     }
+}
+
+tasks.shadowJar {
+    dependsOn(":analyzer:compileRust")
+    from(project(":analyzer").tasks.named("compileRust").get().outputs.files) {
+           into("analyzer")
+   }
 }
 
  spotless {
