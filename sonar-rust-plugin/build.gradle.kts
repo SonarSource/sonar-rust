@@ -21,6 +21,7 @@ version = "0.1.0-SNAPSHOT"
 
 
 dependencies {
+    implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:2.16.0.3141")
     compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:10.1.0.809")
     compileOnly("com.google.code.findbugs:jsr305:3.0.2")

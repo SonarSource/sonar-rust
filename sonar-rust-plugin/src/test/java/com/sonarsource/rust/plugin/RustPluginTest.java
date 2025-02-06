@@ -23,7 +23,7 @@ class RustPluginTest {
         SonarQubeSide.SCANNER,
         SonarEdition.DEVELOPER));
     new RustPlugin().define(context);
-    assertEquals(3, context.getExtensions().size());
+    assertEquals(6, context.getExtensions().size());
   }
 
 }
