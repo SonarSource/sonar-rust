@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2025 SonarSource SA
+ * All rights reserved
+ * mailto:info AT sonarsource DOT com
+ */
 package com.sonarsource.rust.analysis;
 
 import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
