@@ -1,3 +1,8 @@
+/*
+ * Copyright (C) 2025 SonarSource SA
+ * All rights reserved
+ * mailto:info AT sonarsource DOT com
+ */
 use std::{
     collections::HashSet,
     io::{self},
