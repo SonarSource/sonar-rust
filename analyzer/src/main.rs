@@ -19,6 +19,7 @@ struct Output {
 // Highlighting token types, as defined by sonar-plugin-api:
 //  https://github.com/SonarSource/sonar-plugin-api/blob/master/plugin-api/src/main/java/org/sonar/api/batch/sensor/highlighting/TypeOfText.java
 #[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Serialize, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 #[allow(dead_code)]
 enum HighlightTokenType {
     Annotation,
