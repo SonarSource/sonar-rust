@@ -34,7 +34,7 @@ class ClippySensorTest {
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 
-    assertThat(descriptor.name()).isEqualTo("Clippy Sensor");
+    assertThat(descriptor.name()).isEqualTo("Rust Clippy");
     assertThat(descriptor.languages()).containsOnly(RustLanguage.KEY);
     assertThat(descriptor.configurationPredicate()).isNotNull();
   }

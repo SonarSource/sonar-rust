@@ -3,7 +3,7 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-package com.sonarsource.rust.clippy;
+package com.sonarsource.rust.common;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -17,7 +17,7 @@ import org.slf4j.event.Level;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
-class ClippyReportProviderTest {
+class ReportProviderTest {
 
   @RegisterExtension
   final LogTesterJUnit5 logTester = new LogTesterJUnit5().setLevel(Level.DEBUG);
@@ -26,11 +26,22 @@ class ClippyReportProviderTest {
   Path baseDir;
 
   @Test
-  void testNoProvidedReportPaths() {
+  void testNoPropertyProvided() {
     var context = SensorContextTester.create(baseDir);
 
-    var reportPaths = new String[]{};
-    var reportFiles = ClippyReportProvider.getReportFiles(context, reportPaths);
+    var reportProvider = new ReportProvider("Some Report", "sonar.some.reportPaths");
+    var reportFiles = reportProvider.getReportFiles(context);
+
+    assertThat(reportFiles).isEmpty();
+  }
+
+  @Test
+  void testNoProvidedReportPaths() {
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty("sonar.some.reportPaths", "");
+
+    var reportProvider = new ReportProvider("Some Report", "sonar.some.reportPaths");
+    var reportFiles = reportProvider.getReportFiles(context);
 
     assertThat(reportFiles).isEmpty();
   }
@@ -38,10 +49,12 @@ class ClippyReportProviderTest {
   @Test
   void testAbsoluteFileReportPath() throws IOException {
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
-    var context = SensorContextTester.create(baseDir);
 
-    var reportPaths = new String[]{tempFile.toAbsolutePath().toString()};
-    var reportFiles = ClippyReportProvider.getReportFiles(context, reportPaths);
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty("sonar.some.reportPaths", tempFile.toAbsolutePath().toString());
+
+    var reportProvider = new ReportProvider("Some Report", "sonar.some.reportPaths");
+    var reportFiles = reportProvider.getReportFiles(context);
 
     assertThat(reportFiles).hasSize(1);
 
@@ -51,10 +64,12 @@ class ClippyReportProviderTest {
   @Test
   void testRelativeFileReportPath() throws IOException {
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
-    var context = SensorContextTester.create(baseDir);
 
-    var reportPaths = new String[]{tempFile.getFileName().toString()};
-    var reportFiles = ClippyReportProvider.getReportFiles(context, reportPaths);
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty("sonar.some.reportPaths", tempFile.getFileName().toString());
+
+    var reportProvider = new ReportProvider("Some Report", "sonar.some.reportPaths");
+    var reportFiles = reportProvider.getReportFiles(context);
 
     assertThat(reportFiles).hasSize(1);
 
@@ -65,10 +80,12 @@ class ClippyReportProviderTest {
   void testPatternReportPathMatches() throws IOException {
     var tempFile1 = Files.createTempFile(baseDir, "clippy_report1", ".json");
     var tempFile2 = Files.createTempFile(baseDir, "clippy_report2", ".json");
-    var context = SensorContextTester.create(baseDir);
 
-    var reportPaths = new String[]{"**/*.json"};
-    var reportFiles = ClippyReportProvider.getReportFiles(context, reportPaths);
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty("sonar.some.reportPaths", "**/*.json");
+
+    var reportProvider = new ReportProvider("Some Report", "sonar.some.reportPaths");
+    var reportFiles = reportProvider.getReportFiles(context);
 
     assertThat(reportFiles).hasSize(2);
 
@@ -79,10 +96,12 @@ class ClippyReportProviderTest {
   @Test
   void testPatternReportPathNoMatches() throws IOException {
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".txt");
-    var context = SensorContextTester.create(baseDir);
 
-    var reportPaths = new String[]{"**/*.json"};
-    var reportFiles = ClippyReportProvider.getReportFiles(context, reportPaths);
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty("sonar.some.reportPaths", "**/*.json");
+
+    var reportProvider = new ReportProvider("Some Report", "sonar.some.reportPaths");
+    var reportFiles = reportProvider.getReportFiles(context);
 
     assertThat(reportFiles).isEmpty();
 
