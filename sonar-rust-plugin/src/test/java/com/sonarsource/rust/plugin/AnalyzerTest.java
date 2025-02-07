@@ -3,9 +3,8 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-package com.sonarsource.rust.analysis;
+package com.sonarsource.rust.plugin;
 
-import com.sonarsource.rust.plugin.Analyzer;
 import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;

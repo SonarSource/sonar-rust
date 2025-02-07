@@ -3,12 +3,8 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-package com.sonarsource.rust.analysis;
+package com.sonarsource.rust.plugin;
 
-import com.sonarsource.rust.plugin.Analyzer;
-import com.sonarsource.rust.plugin.AnalyzerFactory;
-import com.sonarsource.rust.plugin.RustLanguage;
-import com.sonarsource.rust.plugin.RustSensor;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
