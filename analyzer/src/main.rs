@@ -5,21 +5,27 @@
  */
 use std::{
     collections::HashSet,
-    io::{self},
+    io::{self, Read, Write}
 };
 
-use serde::Serialize;
 use tree_sitter::{Node, Parser, Query, QueryCursor, StreamingIterator};
 
-#[derive(Debug, Serialize)]
+#[derive(Debug)]
 struct Output {
     highlight_tokens: Vec<HighlightToken>,
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+struct Location {
+    start_line: usize,
+    start_column: usize,
+    end_line: usize,
+    end_column: usize,
+}
+
 // Highlighting token types, as defined by sonar-plugin-api:
 //  https://github.com/SonarSource/sonar-plugin-api/blob/master/plugin-api/src/main/java/org/sonar/api/batch/sensor/highlighting/TypeOfText.java
-#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Serialize, Clone)]
-#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
+#[derive(Debug, PartialOrd, Ord, PartialEq, Eq, Clone)]
 #[allow(dead_code)]
 enum HighlightTokenType {
     Annotation,
@@ -44,15 +50,48 @@ impl HighlightTokenType {
             _ => None,
         }
     }
+
+    fn to_sonar_api_name(&self) -> &str {
+        match self {
+            HighlightTokenType::Annotation => "ANNOTATION",
+            HighlightTokenType::Constant => "CONSTANT",
+            HighlightTokenType::Comment => "COMMENT",
+            HighlightTokenType::StructuredComment => "COMMENT",
+            HighlightTokenType::Keyword => "KEYWORD",
+            HighlightTokenType::String => "STRING",
+            HighlightTokenType::KeywordLight => "KEYWORD_LIGHT",
+            HighlightTokenType::PreprocessDirective => "PREPROCESS_DIRECTIVE",
+        }
+    }
 }
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Clone)]
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 struct HighlightToken {
     token_type: HighlightTokenType,
-    start_line: usize,
-    start_column: usize,
-    end_line: usize,
-    end_column: usize,
+    location: Location,
+}
+
+fn node_location(node: Node<'_>, source_code: &str) -> Location {
+    // Tree-sitter and Sonar plugin API have different definitions for column counts.
+    //  - Sonar plugin API defines column counts in terms of UTF-16 code units, so © counts as 1, 𠱓 counts as 2
+    //  - Tree-sitter defines column counts as the number of bytes from the start of the line, so © counts as 2, ॷ as 3, 𠱓 as 4
+    // We will convert between the two definitions by counting UTF-16 code units in the source code.
+
+    // Find the number of UTF-16 code units in the first and the last line of the text range.
+    // For both the first and the last line, we extract the byte range of the relevant part of the line, using the byte column offsets.
+    // Then, these offsets are converted to an iterator over UTF-16 code units, and the count of these code units is calculated.
+    let first_line_start_byte = node.start_byte() - node.start_position().column as usize;
+    let first_line_offset = str::encode_utf16(&source_code[first_line_start_byte..node.start_byte()]).count() as i32;
+
+    let last_line_start_byte = node.end_byte() - node.end_position().column as usize;
+    let last_line_offset = str::encode_utf16(&source_code[last_line_start_byte..node.end_byte()]).count() as i32;
+
+    Location{
+        start_line: node.start_position().row + 1,
+        start_column: first_line_offset as usize,
+        end_line: node.end_position().row + 1,
+        end_column: last_line_offset as usize
+    }
 }
 
 fn process_code(source_code: &str) -> Output {
@@ -91,11 +130,7 @@ fn process_code(source_code: &str) -> Output {
 
                     tokens.push(HighlightToken {
                         token_type,
-                        // Tree-sitter line numbers are 0-based, but the Sonar API expects 1-based line numbers and 0-based column numbers
-                        start_line: capture.node.start_position().row + 1,
-                        start_column: capture.node.start_position().column,
-                        end_line: capture.node.end_position().row + 1,
-                        end_column: capture.node.end_position().column,
+                        location: node_location(capture.node, source_code)
                     });
                 }
                 None => {}
@@ -107,10 +142,7 @@ fn process_code(source_code: &str) -> Output {
     for comment in comments_without_doc_comments {
         tokens.push(HighlightToken {
             token_type: HighlightTokenType::Comment,
-            start_line: comment.start_position().row + 1,
-            start_column: comment.start_position().column,
-            end_line: comment.end_position().row + 1,
-            end_column: comment.end_position().column,
+            location: node_location(comment, source_code)
         });
     }
 
@@ -119,15 +151,63 @@ fn process_code(source_code: &str) -> Output {
     }
 }
 
-fn main() {
-    let stdin = io::read_to_string(io::stdin()).expect("Read Rust source");
-    let output = process_code(&stdin);
+fn read_i32() -> i32 {
+    // Read an i32 from stdin
+    let mut buf = [0u8; 4];
+    io::stdin().read_exact(&mut buf).expect("read from stdin");
+    i32::from_be_bytes(buf)
+}
 
-    serde_json::to_writer(io::stdout(), &output).expect("Write to stdout");
+fn read_string() -> String {
+    let len = read_i32();
+    let mut buf = vec![0u8; len as usize];
+    io::stdin().read_exact(&mut buf).expect("read from stdin");
+    String::from_utf8(buf).expect("UTF-8 conversion error")
+}
+
+fn write_int(value: i32) {
+    io::stdout().write(&value.to_be_bytes()).expect("write to stdout");
+}
+
+fn write_string(value: &str) {
+    write_int(value.len() as i32);
+    io::stdout().write(value.as_bytes()).expect("write to stdout");
+    io::stdout().flush().expect("flush stdout");
+}
+
+fn write_location(location: &Location) {
+    write_int(location.start_line as i32);
+    write_int(location.start_column as i32);
+    write_int(location.end_line as i32);
+    write_int(location.end_column as i32);
+}
+
+fn main() {
+    loop {
+        let command = read_string();
+        if command != "analyze" {
+            return;
+        }
+
+        let len = read_i32();
+        let mut buf = vec![0u8; len as usize];
+        io::stdin().read_exact(&mut buf).expect("read from stdin");
+
+        let output = process_code(std::str::from_utf8(&buf).expect("UTF-8 conversion error"));
+
+        for token in &output.highlight_tokens {
+            write_string("highlight");
+            write_string(token.token_type.to_sonar_api_name());
+            write_location(&token.location);
+        }
+        write_string("end");
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    use std::vec;
+
     use super::*;
 
     #[test]
@@ -148,49 +228,147 @@ fn main() {
         let mut expected = vec![
             HighlightToken {
                 token_type: HighlightTokenType::StructuredComment,
-                start_line: 2,
-                start_column: 0,
-                end_line: 3,
-                end_column: 0,
+                location: Location{
+                    start_line: 2,
+                    start_column: 0,
+                    end_line: 3,
+                    end_column: 0,
+                }
             },
             HighlightToken {
                 token_type: HighlightTokenType::Keyword,
-                start_line: 3,
-                start_column: 0,
-                end_line: 3,
-                end_column: 2,
+                location: Location{
+                    start_line: 3,
+                    start_column: 0,
+                    end_line: 3,
+                    end_column: 2,
+                }
             },
             HighlightToken {
                 token_type: HighlightTokenType::Comment,
-                start_line: 4,
-                start_column: 4,
-                end_line: 4,
-                end_column: 24,
+                location: Location{
+                    start_line: 4,
+                    start_column: 4,
+                    end_line: 4,
+                    end_column: 24,
+                }
             },
             HighlightToken {
                 token_type: HighlightTokenType::Keyword,
-                start_line: 5,
-                start_column: 4,
-                end_line: 5,
-                end_column: 7,
+                location: Location{
+                    start_line: 5,
+                    start_column: 4,
+                    end_line: 5,
+                    end_column: 7,
+                }
             },
             HighlightToken {
                 token_type: HighlightTokenType::Constant,
-                start_line: 5,
-                start_column: 12,
-                end_line: 5,
-                end_column: 14,
+                location: Location{
+                    start_line: 5,
+                    start_column: 12,
+                    end_line: 5,
+                    end_column: 14,
+                }
             },
             HighlightToken {
                 token_type: HighlightTokenType::String,
-                start_line: 6,
-                start_column: 13,
-                end_line: 6,
-                end_column: 28,
+                location: Location{
+                    start_line: 6,
+                    start_column: 13,
+                    end_line: 6,
+                    end_column: 28,
+                }
             },
         ];
         expected.sort();
 
         assert_eq!(expected, actual);
     }
+
+    #[test]
+    fn test_unicode() {
+        // 4 byte value
+        assert_eq!(process_code("//𠱓").highlight_tokens, vec![HighlightToken {
+            token_type: HighlightTokenType::Comment,
+            location: Location{
+                start_line: 1,
+                start_column: 0,
+                end_line: 1,
+                end_column: 4,
+            }
+        }]);
+        assert_eq!("𠱓".as_bytes().len(), 4);
+        
+        // 3 byte unicode
+        assert_eq!(process_code("//ॷ").highlight_tokens, vec![HighlightToken {
+            token_type: HighlightTokenType::Comment,
+            location: Location{
+                start_line: 1,
+                start_column: 0,
+                end_line: 1,
+                end_column: 3,
+            }
+        }]);
+        assert_eq!("ࢣ".as_bytes().len(), 3);
+
+        // 2 byte unicode
+        assert_eq!(process_code("//©").highlight_tokens, vec![HighlightToken {
+            token_type: HighlightTokenType::Comment,
+            location: Location{
+                start_line: 1,
+                start_column: 0,
+                end_line: 1,
+                end_column: 3,
+            }
+        }]);
+        assert_eq!("©".as_bytes().len(), 2);
+    }
+
+    #[test]
+    fn test_multiple_unicode_locations() {
+        let mut actual = process_code("/*𠱓𠱓*/ //𠱓").highlight_tokens;
+        actual.sort();
+
+        let mut expected = vec![HighlightToken {
+            token_type: HighlightTokenType::Comment,
+            location: Location{
+                start_line: 1,
+                start_column: 0,
+                end_line: 1,
+                end_column: 8,
+            }
+        }, HighlightToken{
+            token_type: HighlightTokenType::Comment,
+            location: Location{
+                start_line: 1,
+                start_column: 9,
+                end_line: 1,
+                end_column: 13,
+            }
+        }];
+        expected.sort();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_multi_line_unicode() {
+        let mut actual = process_code("/*\n𠱓\n𠱓\n    𠱓*/").highlight_tokens;
+        actual.sort();
+
+        let mut expected = vec![HighlightToken {
+            token_type: HighlightTokenType::Comment,
+            location: Location{
+                start_line: 1,
+                start_column: 0,
+                end_line: 4,
+                end_column: 8,
+            }
+        }];
+        expected.sort();
+
+        assert_eq!(actual, expected);
+    }
+
 }

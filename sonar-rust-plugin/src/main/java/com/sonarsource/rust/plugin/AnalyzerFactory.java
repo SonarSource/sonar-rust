@@ -17,8 +17,6 @@ import org.sonar.api.scanner.ScannerSide;
 import org.sonar.api.utils.TempFolder;
 
 import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
 
 @ScannerSide
 public class AnalyzerFactory {
@@ -37,11 +35,11 @@ public class AnalyzerFactory {
         throw new IllegalStateException("Analyzer binary not found");
       }
 
-      // save is into temporary file and set it as executable
+      // Save the stream into temporary file and set it as executable
       Path path = tempFolder.newDir().toPath();
       LOG.debug("Copying analyzer to {}", path);
       Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
-      Files.setPosixFilePermissions(path, Set.of(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE));
+      Files.setPosixFilePermissions(path, Set.of(OWNER_EXECUTE));
 
       return new Analyzer(List.of(path.toString()));
     }

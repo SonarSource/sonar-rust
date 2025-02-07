@@ -5,58 +5,95 @@
  */
 package com.sonarsource.rust.plugin;
 
-import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonParseException;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.List;
 
-public class Analyzer {
+public class Analyzer implements AutoCloseable {
 
-  private final List<String> command;
+  private final Process process;
+  private final DataOutputStream outputStream;
+  private final DataInputStream inputStream;
 
   public Analyzer(List<String> command) {
-    this.command = command;
+    try {
+      this.process = new ProcessBuilder(command)
+        .redirectError(ProcessBuilder.Redirect.INHERIT)
+        .redirectInput(ProcessBuilder.Redirect.PIPE)
+        .redirectOutput(ProcessBuilder.Redirect.PIPE)
+        .start();
+      this.outputStream = new DataOutputStream(process.getOutputStream());
+      this.inputStream = new DataInputStream(process.getInputStream());
+    } catch (IOException ex) {
+      throw new IllegalStateException("Failed to start analyzer process", ex);
+    }
   }
 
   /**
-   * Launch the analyzer subprocess and analyze the given code.
-   * @throws IllegalStateException if executing the analyzer fails
+   * Use the analyzer subprocess to analyze the given code.
+   * @throws IOException if executing the analyzer fails due to an I/O error
    */
-  public AnalysisResult analyze(String code) throws InterruptedException {
-    try {
-      var process = new ProcessBuilder(command)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .start();
-      process.getOutputStream().write(code.getBytes());
-      process.getOutputStream().close();
-      var output = process.getInputStream();
+  public AnalysisResult analyze(String code) throws IOException {
+    writeString("analyze");
 
-      Gson gson = new GsonBuilder()
-        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-        .create();
+    var bytes = code.getBytes(StandardCharsets.UTF_8);
+    writeInt(bytes.length);
+    write(bytes);
 
-      var result = gson.fromJson(new InputStreamReader(output), AnalysisResult.class);
-      int exitCode = process.waitFor();
-      if (exitCode != 0) {
-        throw new IllegalStateException("Analyzer failed with exit code " + exitCode);
+    List<HighlightTokens> highlightTokens = new ArrayList<>();
+
+    while (true) {
+      String messageType = readString();
+      if ("highlight".equals(messageType)) {
+        String tokenType = readString();
+        int startLine = inputStream.readInt();
+        int startColumn = inputStream.readInt();
+        int endLine = inputStream.readInt();
+        int endColumn = inputStream.readInt();
+        highlightTokens.add(new HighlightTokens(tokenType, startLine, startColumn, endLine, endColumn));
+      } else {
+        break;
       }
-
-      return result;
-    } catch (IOException ex) {
-      throw new IllegalStateException("I/O error occurred while running analyzer", ex);
-    } catch (JsonParseException ex) {
-      throw new IllegalStateException("Failed to parse analyzer output", ex);
     }
+
+    return new AnalysisResult(highlightTokens);
+  }
+
+  @Override
+  public void close() {
+    process.destroyForcibly();
+  }
+
+  private String readString() throws IOException {
+    int length = inputStream.readInt();
+    byte[] bytes = new byte[length];
+    inputStream.readFully(bytes);
+    return new String(bytes);
+  }
+
+  private void writeInt(int value) throws IOException {
+    outputStream.writeInt(value);
+    outputStream.flush();
+  }
+
+  private void writeString(String value) throws IOException {
+    outputStream.writeInt(value.length());
+    outputStream.write(value.getBytes());
+    outputStream.flush();
+  }
+
+  private void write(byte[] bytes) throws IOException {
+    outputStream.write(bytes);
+    outputStream.flush();
   }
 
   public record AnalysisResult(List<HighlightTokens> highlightTokens) {
   }
 
   public record HighlightTokens(String tokenType, int startLine, int startColumn, int endLine, int endColumn) {
-
   }
 
 }

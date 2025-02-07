@@ -11,7 +11,6 @@ import com.sonarsource.rust.plugin.RustLanguage;
 import com.sonarsource.rust.plugin.RustSensor;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -59,6 +58,22 @@ class RustSensorTest {
     var fnKeyword = context.highlightingTypeAt("%s:test.rs".formatted(PROJECT_KEY), 1, 0);
     assertThat(fnKeyword)
       .containsExactly(TypeOfText.KEYWORD);
+  }
+
+  @Test
+  void analyze_unicode() {
+    RustSensor sensor = sensor();
+    context.fileSystem().add(inputFile("test1.rs", "//𠱓"));
+    context.fileSystem().add(inputFile("test2.rs", "//ॷ"));
+    context.fileSystem().add(inputFile("test3.rs", "//©"));
+
+    sensor.execute(context);
+    assertThat(context.highlightingTypeAt("%s:test1.rs".formatted(PROJECT_KEY), 1, 0))
+      .hasSize(1);
+    assertThat(context.highlightingTypeAt("%s:test2.rs".formatted(PROJECT_KEY), 1, 0))
+      .hasSize(1);
+    assertThat(context.highlightingTypeAt("%s:test3.rs".formatted(PROJECT_KEY), 1, 0))
+      .hasSize(1);
   }
 
   private InputFile inputFile(String relativePath, String content) {

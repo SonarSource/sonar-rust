@@ -6,29 +6,27 @@
 package com.sonarsource.rust.analysis;
 
 import com.sonarsource.rust.plugin.Analyzer;
+import java.io.IOException;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatCode;
 
 class AnalyzerTest {
 
   public static final List<String> RUN_LOCAL_ANALYZER_COMMAND = List.of("cargo", "run", "--manifest-path", "../analyzer/Cargo.toml");
 
   @Test
-  void analyze() throws InterruptedException {
-    Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND);
-    var result = analyzer.analyze("fn main() {}");
+  void analyze() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND)) {
+      var result1 = analyzer.analyze("fn main() {}");
+      var result2 = analyzer.analyze("fn foo() -> i32 { 42 }");
 
-    assertThat(result.highlightTokens()).containsExactly(new Analyzer.HighlightTokens("KEYWORD", 1, 0, 1, 2));
+      assertThat(result1.highlightTokens()).containsExactly(new Analyzer.HighlightTokens("KEYWORD", 1, 0, 1, 2));
+      assertThat(result2.highlightTokens()).containsExactly(
+        new Analyzer.HighlightTokens("KEYWORD", 1, 0, 1, 2),
+        new Analyzer.HighlightTokens("CONSTANT", 1, 18, 1, 20));
+    }
   }
 
-  @Test
-  void analyze_command_fail() {
-    Analyzer analyzer = new Analyzer(List.of("cargo", "run", "--manifest-path", "../analyzer/not-existing"));
-    assertThatCode(() -> analyzer.analyze("fn main() {}"))
-      .isInstanceOf(IllegalStateException.class)
-      .hasMessageContaining("exit code");
-  }
 }

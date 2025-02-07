@@ -40,13 +40,12 @@ public class RustSensor implements Sensor {
   @Override
   public void execute(SensorContext sensorContext) {
     List<InputFile> inputFiles = inputFiles(sensorContext);
-    try {
-      Analyzer analyzer = analyzerFactory.create();
+    try (Analyzer analyzer = analyzerFactory.create()) {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
     } catch (IOException ex) {
-      LOG.error("Failed to execute analyzer: {}", ex.getMessage());
+      LOG.error("Failed to create analyzer: {}", ex.getMessage());
     }
   }
 
@@ -56,25 +55,16 @@ public class RustSensor implements Sensor {
       NewHighlighting newHighlighting = sensorContext.newHighlighting().onFile(inputFile);
       reportHighlighting(inputFile, newHighlighting, result.highlightTokens());
       newHighlighting.save();
-    } catch (InterruptedException ex) {
-      Thread.currentThread().interrupt();
-    } catch (Exception ex) {
+    } catch (IOException ex) {
       LOG.error("Failed to analyze file: {} ({})", inputFile.filename(), ex.getMessage());
     }
   }
 
   private List<InputFile> inputFiles(SensorContext sensorContext) {
     FileSystem fileSystem = sensorContext.fileSystem();
-    FilePredicate predicate = mainFilePredicate(sensorContext);
+    FilePredicate predicate = fileSystem.predicates().hasLanguage(RustLanguage.KEY);
     return StreamSupport.stream(fileSystem.inputFiles(predicate).spliterator(), false)
       .toList();
-  }
-
-  protected FilePredicate mainFilePredicate(SensorContext sensorContext) {
-    FileSystem fileSystem = sensorContext.fileSystem();
-    return fileSystem.predicates().and(
-      fileSystem.predicates().hasLanguage(RustLanguage.KEY),
-      fileSystem.predicates().hasType(InputFile.Type.MAIN));
   }
 
   private static void reportHighlighting(InputFile inputFile, NewHighlighting highlighting, List<Analyzer.HighlightTokens> tokens) {
