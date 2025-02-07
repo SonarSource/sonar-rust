@@ -5,7 +5,7 @@
  */
 use std::{
     collections::HashSet,
-    io::{self, Read, Write}
+    io::{self, Read, Write},
 };
 
 use tree_sitter::{Node, Parser, Query, QueryCursor, StreamingIterator};
@@ -80,17 +80,19 @@ fn node_location(node: Node<'_>, source_code: &str) -> Location {
     // Find the number of UTF-16 code units in the first and the last line of the text range.
     // For both the first and the last line, we extract the byte range of the relevant part of the line, using the byte column offsets.
     // Then, these offsets are converted to an iterator over UTF-16 code units, and the count of these code units is calculated.
-    let first_line_start_byte = node.start_byte() - node.start_position().column as usize;
-    let first_line_offset = str::encode_utf16(&source_code[first_line_start_byte..node.start_byte()]).count() as i32;
+    let first_line_start_byte = node.start_byte() - node.start_position().column;
+    let first_line_offset =
+        str::encode_utf16(&source_code[first_line_start_byte..node.start_byte()]).count() as i32;
 
-    let last_line_start_byte = node.end_byte() - node.end_position().column as usize;
-    let last_line_offset = str::encode_utf16(&source_code[last_line_start_byte..node.end_byte()]).count() as i32;
+    let last_line_start_byte = node.end_byte() - node.end_position().column;
+    let last_line_offset =
+        str::encode_utf16(&source_code[last_line_start_byte..node.end_byte()]).count() as i32;
 
-    Location{
+    Location {
         start_line: node.start_position().row + 1,
         start_column: first_line_offset as usize,
         end_line: node.end_position().row + 1,
-        end_column: last_line_offset as usize
+        end_column: last_line_offset as usize,
     }
 }
 
@@ -130,7 +132,7 @@ fn process_code(source_code: &str) -> Output {
 
                     tokens.push(HighlightToken {
                         token_type,
-                        location: node_location(capture.node, source_code)
+                        location: node_location(capture.node, source_code),
                     });
                 }
                 None => {}
@@ -142,7 +144,7 @@ fn process_code(source_code: &str) -> Output {
     for comment in comments_without_doc_comments {
         tokens.push(HighlightToken {
             token_type: HighlightTokenType::Comment,
-            location: node_location(comment, source_code)
+            location: node_location(comment, source_code),
         });
     }
 
@@ -166,12 +168,16 @@ fn read_string() -> String {
 }
 
 fn write_int(value: i32) {
-    io::stdout().write(&value.to_be_bytes()).expect("write to stdout");
+    io::stdout()
+        .write_all(&value.to_be_bytes())
+        .expect("write to stdout");
 }
 
 fn write_string(value: &str) {
     write_int(value.len() as i32);
-    io::stdout().write(value.as_bytes()).expect("write to stdout");
+    io::stdout()
+        .write_all(value.as_bytes())
+        .expect("write to stdout");
     io::stdout().flush().expect("flush stdout");
 }
 
@@ -228,57 +234,57 @@ fn main() {
         let mut expected = vec![
             HighlightToken {
                 token_type: HighlightTokenType::StructuredComment,
-                location: Location{
+                location: Location {
                     start_line: 2,
                     start_column: 0,
                     end_line: 3,
                     end_column: 0,
-                }
+                },
             },
             HighlightToken {
                 token_type: HighlightTokenType::Keyword,
-                location: Location{
+                location: Location {
                     start_line: 3,
                     start_column: 0,
                     end_line: 3,
                     end_column: 2,
-                }
+                },
             },
             HighlightToken {
                 token_type: HighlightTokenType::Comment,
-                location: Location{
+                location: Location {
                     start_line: 4,
                     start_column: 4,
                     end_line: 4,
                     end_column: 24,
-                }
+                },
             },
             HighlightToken {
                 token_type: HighlightTokenType::Keyword,
-                location: Location{
+                location: Location {
                     start_line: 5,
                     start_column: 4,
                     end_line: 5,
                     end_column: 7,
-                }
+                },
             },
             HighlightToken {
                 token_type: HighlightTokenType::Constant,
-                location: Location{
+                location: Location {
                     start_line: 5,
                     start_column: 12,
                     end_line: 5,
                     end_column: 14,
-                }
+                },
             },
             HighlightToken {
                 token_type: HighlightTokenType::String,
-                location: Location{
+                location: Location {
                     start_line: 6,
                     start_column: 13,
                     end_line: 6,
                     end_column: 28,
-                }
+                },
             },
         ];
         expected.sort();
@@ -289,39 +295,48 @@ fn main() {
     #[test]
     fn test_unicode() {
         // 4 byte value
-        assert_eq!(process_code("//𠱓").highlight_tokens, vec![HighlightToken {
-            token_type: HighlightTokenType::Comment,
-            location: Location{
-                start_line: 1,
-                start_column: 0,
-                end_line: 1,
-                end_column: 4,
-            }
-        }]);
+        assert_eq!(
+            process_code("//𠱓").highlight_tokens,
+            vec![HighlightToken {
+                token_type: HighlightTokenType::Comment,
+                location: Location {
+                    start_line: 1,
+                    start_column: 0,
+                    end_line: 1,
+                    end_column: 4,
+                }
+            }]
+        );
         assert_eq!("𠱓".as_bytes().len(), 4);
-        
+
         // 3 byte unicode
-        assert_eq!(process_code("//ॷ").highlight_tokens, vec![HighlightToken {
-            token_type: HighlightTokenType::Comment,
-            location: Location{
-                start_line: 1,
-                start_column: 0,
-                end_line: 1,
-                end_column: 3,
-            }
-        }]);
+        assert_eq!(
+            process_code("//ॷ").highlight_tokens,
+            vec![HighlightToken {
+                token_type: HighlightTokenType::Comment,
+                location: Location {
+                    start_line: 1,
+                    start_column: 0,
+                    end_line: 1,
+                    end_column: 3,
+                }
+            }]
+        );
         assert_eq!("ࢣ".as_bytes().len(), 3);
 
         // 2 byte unicode
-        assert_eq!(process_code("//©").highlight_tokens, vec![HighlightToken {
-            token_type: HighlightTokenType::Comment,
-            location: Location{
-                start_line: 1,
-                start_column: 0,
-                end_line: 1,
-                end_column: 3,
-            }
-        }]);
+        assert_eq!(
+            process_code("//©").highlight_tokens,
+            vec![HighlightToken {
+                token_type: HighlightTokenType::Comment,
+                location: Location {
+                    start_line: 1,
+                    start_column: 0,
+                    end_line: 1,
+                    end_column: 3,
+                }
+            }]
+        );
         assert_eq!("©".as_bytes().len(), 2);
     }
 
@@ -330,23 +345,26 @@ fn main() {
         let mut actual = process_code("/*𠱓𠱓*/ //𠱓").highlight_tokens;
         actual.sort();
 
-        let mut expected = vec![HighlightToken {
-            token_type: HighlightTokenType::Comment,
-            location: Location{
-                start_line: 1,
-                start_column: 0,
-                end_line: 1,
-                end_column: 8,
-            }
-        }, HighlightToken{
-            token_type: HighlightTokenType::Comment,
-            location: Location{
-                start_line: 1,
-                start_column: 9,
-                end_line: 1,
-                end_column: 13,
-            }
-        }];
+        let mut expected = vec![
+            HighlightToken {
+                token_type: HighlightTokenType::Comment,
+                location: Location {
+                    start_line: 1,
+                    start_column: 0,
+                    end_line: 1,
+                    end_column: 8,
+                },
+            },
+            HighlightToken {
+                token_type: HighlightTokenType::Comment,
+                location: Location {
+                    start_line: 1,
+                    start_column: 9,
+                    end_line: 1,
+                    end_column: 13,
+                },
+            },
+        ];
         expected.sort();
 
         assert_eq!(actual, expected);
@@ -359,16 +377,15 @@ fn main() {
 
         let mut expected = vec![HighlightToken {
             token_type: HighlightTokenType::Comment,
-            location: Location{
+            location: Location {
                 start_line: 1,
                 start_column: 0,
                 end_line: 4,
                 end_column: 8,
-            }
+            },
         }];
         expected.sort();
 
         assert_eq!(actual, expected);
     }
-
 }
