@@ -53,7 +53,8 @@ build_task:
     DEPLOY_PULL_REQUEST: "true"
   build_script:
     - source cirrus-env BUILD
-    - ./gradlew build
+    - source .cirrus/use-gradle-wrapper.sh
+    - regular_gradle_build_deploy_analyze
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 promote_task:
