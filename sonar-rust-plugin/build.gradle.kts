@@ -63,17 +63,51 @@ tasks.shadowJar {
    }
 }
 
- spotless {
-      java {
-          licenseHeader(
-              """
-              /*
-               * Copyright (C) 2025 SonarSource SA
-               * All rights reserved
-               * mailto:info AT sonarsource DOT com
-               */
-              """.trimIndent()
-          )
-          trimTrailingWhitespace()
-      }
-  }
+spotless {
+    java {
+        licenseHeader(
+            """
+            /*
+             * Copyright (C) 2025 SonarSource SA
+             * All rights reserved
+             * mailto:info AT sonarsource DOT com
+             */
+            """.trimIndent()
+        )
+        trimTrailingWhitespace()
+    }
+}
+
+artifactory {
+    clientConfig.info.buildName = "sonar-rust"
+    clientConfig.info.buildNumber = System.getenv("BUILD_NUMBER")
+    clientConfig.isIncludeEnvVars = true
+    clientConfig.envVarsExcludePatterns =
+        "*password*,*PASSWORD*,*secret*,*MAVEN_CMD_LINE_ARGS*,sun.java.command,*token*,*TOKEN*,*LOGIN*,*login*,*key*,*KEY*,*PASSPHRASE*,*signing*"
+
+    // Define the artifacts to be deployed to https://binaries.sonarsource.com on releases
+    clientConfig.info.addEnvironmentProperty("ARTIFACTS_TO_PUBLISH", "${project.group}:sonar-rust-plugin:jar")
+    // The name of this variable is important because it"s used by the delivery process when extracting version from Artifactory build info.
+    clientConfig.info.addEnvironmentProperty("PROJECT_VERSION", version.toString())
+
+    setContextUrl(System.getenv("ARTIFACTORY_URL"))
+    publish {
+        repository {
+            repoKey = System.getenv("ARTIFACTORY_DEPLOY_REPO")
+            username = System.getenv("ARTIFACTORY_DEPLOY_USERNAME")
+            password = System.getenv("ARTIFACTORY_DEPLOY_PASSWORD")
+        }
+        defaults {
+            setProperties(
+                mapOf(
+                    "build.name" to "sonar-rust",
+                    "build.number" to System.getenv("BUILD_NUMBER"),
+                    "version" to project.version as String,
+                )
+            )
+            publications("plugin")
+            setPublishPom(true) // Publish generated POM files to Artifactory (true by default)
+            setPublishIvy(false) // Publish generated Ivy descriptor files to Artifactory (true by default)
+        }
+    }
+}
