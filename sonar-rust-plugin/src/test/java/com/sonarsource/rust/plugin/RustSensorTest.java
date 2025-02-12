@@ -42,7 +42,7 @@ class RustSensorTest {
     DefaultSensorDescriptor descriptor = new DefaultSensorDescriptor();
     sensor().describe(descriptor);
 
-    assertThat(descriptor.name()).isEqualTo("Rust sensor");
+    assertThat(descriptor.name()).isEqualTo("Rust");
     assertThat(descriptor.languages()).containsExactly("rust");
   }
 

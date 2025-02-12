@@ -39,7 +39,7 @@ public class Analyzer implements AutoCloseable {
   public AnalysisResult analyze(String code) throws IOException {
     writeString("analyze");
 
-    var bytes = code.getBytes(StandardCharsets.UTF_8);
+    byte[] bytes = code.getBytes(StandardCharsets.UTF_8);
     writeInt(bytes.length);
     write(bytes);
 

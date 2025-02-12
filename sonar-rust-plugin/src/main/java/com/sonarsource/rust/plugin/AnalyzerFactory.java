@@ -29,7 +29,7 @@ public class AnalyzerFactory {
     this.tempFolder = tempFolder;
   }
 
-  public Analyzer create() throws IOException{
+  public Analyzer create() throws IOException {
     try (var stream = getClass().getResourceAsStream("/analyzer/analyzer")) {
       if (stream == null) {
         throw new IllegalStateException("Analyzer binary not found");

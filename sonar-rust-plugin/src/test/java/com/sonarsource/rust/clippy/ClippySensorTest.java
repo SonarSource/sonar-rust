@@ -5,8 +5,6 @@
  */
 package com.sonarsource.rust.clippy;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -19,6 +17,8 @@ import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class ClippySensorTest {
 
@@ -34,7 +34,7 @@ class ClippySensorTest {
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 
-    assertThat(descriptor.name()).isEqualTo("Clippy Sensor");
+    assertThat(descriptor.name()).isEqualTo("Clippy");
     assertThat(descriptor.languages()).containsOnly(RustLanguage.KEY);
     assertThat(descriptor.configurationPredicate()).isNotNull();
   }

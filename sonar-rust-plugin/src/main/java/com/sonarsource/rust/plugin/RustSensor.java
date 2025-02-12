@@ -34,7 +34,7 @@ public class RustSensor implements Sensor {
   public void describe(SensorDescriptor descriptor) {
     descriptor
       .onlyOnLanguage(RustLanguage.KEY)
-      .name("Rust sensor");
+      .name("Rust");
   }
 
   @Override
