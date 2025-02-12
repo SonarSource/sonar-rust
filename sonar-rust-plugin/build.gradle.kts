@@ -16,10 +16,6 @@ plugins {
     id("com.gradleup.shadow") version "8.3.1"
 }
 
-group = "com.sonarsource.rust"
-version = "0.1.0-SNAPSHOT"
-
-
 dependencies {
     implementation("com.google.code.gson:gson:2.11.0")
     implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:2.16.0.3141")
