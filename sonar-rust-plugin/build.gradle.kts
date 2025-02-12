@@ -11,7 +11,6 @@ plugins {
     id("maven-publish")
     id("signing")
     id("com.diffplug.spotless") version "7.0.2"
-    id("org.sonarqube") version "5.1.0.4882"
     id("com.jfrog.artifactory") version "5.2.5"
     id("com.gradleup.shadow") version "8.3.1"
 }
