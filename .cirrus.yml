@@ -54,7 +54,7 @@ build_task:
   build_script:
     - source cirrus-env BUILD
     - source .cirrus/use-gradle-wrapper.sh
-    - regular_gradle_build_deploy_analyze
+    - regular_gradle_build_deploy_analyze --info --stacktrace
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 promote_task:
