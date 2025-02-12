@@ -1,3 +1,6 @@
+import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
+import org.jfrog.gradle.plugin.artifactory.task.ArtifactoryTask
+
 plugins {
     id("org.sonarqube") version "6.0.1.5171"
     id("com.jfrog.artifactory") version "5.2.5"
