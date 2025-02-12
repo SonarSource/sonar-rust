@@ -7,6 +7,7 @@ use std::collections::HashSet;
  */
 use tree_sitter::{Node, Parser, Query, QueryCursor, StreamingIterator, Tree};
 
+
 #[derive(Debug)]
 pub struct Output {
     pub highlight_tokens: Vec<HighlightToken>,
@@ -44,9 +45,11 @@ pub struct HighlightToken {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Default)]
 pub struct Metrics {
-    functions: i32,
     ncloc: i32,
+    comment_lines: i32,
+    functions: i32,
     statements: i32,
+    classes: i32,
 }
 
 pub fn process_code(source_code: &str) -> Output {
@@ -112,44 +115,67 @@ fn highlight(tree: &Tree, source_code: &str) -> Vec<HighlightToken> {
 }
 
 fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
-    let measures_query = Query::new(&tree_sitter_rust::LANGUAGE.into(), "
-(struct_item
-    name: (type_identifier) @name) @definition.class
+    let mut metrics = Metrics::default();
 
-(enum_item
-    name: (type_identifier) @name) @definition.class
+    // Lines containing comments
+    let mut comment_lines: HashSet<usize> = HashSet::new();
+    // Lines containing only comments
+    let mut lines_of_code: HashSet<usize> = HashSet::new();
 
-(union_item
-    name: (type_identifier) @name) @definition.class
+    let mut cursor = tree.walk();
+    let mut has_next = true;
+    let mut visited_children = false;
 
-(function_item
-    name: (identifier) @name) @definition.function
+    while has_next {
+        let node = cursor.node();
 
-(expression_statement) @definition.statement
-
-").expect("Query parsing error");
-
-    let mut cursor = QueryCursor::new();
-    let mut query_matches =
-        cursor.matches(&measures_query, tree.root_node(), source_code.as_bytes());
-
+        if node.is_extra() {
+            // "Extra" nodes are nodes that are not part of the grammer (e.g. comments), so we are skipping them
+            visited_children = true;
+        }
+        
+        if !visited_children {
+            if !cursor.goto_first_child() {
+                // This is a leaf node that is not part of a comment
+                lines_of_code.insert(node.start_position().row);
+                visited_children = true;
+            }
+        } else {
+            match node.kind() {
+                "line_comment" | "block_comment" => {
+                    let start_line = node.start_position().row;
+                    let mut end_line = node.end_position().row;
     
-    let mut metrics = Metrics {
-        functions: 0,
-        ncloc: 0,
-        statements: 0,
-    };
-
-    while let Some(m) = query_matches.next() {
-        for capture in m.captures {
-            match measures_query.capture_names()[capture.index as usize] {
-                "definition.class" => {},
-                "definition.function" => metrics.functions += 1,
-                "definition.statement" => metrics.statements += 1,
+                    // Tree-sitter counts lines for doc comments differently, the end line is the line after the last line of the comment.
+                    if node.child_by_field_name("doc").is_some() {
+                        end_line = end_line - 1;
+                    }
+    
+                    for line in start_line..=end_line {
+                        comment_lines.insert(line);
+                    }
+                },
+                "struct_item" | "enum_item" => {
+                    metrics.classes += 1;
+                },
+                "function_item" => {
+                    metrics.functions += 1;
+                },
+                "expression_statement" => {
+                    metrics.statements += 1;
+                },
                 _ => {}
+            }
+            if cursor.goto_next_sibling() {
+                visited_children = false;
+            } else if !cursor.goto_parent() {
+                has_next = false;
             }
         }
     }
+
+    metrics.ncloc = lines_of_code.len() as i32;
+    metrics.comment_lines = comment_lines.len() as i32;
 
     metrics
 
@@ -226,9 +252,11 @@ fn main() {
         let output = process_code(source_code);
 
         assert_eq!(output.metrics, Metrics {
-            functions: 1,
             ncloc: 4,
+            comment_lines: 2,
+            functions: 1,
             statements: 1,
+            classes: 0,
         });
 
         let mut actual_highlighting = output.highlight_tokens.clone();
@@ -391,4 +419,24 @@ fn main() {
 
         assert_eq!(actual, expected);
     }
+
+    #[test]
+    fn test_comment_metrics_comments() {
+        let actual = process_code(r#"
+/* Hello */
+fn main() {
+    let x = "foo"; // Set 'x' to 'foo'
+}         
+"#).metrics;
+
+    assert_eq!(actual, Metrics {
+        ncloc: 3,
+        comment_lines: 2,
+        functions: 1,
+        statements: 0,
+        classes: 0,
+    });
+
+    }
+
 }
