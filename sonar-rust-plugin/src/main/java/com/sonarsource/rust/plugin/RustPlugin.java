@@ -18,6 +18,8 @@ public class RustPlugin implements Plugin {
     context.addExtensions(
       RustLanguage.class,
       RustProfile.class,
+      RustSensor.class,
+      AnalyzerFactory.class,
       ClippyRulesDefinition.class,
       ClippySensor.class
     );

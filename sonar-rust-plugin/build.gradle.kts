@@ -46,6 +46,7 @@ tasks.named<Test>("test") {
 }
 
 tasks.jar {
+    dependsOn(tasks.shadowJar)
     manifest {
         attributes(
             mapOf(
@@ -60,17 +61,24 @@ tasks.jar {
     }
 }
 
- spotless {
-      java {
-          licenseHeader(
-              """
-              /*
-               * Copyright (C) 2025 SonarSource SA
-               * All rights reserved
-               * mailto:info AT sonarsource DOT com
-               */
-              """.trimIndent()
-          )
-          trimTrailingWhitespace()
-      }
-  }
+tasks.shadowJar {
+    dependsOn(":analyzer:compileRust")
+    from(project(":analyzer").tasks.named("compileRust").get().outputs.files) {
+           into("analyzer")
+    }
+}
+
+spotless {
+    java {
+        licenseHeader(
+            """
+            /*
+             * Copyright (C) 2025 SonarSource SA
+             * All rights reserved
+             * mailto:info AT sonarsource DOT com
+             */
+            """.trimIndent()
+        )
+        trimTrailingWhitespace()
+    }
+}
