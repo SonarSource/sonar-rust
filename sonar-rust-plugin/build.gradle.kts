@@ -105,7 +105,8 @@ artifactory {
                     "version" to project.version as String,
                 )
             )
-            publications("plugin")
+            publications("mavenJava")
+            setPublishArtifacts(true)
             setPublishPom(true) // Publish generated POM files to Artifactory (true by default)
             setPublishIvy(false) // Publish generated Ivy descriptor files to Artifactory (true by default)
         }
