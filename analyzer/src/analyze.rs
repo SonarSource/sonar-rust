@@ -1,12 +1,10 @@
-use std::collections::HashSet;
-
 /*
  * Copyright (C) 2025 SonarSource SA
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
+use std::collections::HashSet;
 use tree_sitter::{Node, Parser, Query, QueryCursor, StreamingIterator, Tree};
-
 
 #[derive(Debug)]
 pub struct Output {
@@ -45,11 +43,11 @@ pub struct HighlightToken {
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Default)]
 pub struct Metrics {
-    ncloc: i32,
-    comment_lines: i32,
-    functions: i32,
-    statements: i32,
-    classes: i32,
+    pub ncloc: i32,
+    pub comment_lines: i32,
+    pub functions: i32,
+    pub statements: i32,
+    pub classes: i32,
 }
 
 pub fn process_code(source_code: &str) -> Output {
@@ -58,18 +56,20 @@ pub fn process_code(source_code: &str) -> Output {
         .set_language(&tree_sitter_rust::LANGUAGE.into())
         .expect("Error loading Rust grammar");
 
-
     let tree = parser.parse(source_code, None).expect("Rust parsing error");
 
     Output {
         highlight_tokens: highlight(&tree, source_code),
-        metrics: calculate_metrics(&tree, source_code),
+        metrics: calculate_metrics(&tree),
     }
 }
 
 fn highlight(tree: &Tree, source_code: &str) -> Vec<HighlightToken> {
-    let highlight_query = Query::new(&tree_sitter_rust::LANGUAGE.into(), tree_sitter_rust::HIGHLIGHTS_QUERY)
-        .expect("Query parsing error");
+    let highlight_query = Query::new(
+        &tree_sitter_rust::LANGUAGE.into(),
+        tree_sitter_rust::HIGHLIGHTS_QUERY,
+    )
+    .expect("Query parsing error");
 
     let mut cursor = QueryCursor::new();
     let mut query_matches =
@@ -114,14 +114,10 @@ fn highlight(tree: &Tree, source_code: &str) -> Vec<HighlightToken> {
     tokens
 }
 
-fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
-    let mut metrics = Metrics::default();
-
-    // Lines containing comments
-    let mut comment_lines: HashSet<usize> = HashSet::new();
-    // Lines containing only comments
-    let mut lines_of_code: HashSet<usize> = HashSet::new();
-
+fn walk_tree<F>(tree: &Tree, mut callback: F)
+where
+    F: FnMut(Node<'_>),
+{
     let mut cursor = tree.walk();
     let mut has_next = true;
     let mut visited_children = false;
@@ -130,42 +126,17 @@ fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
         let node = cursor.node();
 
         if node.is_extra() {
-            // "Extra" nodes are nodes that are not part of the grammer (e.g. comments), so we are skipping them
+            // "Extra" nodes are nodes that are not part of the grammer (e.g. comments), so there is no need to visit their children.
             visited_children = true;
         }
-        
+
         if !visited_children {
             if !cursor.goto_first_child() {
-                // This is a leaf node that is not part of a comment
-                lines_of_code.insert(node.start_position().row);
                 visited_children = true;
             }
         } else {
-            match node.kind() {
-                "line_comment" | "block_comment" => {
-                    let start_line = node.start_position().row;
-                    let mut end_line = node.end_position().row;
-    
-                    // Tree-sitter counts lines for doc comments differently, the end line is the line after the last line of the comment.
-                    if node.child_by_field_name("doc").is_some() {
-                        end_line = end_line - 1;
-                    }
-    
-                    for line in start_line..=end_line {
-                        comment_lines.insert(line);
-                    }
-                },
-                "struct_item" | "enum_item" => {
-                    metrics.classes += 1;
-                },
-                "function_item" => {
-                    metrics.functions += 1;
-                },
-                "expression_statement" => {
-                    metrics.statements += 1;
-                },
-                _ => {}
-            }
+            callback(node);
+
             if cursor.goto_next_sibling() {
                 visited_children = false;
             } else if !cursor.goto_parent() {
@@ -173,12 +144,59 @@ fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
             }
         }
     }
+}
+
+fn calculate_metrics(tree: &Tree) -> Metrics {
+    let mut metrics = Metrics::default();
+
+    // Lines containing comments
+    let mut comment_lines: HashSet<usize> = HashSet::new();
+    // Lines containing only comments
+    let mut lines_of_code: HashSet<usize> = HashSet::new();
+
+    walk_tree(tree, |node: Node<'_>| {
+        // When this branch is reached, all children of the node have already been processed.
+        // Process the information in the node and move on to the next sibling (or backtrack to the parent if there aren't any).
+        match node.kind() {
+            "line_comment" | "block_comment" => {
+                let start_line = node.start_position().row;
+                let mut end_line = node.end_position().row;
+
+                // Tree-sitter counts lines for doc comments differently, the end line is the line after the last line of the comment.
+                if node.child_by_field_name("doc").is_some() {
+                    end_line -= 1;
+                }
+
+                for line in start_line..=end_line {
+                    comment_lines.insert(line);
+                }
+            }
+            "struct_item" | "enum_item" => {
+                metrics.classes += 1;
+            }
+            "function_item" => {
+                metrics.functions += 1;
+            }
+            "expression_statement" => {
+                metrics.statements += 1;
+            }
+            _ => {}
+        }
+
+        if node.child_count() == 0 {
+            let start_line = node.start_position().row;
+            let end_line = node.end_position().row;
+
+            for line in start_line..=end_line {
+                lines_of_code.insert(line);
+            }
+        }
+    });
 
     metrics.ncloc = lines_of_code.len() as i32;
     metrics.comment_lines = comment_lines.len() as i32;
 
     metrics
-
 }
 
 fn node_location(node: Node<'_>, source_code: &str) -> Location {
@@ -251,13 +269,16 @@ fn main() {
         "#;
         let output = process_code(source_code);
 
-        assert_eq!(output.metrics, Metrics {
-            ncloc: 4,
-            comment_lines: 2,
-            functions: 1,
-            statements: 1,
-            classes: 0,
-        });
+        assert_eq!(
+            output.metrics,
+            Metrics {
+                ncloc: 4,
+                comment_lines: 2,
+                functions: 1,
+                statements: 1,
+                classes: 0,
+            }
+        );
 
         let mut actual_highlighting = output.highlight_tokens.clone();
         actual_highlighting.sort();
@@ -422,21 +443,64 @@ fn main() {
 
     #[test]
     fn test_comment_metrics_comments() {
-        let actual = process_code(r#"
+        let actual = process_code(
+            r#"
 /* Hello */
 fn main() {
     let x = "foo"; // Set 'x' to 'foo'
 }         
-"#).metrics;
+"#,
+        )
+        .metrics;
 
-    assert_eq!(actual, Metrics {
-        ncloc: 3,
-        comment_lines: 2,
-        functions: 1,
-        statements: 0,
-        classes: 0,
-    });
-
+        assert_eq!(
+            actual,
+            Metrics {
+                ncloc: 3,
+                comment_lines: 2,
+                functions: 1,
+                statements: 0,
+                classes: 0,
+            }
+        );
     }
+    #[test]
+    fn test_class_and_function_metrics() {
+        let actual = process_code(
+            r#"
+enum Color {
+    Red,
+    Green,
+    Blue
+}
 
+struct Point {
+    x: i32,
+    y: i32,
+}
+
+impl Point {
+    fn new(x: i32, y: i32) -> Point {
+        Point { x, y }
+    }
+}
+
+fn main() {
+    let x = "foo";
+}
+"#,
+        )
+        .metrics;
+
+        assert_eq!(
+            actual,
+            Metrics {
+                ncloc: 17,
+                comment_lines: 0,
+                functions: 2,
+                statements: 0,
+                classes: 2,
+            }
+        );
+    }
 }

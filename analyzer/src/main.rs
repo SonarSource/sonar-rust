@@ -5,12 +5,9 @@
  */
 mod analyze;
 
-use std::{
-    collections::HashSet,
-    io::{self, Read, Write},
-};
+use std::io::{self, Read, Write};
 
-use analyze::{process_code, HighlightToken, HighlightTokenType, Location};
+use analyze::{process_code, Location};
 
 fn main() {
     loop {
@@ -30,6 +27,13 @@ fn main() {
             write_string(token.token_type.to_sonar_api_name());
             write_location(&token.location);
         }
+        write_string("metrics");
+        write_int(output.metrics.ncloc);
+        write_int(output.metrics.comment_lines);
+        write_int(output.metrics.functions);
+        write_int(output.metrics.statements);
+        write_int(output.metrics.classes);
+
         write_string("end");
     }
 }
