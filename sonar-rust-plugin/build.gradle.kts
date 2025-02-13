@@ -10,7 +10,19 @@ plugins {
     id("com.diffplug.spotless") version "7.0.2"
     id("org.sonarqube")
     id("com.jfrog.artifactory")
-    id("com.gradleup.shadow") version "8.3.1"
+    id("com.gradleup.shadow") version "8.3.5"
+}
+
+
+group = "com.sonarsource.rust"
+version = "0.1.0-SNAPSHOT"
+
+// Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
+val buildNumber: String? = System.getProperty("buildNumber")
+val unqualifiedVersion = project.version
+if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
+    val versionSuffix = if (project.version.toString().count { it == '.' } == 1) ".0.$buildNumber" else ".$buildNumber"
+    project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
 dependencies {
@@ -54,11 +66,11 @@ tasks.jar {
 }
 
 tasks.shadowJar {
-    dependsOn(tasks.jar)
     dependsOn(":analyzer:compileRust")
     from(project(":analyzer").tasks.named("compileRust").get().outputs.files) {
            into("analyzer")
    }
+   archiveClassifier.set("")
 }
 
 spotless {
@@ -98,10 +110,6 @@ signing {
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     sign(publishing.publications)
     setRequired { gradle.taskGraph.hasTask(":artifactoryPublish") }
-}
-
-artifacts {
-    archives(tasks.shadowJar)
 }
 
 val projectTitle: String by project
