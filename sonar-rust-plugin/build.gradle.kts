@@ -45,9 +45,17 @@ java {
   }
 }
 
+tasks.jacocoTestReport {
+  reports {
+    xml.required.set(true)
+    html.required.set(false)
+  }
+}
+
 tasks.named<Test>("test") {
   // Use JUnit Platform for unit tests.
   useJUnitPlatform()
+  finalizedBy("jacocoTestReport")
 }
 
 tasks.jar {

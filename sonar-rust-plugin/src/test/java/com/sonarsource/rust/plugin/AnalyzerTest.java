@@ -25,6 +25,8 @@ class AnalyzerTest {
       assertThat(result2.highlightTokens()).containsExactly(
         new Analyzer.HighlightTokens("KEYWORD", 1, 0, 1, 2),
         new Analyzer.HighlightTokens("CONSTANT", 1, 18, 1, 20));
+      assertThat(result1.measures()).isEqualTo(new Analyzer.Measures(1, 0, 1, 0, 0));
+      assertThat(result2.measures()).isEqualTo(new Analyzer.Measures(1, 0, 1, 0, 0));
     }
   }
 
