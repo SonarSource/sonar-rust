@@ -60,7 +60,7 @@ pub fn process_code(source_code: &str) -> Output {
 
     Output {
         highlight_tokens: highlight(&tree, source_code),
-        metrics: calculate_metrics(&tree, &source_code),
+        metrics: calculate_metrics(&tree, source_code),
     }
 }
 
@@ -134,7 +134,7 @@ fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
                     }
                     current_line += 1;
                 }
-            },
+            }
             "struct_item" | "enum_item" => {
                 metrics.classes += 1;
             }
@@ -201,7 +201,8 @@ where
 }
 
 fn is_blank(line: &str) -> bool {
-    line.chars().all(|c| c.is_whitespace() || c.is_ascii_punctuation())
+    line.chars()
+        .all(|c| c.is_whitespace() || c.is_ascii_punctuation())
 }
 
 fn node_location(node: Node<'_>, source_code: &str) -> Location {
@@ -472,13 +473,16 @@ fn main() {
 
     #[test]
     fn test_comment_metrics_doc_comment() {
-        let actual = process_code(r#"
+        let actual = process_code(
+            r#"
 /// This main function does something wonderful.
 /// Even more wonderful than what you can imagine.
 fn main() {
     let x = "foo";
 }
-"#).metrics;
+"#,
+        )
+        .metrics;
 
         assert_eq!(
             actual,
@@ -494,7 +498,8 @@ fn main() {
 
     #[test]
     fn test_comment_metrics_empty_lines() {
-        let actual = process_code(r#"
+        let actual = process_code(
+            r#"
 /**
  * 
  * This is a comment
@@ -505,7 +510,9 @@ fn main() {
 fn main() {
     let x = "foo";
 }
-"#).metrics;
+"#,
+        )
+        .metrics;
 
         assert_eq!(
             actual,
