@@ -150,7 +150,7 @@ publishing {
 }
 
 configure<ArtifactoryPluginConvention> {
-  clientConfig.info.buildName = "sonar-rust"
+  clientConfig.info.buildName = "sonar-rust-plugin"
   clientConfig.info.buildNumber = System.getenv("BUILD_NUMBER")
   clientConfig.isIncludeEnvVars = true
   clientConfig.envVarsExcludePatterns =
