@@ -54,13 +54,9 @@ public class RustSensor implements Sensor {
   private static void analyzeFile(Analyzer analyzer, SensorContext sensorContext, InputFile inputFile) {
     try {
       var result = analyzer.analyze(inputFile.contents());
-      // Measures
-      reportMeasures(sensorContext, inputFile, result.measures());
 
-      // Highlighting
-      NewHighlighting newHighlighting = sensorContext.newHighlighting().onFile(inputFile);
-      reportHighlighting(inputFile, newHighlighting, result.highlightTokens());
-      newHighlighting.save();
+      reportMeasures(sensorContext, inputFile, result.measures());
+      reportHighlighting(sensorContext, inputFile, result.highlightTokens());
     } catch (IOException ex) {
       LOG.error("Failed to analyze file: {} ({})", inputFile.filename(), ex.getMessage());
     }
@@ -73,7 +69,9 @@ public class RustSensor implements Sensor {
       .toList();
   }
 
-  private static void reportHighlighting(InputFile inputFile, NewHighlighting highlighting, List<Analyzer.HighlightTokens> tokens) {
+  private static void reportHighlighting(SensorContext sensorContext, InputFile inputFile, List<Analyzer.HighlightTokens> tokens) {
+    NewHighlighting highlighting = sensorContext.newHighlighting();
+    highlighting.onFile(inputFile);
     for (var token : tokens) {
       try {
         TextRange range = inputFile.newRange(token.startLine(), token.startColumn(), token.endLine(), token.endColumn());
@@ -82,6 +80,7 @@ public class RustSensor implements Sensor {
         LOG.error("Invalid highlighting: {}", e.getMessage());
       }
     }
+    highlighting.save();
   }
 
   private static void reportMeasures(SensorContext sensorContext, InputFile inputFile, Analyzer.Measures measures) {

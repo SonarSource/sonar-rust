@@ -141,7 +141,7 @@ fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
             "function_item" => {
                 metrics.functions += 1;
             }
-            "expression_statement" => {
+            "expression_statement" | "let_declaration" | "empty_statement" => {
                 metrics.statements += 1;
             }
             _ => {}
@@ -281,7 +281,7 @@ fn main() {
                 ncloc: 4,
                 comment_lines: 2,
                 functions: 1,
-                statements: 1,
+                statements: 2,
                 classes: 0,
             }
         );
@@ -465,7 +465,7 @@ fn main() {
                 ncloc: 3,
                 comment_lines: 2,
                 functions: 1,
-                statements: 0,
+                statements: 1,
                 classes: 0,
             }
         );
@@ -490,7 +490,7 @@ fn main() {
                 ncloc: 3,
                 comment_lines: 2,
                 functions: 1,
-                statements: 0,
+                statements: 1,
                 classes: 0,
             }
         );
@@ -520,7 +520,7 @@ fn main() {
                 ncloc: 3,
                 comment_lines: 2,
                 functions: 1,
-                statements: 0,
+                statements: 1,
                 classes: 0,
             }
         );
@@ -549,6 +549,7 @@ impl Point {
 
 fn main() {
     let x = "foo";
+    ; // Empty statement
 }
 "#,
         )
@@ -557,10 +558,10 @@ fn main() {
         assert_eq!(
             actual,
             Metrics {
-                ncloc: 17,
-                comment_lines: 0,
+                ncloc: 18,
+                comment_lines: 1,
                 functions: 2,
-                statements: 0,
+                statements: 2,
                 classes: 2,
             }
         );
