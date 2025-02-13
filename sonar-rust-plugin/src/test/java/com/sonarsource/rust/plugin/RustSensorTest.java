@@ -83,7 +83,7 @@ class RustSensorTest {
       .setModuleBaseDir(baseDir.toPath())
       .setType(InputFile.Type.MAIN)
       .setLanguage(RustLanguage.KEY)
-      .setCharset(StandardCharsets.ISO_8859_1)
+      .setCharset(StandardCharsets.UTF_8)
       .setContents(content)
       .build();
   }
