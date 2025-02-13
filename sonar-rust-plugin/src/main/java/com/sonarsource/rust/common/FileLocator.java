@@ -11,7 +11,11 @@ import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.utils.PathUtils;
 
 /**
- * Copied from the Sonar JavaScript analyzer.
+ * This FileLocator class was introduced as part of the implementation of LCOV coverage reports in the Sonar Rust plugin.
+ * It is responsible for locating files based on their paths using a reverse path tree to index and retrieve files efficiently.
+ * The logic for this class was adapted from the JavaScript analyzer, which uses similar logic for parsing LCOV files.
+ *
+ * @see https://github.com/SonarSource/SonarJS/blob/master/sonar-plugin/sonar-javascript-plugin/src/main/java/org/sonar/plugins/javascript/lcov/FileLocator.java
  */
 public class FileLocator {
 
