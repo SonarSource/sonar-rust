@@ -39,7 +39,6 @@ tasks.named<Test>("test") {
 }
 
 tasks.jar {
-    dependsOn(tasks.shadowJar)
     manifest {
         attributes(
             mapOf(
@@ -55,6 +54,7 @@ tasks.jar {
 }
 
 tasks.shadowJar {
+    dependsOn(tasks.jar)
     dependsOn(":analyzer:compileRust")
     from(project(":analyzer").tasks.named("compileRust").get().outputs.files) {
            into("analyzer")
@@ -98,6 +98,10 @@ signing {
     useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
     sign(publishing.publications)
     setRequired { gradle.taskGraph.hasTask(":artifactoryPublish") }
+}
+
+artifacts {
+    archives(tasks.shadowJar)
 }
 
 val projectTitle: String by project
