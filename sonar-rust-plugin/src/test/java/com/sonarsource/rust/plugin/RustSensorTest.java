@@ -17,6 +17,7 @@ import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
+import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -54,6 +55,8 @@ class RustSensorTest {
     var fnKeyword = context.highlightingTypeAt("%s:test.rs".formatted(PROJECT_KEY), 1, 0);
     assertThat(fnKeyword)
       .containsExactly(TypeOfText.KEYWORD);
+    assertThat(context.measure("%s:test.rs".formatted(PROJECT_KEY), CoreMetrics.FUNCTIONS).value())
+      .isEqualTo(1);
   }
 
   @Test
@@ -70,6 +73,9 @@ class RustSensorTest {
       .hasSize(1);
     assertThat(context.highlightingTypeAt("%s:test3.rs".formatted(PROJECT_KEY), 1, 0))
       .hasSize(1);
+
+    assertThat(context.measure("%s:test1.rs".formatted(PROJECT_KEY), CoreMetrics.COMMENT_LINES).value())
+      .isOne();
   }
 
   private InputFile inputFile(String relativePath, String content) {
