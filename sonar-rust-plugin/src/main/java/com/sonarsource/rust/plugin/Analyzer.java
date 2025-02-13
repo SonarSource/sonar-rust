@@ -44,6 +44,7 @@ public class Analyzer implements AutoCloseable {
     write(bytes);
 
     List<HighlightTokens> highlightTokens = new ArrayList<>();
+    Measures measures = new Measures();
 
     while (true) {
       String messageType = readString();
@@ -54,12 +55,20 @@ public class Analyzer implements AutoCloseable {
         int endLine = inputStream.readInt();
         int endColumn = inputStream.readInt();
         highlightTokens.add(new HighlightTokens(tokenType, startLine, startColumn, endLine, endColumn));
+      } else if ("metrics".equals(messageType)) {
+        int ncloc = inputStream.readInt();
+        int commentLines = inputStream.readInt();
+        int functions = inputStream.readInt();
+        int statements = inputStream.readInt();
+        int classes = inputStream.readInt();
+
+        measures = new Measures(ncloc, commentLines, functions, statements, classes);
       } else {
         break;
       }
     }
 
-    return new AnalysisResult(highlightTokens);
+    return new AnalysisResult(highlightTokens, measures);
   }
 
   @Override
@@ -71,7 +80,7 @@ public class Analyzer implements AutoCloseable {
     int length = inputStream.readInt();
     byte[] bytes = new byte[length];
     inputStream.readFully(bytes);
-    return new String(bytes);
+    return new String(bytes, StandardCharsets.UTF_8);
   }
 
   private void writeInt(int value) throws IOException {
@@ -81,7 +90,7 @@ public class Analyzer implements AutoCloseable {
 
   private void writeString(String value) throws IOException {
     outputStream.writeInt(value.length());
-    outputStream.write(value.getBytes());
+    outputStream.write(value.getBytes(StandardCharsets.UTF_8));
     outputStream.flush();
   }
 
@@ -90,10 +99,16 @@ public class Analyzer implements AutoCloseable {
     outputStream.flush();
   }
 
-  public record AnalysisResult(List<HighlightTokens> highlightTokens) {
+  public record AnalysisResult(List<HighlightTokens> highlightTokens, Measures measures) {
   }
 
   public record HighlightTokens(String tokenType, int startLine, int startColumn, int endLine, int endColumn) {
+  }
+
+  public record Measures(int ncloc, int commentLines, int functions, int statements, int classes) {
+    public Measures() {
+      this(0, 0, 0, 0, 0);
+    }
   }
 
 }
