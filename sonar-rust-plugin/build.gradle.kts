@@ -51,6 +51,8 @@ tasks.named<Test>("test") {
 }
 
 tasks.jar {
+  enabled = false
+  dependsOn(tasks.shadowJar)
   manifest {
     attributes(
       mapOf(
