@@ -108,7 +108,7 @@ signing {
   val signingKey: String? by project
   val signingPassword: String? by project
   useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-  sign(publishing.publications["mavenJava"])
+  sign(publishing.publications)
   setRequired { gradle.taskGraph.hasTask(":artifactoryPublish") }
 }
 
