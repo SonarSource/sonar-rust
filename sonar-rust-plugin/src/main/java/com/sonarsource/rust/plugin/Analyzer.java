@@ -80,7 +80,7 @@ public class Analyzer implements AutoCloseable {
     int length = inputStream.readInt();
     byte[] bytes = new byte[length];
     inputStream.readFully(bytes);
-    return new String(bytes);
+    return new String(bytes, StandardCharsets.UTF_8);
   }
 
   private void writeInt(int value) throws IOException {
@@ -90,7 +90,7 @@ public class Analyzer implements AutoCloseable {
 
   private void writeString(String value) throws IOException {
     outputStream.writeInt(value.length());
-    outputStream.write(value.getBytes());
+    outputStream.write(value.getBytes(StandardCharsets.UTF_8));
     outputStream.flush();
   }
 
