@@ -12,3 +12,4 @@ plugins {
 
 include("sonar-rust-plugin")
 include("analyzer")
+include("e2e")
