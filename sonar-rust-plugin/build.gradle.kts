@@ -107,33 +107,35 @@ artifacts {
 val projectTitle: String by project
 
 publishing {
-    publications.create<MavenPublication>("mavenJava") {
-        pom {
-            name.set(projectTitle)
-            description.set(project.description)
-            url.set("http://www.sonarsource.com/")
-            organization {
-                name.set("SonarSource")
-                url.set("http://www.sonarsource.com/")
-            }
-            licenses {
-                license {
-                    name.set("SonarSource")
-                }
-            }
-            scm {
-                url.set("https://github.com/SonarSource/sonar-armor")
-            }
-            developers {
-                developer {
-                    id.set("sonarsource-team")
-                    name.set("SonarSource Team")
-                }
-            }
-        }
-        artifact(tasks.shadowJar) {
-           classifier = null
-        }
+    publications {
+      create<MavenPublication>("mavenJava") {
+          pom {
+              name.set(projectTitle)
+              description.set(project.description)
+              url.set("http://www.sonarsource.com/")
+              organization {
+                  name.set("SonarSource")
+                  url.set("http://www.sonarsource.com/")
+              }
+              licenses {
+                  license {
+                      name.set("SonarSource")
+                  }
+              }
+              scm {
+                  url.set("https://github.com/SonarSource/sonar-armor")
+              }
+              developers {
+                  developer {
+                      id.set("sonarsource-team")
+                      name.set("SonarSource Team")
+                  }
+              }
+          }
+          artifact(tasks.shadowJar) {
+             classifier = null
+          }
+      }
     }
 }
 
