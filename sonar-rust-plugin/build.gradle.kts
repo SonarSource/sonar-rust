@@ -158,7 +158,7 @@ configure<ArtifactoryPluginConvention> {
 
   // Define the artifacts to be deployed to https://binaries.sonarsource.com on releases
   clientConfig.info.addEnvironmentProperty("ARTIFACTS_TO_PUBLISH", "${project.group}:sonar-rust-plugin:jar")
-  // The name of this variable is important because it"s used by the delivery process when extracting version from Artifactory build info.
+  // The name of this variable is important because it's used by the delivery process when extracting version from Artifactory build info.
   clientConfig.info.addEnvironmentProperty("PROJECT_VERSION", version.toString())
 
   setContextUrl(System.getenv("ARTIFACTORY_URL"))

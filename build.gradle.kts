@@ -1,8 +1,6 @@
 plugins {
-  `maven-publish`
-  signing
   id("org.sonarqube") version "6.0.1.5171"
-  id("com.jfrog.artifactory") version "5.2.5"
+  id("com.jfrog.artifactory") version "5.2.5" apply false
 }
 
 
@@ -34,44 +32,3 @@ sonar {
   }
 }
 
-signing {
-  val signingKeyId: String? by project
-  val signingKey: String? by project
-  val signingPassword: String? by project
-  useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-  sign(publishing.publications)
-  setRequired { gradle.taskGraph.hasTask(":artifactoryPublish") }
-}
-
-
-val projectTitle: String by project
-
-publishing {
-  publications {
-    create<MavenPublication>("mavenJava") {
-      pom {
-        name.set(projectTitle)
-        description.set(project.description)
-        url.set("http://www.sonarsource.com/")
-        organization {
-          name.set("SonarSource")
-          url.set("http://www.sonarsource.com/")
-        }
-        licenses {
-          license {
-            name.set("SonarSource")
-          }
-        }
-        scm {
-          url.set("https://github.com/SonarSource/sonar-armor")
-        }
-        developers {
-          developer {
-            id.set("sonarsource-team")
-            name.set("SonarSource Team")
-          }
-        }
-      }
-    }
-  }
-}
