@@ -150,7 +150,7 @@ publishing {
 }
 
 configure<ArtifactoryPluginConvention> {
-  clientConfig.info.buildName = "sonar-rust-plugin"
+  clientConfig.info.buildName = "sonar-rust"
   clientConfig.info.buildNumber = System.getenv("BUILD_NUMBER")
   clientConfig.isIncludeEnvVars = true
   clientConfig.envVarsExcludePatterns =
@@ -171,7 +171,7 @@ configure<ArtifactoryPluginConvention> {
     defaults {
       setProperties(
         mapOf(
-          "build.name" to "sonar-rust-plugin",
+          "build.name" to "sonar-rust",
           "build.number" to project.ext["buildNumber"].toString(),
           "pr.branch.target" to System.getenv("PULL_REQUEST_BRANCH_TARGET"),
           "pr.number" to System.getenv("PULL_REQUEST_NUMBER"),
@@ -181,8 +181,6 @@ configure<ArtifactoryPluginConvention> {
         )
       )
       publications("mavenJava")
-      setPublishArtifacts(true)
-      setPublishPom(true) // Publish generated POM files to Artifactory (true by default)
       setPublishIvy(false) // Publish generated Ivy descriptor files to Artifactory (true by default)
     }
   }
