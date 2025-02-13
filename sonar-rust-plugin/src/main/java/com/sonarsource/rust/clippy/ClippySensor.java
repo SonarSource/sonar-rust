@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.clippy;
 
+import com.sonarsource.rust.common.ReportProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.util.ArrayList;
 import org.slf4j.Logger;
@@ -29,8 +30,10 @@ public class ClippySensor implements Sensor {
 
   @Override
   public void execute(SensorContext context) {
-    var reportPaths = context.config().getStringArray(CLIPPY_REPORT_PATHS);
-    var reportFiles = ClippyReportProvider.getReportFiles(context, reportPaths);
+    LOG.debug("Processing Clippy reports");
+
+    var reportProvider = new ReportProvider("Clippy", CLIPPY_REPORT_PATHS);
+    var reportFiles = reportProvider.getReportFiles(context);
     if (reportFiles.isEmpty()) {
       LOG.warn("No Clippy report files found");
       return;
@@ -59,6 +62,8 @@ public class ClippySensor implements Sensor {
         LOG.warn("Failed to save Clippy diagnostic. {}", e.getMessage());
       }
     }
+
+    LOG.debug("Processed Clippy reports");
   }
 
   @SuppressWarnings("deprecation")
