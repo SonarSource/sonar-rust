@@ -31,7 +31,6 @@ class CodeCoverageTest {
       """;
 
     var inputFile = TestInputFileBuilder.create("module", "file.rs")
-      .initMetadata("fn main() {\n  println!(\"Hello, world!\");\n}\n")
       .setContents(rustCode)
       .build();
 
