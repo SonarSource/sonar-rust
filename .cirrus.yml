@@ -37,8 +37,6 @@ cleanup_gradle_cache_script_template: &CLEANUP_GRADLE_CACHE_SCRIPT
     rm -rf "${GRADLE_USER_HOME}"/workers
     rm -rf "${GRADLE_USER_HOME}"/.tmp
     /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete
-    
-    
 
 build_task:
   eks_container:
