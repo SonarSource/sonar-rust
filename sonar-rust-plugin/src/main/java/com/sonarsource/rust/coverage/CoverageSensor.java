@@ -81,7 +81,7 @@ public class CoverageSensor implements Sensor {
     LOG.debug("Processed LCOV coverage reports");
   }
 
-  private void saveCoverage(SensorContext context, CodeCoverage coverage) {
+  private static void saveCoverage(SensorContext context, CodeCoverage coverage) {
     var newCoverage = context.newCoverage()
       .onFile(coverage.getInputFile());
 
