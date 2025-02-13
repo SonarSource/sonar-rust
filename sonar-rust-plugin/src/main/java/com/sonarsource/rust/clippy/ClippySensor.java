@@ -23,7 +23,7 @@ public class ClippySensor implements Sensor {
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor
-      .name("Rust Clippy")
+      .name("Clippy")
       .onlyOnLanguage(RustLanguage.KEY)
       .onlyWhenConfiguration(config -> config.hasKey(CLIPPY_REPORT_PATHS));
   }

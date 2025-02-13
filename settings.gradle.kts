@@ -12,3 +12,4 @@ plugins {
 
 rootProject.name = "sonar-rust"
 include("sonar-rust-plugin")
+include("analyzer")
