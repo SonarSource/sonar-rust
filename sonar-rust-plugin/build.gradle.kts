@@ -171,7 +171,7 @@ configure<ArtifactoryPluginConvention> {
     defaults {
       setProperties(
         mapOf(
-          "build.name" to "sonar-rust",
+          "build.name" to "sonar-rust-plugin",
           "build.number" to project.ext["buildNumber"].toString(),
           "pr.branch.target" to System.getenv("PULL_REQUEST_BRANCH_TARGET"),
           "pr.number" to System.getenv("PULL_REQUEST_NUMBER"),
