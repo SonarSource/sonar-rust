@@ -204,6 +204,8 @@ class LCOVParserTest {
     var lcovData = """
       SF:path/to/file1.rs
       DA:1,1
+      SF:path/to/file2.rs
+      BRDA:1,1,1,1
       end_of_record
       """;
     var lcovFile = Files.createTempFile(baseDir, "lcov", ".info");
@@ -216,10 +218,13 @@ class LCOVParserTest {
     var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
-    assertThat(problems).hasSize(1);
+    assertThat(problems).hasSize(2);
 
-    var problem = problems.get(0);
-    assertThat(problem).isEqualTo(String.format("%s:%d: Invalid SF. File not found: %s", lcovFile, 1, "path/to/file1.rs"));
+    var problem1 = problems.get(0);
+    assertThat(problem1).isEqualTo(String.format("%s:%d: Invalid SF. File not found: %s", lcovFile, 1, "path/to/file1.rs"));
+
+    var problem2 = problems.get(1);
+    assertThat(problem2).isEqualTo(String.format("%s:%d: Invalid SF. File not found: %s", lcovFile, 3, "path/to/file2.rs"));
 
     Files.delete(lcovFile);
   }
@@ -318,7 +323,7 @@ class LCOVParserTest {
   }
 
   @Test
-  void testParseBrandDataSyntaxError() throws IOException {
+  void testParseBranchDataSyntaxError() throws IOException {
     var lcovData = """
       SF:path/to/file1.rs
       BRDA:1,
@@ -373,6 +378,36 @@ class LCOVParserTest {
 
     var problem = problems.get(0);
     assertThat(problem).isEqualTo(String.format("%s:%d: Invalid BRDA. Number format error", lcovFile, 2));
+
+    Files.delete(lcovFile);
+  }
+
+  @Test
+  void testParseBranchDataOutOfRangeError() throws IOException {
+    var lcovData = """
+      SF:path/to/file1.rs
+      BRDA:42,1,1,1,1
+      end_of_record
+      """;
+    var lcovFile = baseDir.resolve("lcov.info");
+    Files.writeString(lcovFile, lcovData);
+
+    var context = SensorContextTester.create(baseDir);
+    var fs = context.fileSystem();
+
+    var inputFile = TestInputFileBuilder.create("module", "path/to/file1.rs")
+      .setLines(1)
+      .build();
+    fs.add(inputFile);
+
+    var locator = new FileLocator(fs.inputFiles());
+    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+
+    var problems = parser.parse().problems();
+    assertThat(problems).hasSize(1);
+
+    var problem = problems.get(0);
+    assertThat(problem).isEqualTo(String.format("%s:%d: Invalid BRDA. Line number outside file range: 42", lcovFile, 2));
 
     Files.delete(lcovFile);
   }

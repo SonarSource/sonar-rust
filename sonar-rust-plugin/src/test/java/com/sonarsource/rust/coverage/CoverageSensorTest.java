@@ -109,7 +109,7 @@ class CoverageSensorTest {
         DA:18,1
         DA:19,1
         DA:20,1
-        BRDA:2,0,0,2
+        BRDA:2,0,0,0
         BRDA:2,0,1,3
         BRF:2
         BRH:2
@@ -176,28 +176,31 @@ class CoverageSensorTest {
     var fs = context.fileSystem();
 
     var mainFile = TestInputFileBuilder.create("module", "src/main.rs")
-      .setLines(12)
+      .setLines(30)
       .build();
     fs.add(mainFile);
 
     var absFile = TestInputFileBuilder.create("module", "src/abs.rs")
-      .setLines(8)
+      .setLines(25)
       .build();
     fs.add(absFile);
 
     var signFile = TestInputFileBuilder.create("module", "src/sign.rs")
-      .setLines(10)
+      .setLines(25)
       .build();
     fs.add(signFile);
 
     var sensor = new CoverageSensor();
     sensor.execute(context);
 
+    assertThat(logTester.logs()).noneSatisfy(log -> assertThat(log).contains("problems"));
+
     assertThat(context.lineHits(absFile.key(), 1)).isEqualTo(5);
     assertThat(context.lineHits(absFile.key(), 2)).isEqualTo(5);
     assertThat(context.lineHits(absFile.key(), 3)).isEqualTo(2);
     assertThat(context.lineHits(absFile.key(), 5)).isEqualTo(3);
     assertThat(context.conditions(absFile.key(), 2)).isEqualTo(2);
+    assertThat(context.coveredConditions(absFile.key(), 2)).isEqualTo(1);
 
     assertThat(context.lineHits(mainFile.key(), 4)).isZero();
     assertThat(context.lineHits(mainFile.key(), 5)).isZero();
@@ -213,5 +216,7 @@ class CoverageSensorTest {
     assertThat(context.lineHits(signFile.key(), 7)).isEqualTo(1);
     assertThat(context.conditions(signFile.key(), 2)).isEqualTo(2);
     assertThat(context.conditions(signFile.key(), 4)).isEqualTo(2);
+    assertThat(context.coveredConditions(signFile.key(), 2)).isEqualTo(2);
+    assertThat(context.coveredConditions(signFile.key(), 4)).isEqualTo(2);
   }
 }
