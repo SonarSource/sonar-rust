@@ -5,7 +5,7 @@ plugins {
   id("java")
   id("jacoco")
   `maven-publish`
-  id("signing")
+  signing
   id("com.diffplug.spotless") version "7.0.2"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
@@ -108,7 +108,7 @@ signing {
   val signingKey: String? by project
   val signingPassword: String? by project
   useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-  sign(publishing.publications)
+  sign(publishing.publications["mavenJava"])
   setRequired { gradle.taskGraph.hasTask(":artifactoryPublish") }
 }
 
