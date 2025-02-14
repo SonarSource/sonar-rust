@@ -74,7 +74,7 @@ class ClippyReportParserTest {
 
     var diagnostics = ClippyReportParser.parse(tempFile.toFile());
 
-    assertThat(diagnostics).hasSize(0);
+    assertThat(diagnostics).isEmpty();
 
     Files.delete(tempFile);
   }

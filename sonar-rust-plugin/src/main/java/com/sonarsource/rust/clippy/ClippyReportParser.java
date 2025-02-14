@@ -17,6 +17,10 @@ public class ClippyReportParser {
 
   private static final Gson GSON = new Gson();
 
+  private ClippyReportParser() {
+    // Utility class
+  }
+
   public static List<ClippyDiagnostic> parse(File reportFile) {
     try {
       // Clippy reports are not syntactically valid JSON, because they contain one JSON object per line.

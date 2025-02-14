@@ -62,7 +62,7 @@ public class RustSensor implements Sensor {
     }
   }
 
-  private List<InputFile> inputFiles(SensorContext sensorContext) {
+  private static List<InputFile> inputFiles(SensorContext sensorContext) {
     FileSystem fileSystem = sensorContext.fileSystem();
     FilePredicate predicate = fileSystem.predicates().hasLanguage(RustLanguage.KEY);
     return StreamSupport.stream(fileSystem.inputFiles(predicate).spliterator(), false)
