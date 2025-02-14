@@ -18,3 +18,9 @@ task<Exec>("checkRustFormat") {
   inputs.files("src/", "Cargo.toml", "Cargo.lock")
   commandLine("cargo", "fmt", "--", "--check")
 }
+
+task<Exec>("coverageRust") {
+  inputs.files("src/", "Cargo.toml", "Cargo.lock")
+  outputs.files("target/llvm-cov-target/coverage.lcov")
+  commandLine("cargo", "llvm-cov", "--lcov", "--output-path", "target/llvm-cov-target/coverage.lcov")
+}
