@@ -4,6 +4,6 @@
  * mailto:info AT sonarsource DOT com
  */
 @ParametersAreNonnullByDefault
-package com.sonarsource.rust.plugin;
+package com.sonarsource.rust.coverage;
 
 import javax.annotation.ParametersAreNonnullByDefault;

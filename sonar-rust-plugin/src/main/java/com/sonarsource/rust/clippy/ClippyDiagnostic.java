@@ -6,7 +6,6 @@
 package com.sonarsource.rust.clippy;
 
 import java.util.List;
-
 import javax.annotation.Nullable;
 
 public record ClippyDiagnostic(@Nullable ClippyMessage message) {}

@@ -67,7 +67,7 @@ public class ClippySensor implements Sensor {
   }
 
   @SuppressWarnings("deprecation")
-  private void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {
+  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {
     var spans = diagnostic.message().spans();
     if (spans.isEmpty()) {
       throw new IllegalStateException("Empty spans");
