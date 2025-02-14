@@ -7,6 +7,6 @@ RUN apt-get update && apt-get -y install rustup && apt-get clean
 
 USER sonarsource
 
-RUN rustup default 1.84.1
-  && rustup component add llvm-tools
+RUN rustup default 1.84.1 \\
+  && rustup component add llvm-tools \\
   && cargo install cargo-llvm-cov
