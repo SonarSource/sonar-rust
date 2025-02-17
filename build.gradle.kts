@@ -32,7 +32,7 @@ repositories {
   mavenCentral()
 }
 
-sonar {
+sonarqube {
   properties {
     property("sonar.projectName", "sonar-rust")
     property("sonar.projectKey", "SonarSource_sonar-rust")
@@ -44,12 +44,7 @@ sonar {
     property("sonar.links.scm", "https://github.com/SonarSource/sonar-rust")
     property("sonar.links.issue", "https://jira.sonarsource.com/projects/SKUNK")
     property("sonar.rust.lcov.reportPaths", "analyzer/target/llvm-cov-target/coverage.lcov")
-    property("sonar.log.level", "DEBUG")
   }
-}
-
-tasks.sonar {
-  useLoggerLevel(LogLevel.DEBUG)
 }
 
 configure<ArtifactoryPluginConvention> {
