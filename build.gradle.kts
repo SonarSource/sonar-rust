@@ -47,6 +47,10 @@ sonar {
   }
 }
 
+tasks.sonar {
+  useLoggerLevel(LogLevel.DEBUG)
+}
+
 configure<ArtifactoryPluginConvention> {
   clientConfig.info.buildName = "sonar-rust"
   clientConfig.info.buildNumber = System.getenv("BUILD_NUMBER")
