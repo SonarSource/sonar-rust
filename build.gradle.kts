@@ -46,6 +46,10 @@ sonarqube {
   }
 }
 
+tasks.sonarqube {
+  dependsOn(":analyzer:coverageRust")
+}
+
 configure<ArtifactoryPluginConvention> {
   clientConfig.info.buildName = "sonar-rust"
   clientConfig.info.buildNumber = System.getenv("BUILD_NUMBER")
