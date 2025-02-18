@@ -21,7 +21,6 @@ eks_container_definition: &CONTAINER_DEFINITION
   docker_arguments:
     CIRRUS_AWS_ACCOUNT: ${CIRRUS_AWS_ACCOUNT}
 
-
 setup_gradle_cache_template: &SETUP_GRADLE_CACHE
   gradle_cache:
     folder: .gradle
@@ -74,8 +73,10 @@ e2e_task:
     memory: 16G
   <<: *SETUP_GRADLE_CACHE
   script:
-    - ./gradlew build -x test
-    - ./gradlew :e2e:test -Pe2e
+    - source cirrus-env QA
+    - source .cirrus/use-gradle-wrapper.sh
+    - source set_gradle_build_version
+    - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION}
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 promote_task:
