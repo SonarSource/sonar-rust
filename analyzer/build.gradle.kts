@@ -33,3 +33,10 @@ task<Exec>("clippyRust") {
   val outputFile = file("clippy_report.json")
   standardOutput = outputFile.outputStream()
 }
+
+task<Exec>("compileCross") {
+  description = "Compiles Rust code for all supported platforms."
+  inputs.files("src/", "Cargo.toml", "Cargo.lock")
+  outputs.files("target/x86_64-pc-windows-gnu/release/analyzer.exe")
+  commandLine("cargo", "build", "--release", "--target", "x86_64-pc-windows-gnu")
+}
