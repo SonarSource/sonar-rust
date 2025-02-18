@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import javax.annotation.Nullable;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
 
@@ -89,7 +90,7 @@ public class LCOVParser {
     return new CodeCoverage(inputFile);
   }
 
-  private void parseDA(CodeCoverage coverage, String line, int lineCounter) {
+  private void parseDA(@Nullable CodeCoverage coverage, String line, int lineCounter) {
     // DA:<line number>,<execution count>[,<checksum>]
     if (coverage == null) {
       return;
@@ -110,7 +111,7 @@ public class LCOVParser {
     }
   }
 
-  private void parseBRDA(CodeCoverage coverage, String line, int lineCounter) {
+  private void parseBRDA(@Nullable CodeCoverage coverage, String line, int lineCounter) {
     // BRDA:<line number>,<block number>,<branch number>,<taken>
     if (coverage == null) {
       return;
