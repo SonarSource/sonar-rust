@@ -24,3 +24,12 @@ task<Exec>("coverageRust") {
   outputs.files("target/llvm-cov-target/coverage.lcov")
   commandLine("cargo", "llvm-cov", "--lcov", "--output-path", "target/llvm-cov-target/coverage.lcov")
 }
+
+task<Exec>("clippyRust") {
+  inputs.files("src/", "Cargo.toml", "Cargo.lock")
+  outputs.files("clippy_report.json")
+  commandLine("cargo", "clippy", "--message-format", "json")
+
+  val outputFile = file("clippy_report.json")
+  standardOutput = outputFile.outputStream()
+}
