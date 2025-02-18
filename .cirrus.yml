@@ -65,10 +65,24 @@ build_task:
     - source regular_gradle_build_deploy_analyze --info --stacktrace
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
+e2e_task:
+  depends_on:
+    - build
+  eks_container:
+    <<: *CONTAINER_DEFINITION
+    cpu: 4
+    memory: 16G
+  <<: *SETUP_GRADLE_CACHE
+  script:
+    - ./gradlew build -x test
+    - ./gradlew :e2e:test -Pe2e
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
+
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
   depends_on:
     - build
+    - e2e
   eks_container:
     <<: *CONTAINER_DEFINITION
     cpu: 1
