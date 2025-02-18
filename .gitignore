@@ -24,6 +24,9 @@ target/
 # MSVC Windows builds of rustc generate these, which store debugging information
 *.pdb
 
+# Clippy reports
+analyzer/clippy_report.json
+
 # ---- Mac OS X
 .DS_Store
 Icon?

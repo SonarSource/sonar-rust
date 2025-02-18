@@ -58,6 +58,11 @@ tasks.named<Test>("test") {
   finalizedBy("jacocoTestReport")
 }
 
+tasks.named("check") {
+  dependsOn(":analyzer:testRust")
+  dependsOn(":analyzer:checkRustFormat")
+}
+
 tasks.jar {
   enabled = false
   dependsOn(tasks.shadowJar)
