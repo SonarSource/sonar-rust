@@ -32,7 +32,7 @@ repositories {
   mavenCentral()
 }
 
-sonarqube {
+sonar {
   properties {
     property("sonar.projectName", "sonar-rust")
     property("sonar.projectKey", "SonarSource_sonar-rust")
@@ -46,7 +46,7 @@ sonarqube {
   }
 }
 
-tasks.sonarqube {
+tasks.sonar {
   dependsOn(":analyzer:coverageRust")
 }
 

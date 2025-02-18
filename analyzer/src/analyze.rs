@@ -60,7 +60,7 @@ pub fn process_code(source_code: &str) -> Output {
 
     Output {
         highlight_tokens: highlight(&tree, source_code),
-        metrics: calculate_metrics(&tree, source_code),
+        metrics: calculate_metrics(&tree, &source_code),
     }
 }
 
