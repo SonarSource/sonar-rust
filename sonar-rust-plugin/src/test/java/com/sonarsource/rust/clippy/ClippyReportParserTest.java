@@ -80,6 +80,21 @@ class ClippyReportParserTest {
   }
 
   @Test
+  void testParseEmptyJson() throws IOException {
+    var json = """
+      {}
+      """;
+    var tempFile = Files.createTempFile("clippy_report", ".json");
+    Files.writeString(tempFile, json);
+
+    var diagnostics = ClippyReportParser.parse(tempFile.toFile());
+
+    assertThat(diagnostics).isEmpty();
+
+    Files.delete(tempFile);
+  }
+
+  @Test
   void testParseEmptyReport() throws IOException {
     var tempFile = Files.createTempFile("clippy_report", ".json");
 
