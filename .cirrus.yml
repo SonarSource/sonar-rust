@@ -90,7 +90,6 @@ cross_task:
         image: ghcr.io/cirruslabs/macos-sonoma-xcode:latest
         cpu: 4
         memory: 8G
-  <<: *SETUP_GRADLE_CACHE
   env:
     # analysis on Next
     SONAR_TOKEN: VAULT[development/kv/data/next data.token]
@@ -108,7 +107,6 @@ cross_task:
     DEPLOY_PULL_REQUEST: "true"
   build_script:
     - ./gradlew :analyzer:compileCross
-  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
