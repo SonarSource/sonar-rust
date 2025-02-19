@@ -20,6 +20,13 @@ To build the project, you can use the following Gradle commands:
 - `./gradlew shadowJar`: Creates a fat JAR file that includes all dependencies.
 - `./gradlew spotlessApply`: Formats the code according to the project's style guidelines.
 
+### Cross-Compilation
+
+The project includes a native Rust analyzer that needs to be cross-compiled for different platforms. To cross-compile the Rust analyzer, you can use the following Gradle tasks:
+
+
+
+
 ## Running End-to-End Tests
 
 End-to-end tests verify the entire system from start to finish. These tests involve starting a SonarQube instance, invoking the scanner as a user would, running the sensor, sending issues to the Plugin API, processing them using the SonarQube instance, and finally comparing the outcome to the expected behavior.

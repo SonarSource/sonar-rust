@@ -1,9 +1,39 @@
+import org.gradle.internal.os.OperatingSystem
 
-task<Exec>("compileRust") {
+fun createCompileRustTask(target: String, envVars: Map<String, String> = emptyMap()): TaskProvider<Exec> {
+  return tasks.register<Exec>("compileRust${target.replaceFirstChar { it.uppercase() }}") {
+    description = "Compiles Rust code for target $target."
+    group = "Rust compilation"
+    inputs.files("src/", "Cargo.toml", "Cargo.lock")
+    outputs.files(fileTree("target/$target/release") {
+      include("analyzer*")
+    })
+    commandLine("cargo", "build", "--release", "--target", target)
+    environment(envVars)
+  }
+}
+
+// Create tasks for compiling Rust code for different targets, to get a list of available targets run `rustup target list`
+val compileRustLinux = createCompileRustTask(
+  "x86_64-unknown-linux-gnu",
+  mapOf("TARGET_CC" to "x86_64-unknown-linux-gnu-gcc", "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER" to "x86_64-unknown-linux-gnu-gcc")
+)
+val compileRustLinuxMusl = createCompileRustTask(
+  "x86_64-unknown-linux-musl",
+  mapOf("TARGET_CC" to "x86_64-linux-musl-gcc", "CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER" to "x86_64-linux-musl-gcc")
+)
+val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu")
+val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin")
+
+task("compileRust") {
   description = "Compiles Rust code."
-  inputs.files("src/", "Cargo.toml", "Cargo.lock")
-  outputs.files("target/release/analyzer")
-  commandLine("cargo", "build", "--release")
+  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin)
+  if (OperatingSystem.current().isMacOsX) {
+    dependsOn(compileRustDarwin)
+  }
+  doLast {
+    println("Rust code compiled successfully")
+  }
 }
 
 task<Exec>("testRust") {
@@ -34,16 +64,3 @@ task<Exec>("clippyRust") {
   standardOutput = outputFile.outputStream()
 }
 
-task<Exec>("compileRustWin") {
-  description = "Compiles Rust code for all supported platforms."
-  inputs.files("src/", "Cargo.toml", "Cargo.lock")
-  outputs.files("target/x86_64-pc-windows-gnu/release/analyzer.exe")
-  commandLine("cargo", "build", "--release", "--target", "x86_64-pc-windows-gnu")
-}
-
-task<Exec>("compileRustDarwin") {
-  description = "Compiles Rust code for all supported platforms."
-  inputs.files("src/", "Cargo.toml", "Cargo.lock")
-  outputs.files("target/x86_64-pc-windows-gnu/release/analyzer.exe")
-  commandLine("cargo", "build", "--release", "--target", "aarch64-apple-darwin")
-}

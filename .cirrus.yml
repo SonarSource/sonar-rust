@@ -80,16 +80,11 @@ e2e_task:
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 cross_task:
-  persistent_worker:
-    resources:
-      tart-vms: 1
-    labels:
-      envname: prod
-    isolation:
-      tart:
-        image: ghcr.io/cirruslabs/macos-sonoma-xcode:latest
-        cpu: 4
-        memory: 8G
+  eks_container:
+    <<: *CONTAINER_DEFINITION
+    cpu: 4
+    memory: 16G
+  <<: *SETUP_GRADLE_CACHE
   env:
     # analysis on Next
     SONAR_TOKEN: VAULT[development/kv/data/next data.token]
@@ -106,7 +101,8 @@ cross_task:
     ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
     DEPLOY_PULL_REQUEST: "true"
   build_script:
-    - ./gradlew :analyzer:compileCross
+    - ./gradlew :analyzer:compileCross --info
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
