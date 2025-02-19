@@ -5,6 +5,7 @@ USER root
 
 RUN apt-get update && apt-get -y install rustup gcc-mingw-w64 && apt-get clean
 
+
 USER sonarsource
 
 RUN rustup default 1.84.1 && \

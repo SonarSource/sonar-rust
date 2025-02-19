@@ -34,9 +34,16 @@ task<Exec>("clippyRust") {
   standardOutput = outputFile.outputStream()
 }
 
-task<Exec>("compileCross") {
+task<Exec>("compileRustWin") {
   description = "Compiles Rust code for all supported platforms."
   inputs.files("src/", "Cargo.toml", "Cargo.lock")
   outputs.files("target/x86_64-pc-windows-gnu/release/analyzer.exe")
   commandLine("cargo", "build", "--release", "--target", "x86_64-pc-windows-gnu")
+}
+
+task<Exec>("compileRustDarwin") {
+  description = "Compiles Rust code for all supported platforms."
+  inputs.files("src/", "Cargo.toml", "Cargo.lock")
+  outputs.files("target/x86_64-pc-windows-gnu/release/analyzer.exe")
+  commandLine("cargo", "build", "--release", "--target", "aarch64-apple-darwin")
 }
