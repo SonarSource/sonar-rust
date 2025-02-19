@@ -23,4 +23,5 @@ tasks.test {
         project.hasProperty("e2e")
     }
     useJUnitPlatform()
+    systemProperty("pluginVersion", System.getProperty("pluginVersion", null))
 }

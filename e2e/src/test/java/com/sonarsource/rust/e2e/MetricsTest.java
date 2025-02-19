@@ -10,25 +10,20 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
-import com.sonar.orchestrator.locator.FileLocation;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.RegisterExtension;
-import org.sonarqube.ws.client.HttpConnector;
-import org.sonarqube.ws.client.WsClientFactories;
-import org.sonarqube.ws.client.measures.ComponentRequest;
-import java.io.File;
+import com.sonarsource.rust.e2e.helpers.OrchestratorHelper;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.extension.RegisterExtension;
+import org.junit.jupiter.api.Test;
+import org.sonarqube.ws.client.HttpConnector;
+import org.sonarqube.ws.client.measures.ComponentRequest;
+import org.sonarqube.ws.client.WsClientFactories;
 
 class MetricsTest {
 
   @RegisterExtension
-  static final OrchestratorExtension orchestrator = OrchestratorExtension.builderEnv()
-    .useDefaultAdminCredentialsForBuilds(true)
-    .setSonarVersion(System.getProperty("sonar.runtimeVersion", "LATEST_RELEASE"))
-    .addPlugin(FileLocation.byWildcardMavenFilename(new File("../sonar-rust-plugin/build/libs"), "sonar-rust-plugin-*.jar"))
-    .build();
+  static final OrchestratorExtension orchestrator = OrchestratorHelper.createOrchestrator();
 
   @Test
   void test() throws Exception {
