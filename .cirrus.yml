@@ -79,31 +79,6 @@ e2e_task:
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION}
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
-cross_task:
-  eks_container:
-    <<: *CONTAINER_DEFINITION
-    cpu: 4
-    memory: 16G
-  <<: *SETUP_GRADLE_CACHE
-  env:
-    # analysis on Next
-    SONAR_TOKEN: VAULT[development/kv/data/next data.token]
-    SONAR_HOST_URL: VAULT[development/kv/data/next data.url]
-
-    # required to sign artifacts generated at build time and detect tampering in the follow-up pipelines,
-    # see https://xtranet-sonarsource.atlassian.net/wiki/x/DwAIY
-    ORG_GRADLE_PROJECT_signingKey: VAULT[development/kv/data/sign data.key]
-    ORG_GRADLE_PROJECT_signingPassword: VAULT[development/kv/data/sign data.passphrase]
-    ORG_GRADLE_PROJECT_signingKeyId: VAULT[development/kv/data/sign data.key_id]
-
-    ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa
-    ARTIFACTORY_DEPLOY_USERNAME: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer username]
-    ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
-    DEPLOY_PULL_REQUEST: "true"
-  build_script:
-    - ./gradlew :analyzer:compileCross --info
-  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
-
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
   depends_on:
