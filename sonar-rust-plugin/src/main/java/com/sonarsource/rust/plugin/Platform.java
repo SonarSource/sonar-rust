@@ -16,15 +16,7 @@ enum Platform {
   DARWIN_ARM64,
   UNSUPPORTED;
 
-  String pathInJar() {
-    return switch (this) {
-      case WIN_X64 -> "/analyzer/win-x64/analyzer.exe";
-      case LINUX_X64 -> "/analyzer/linux-x64/analyzer";
-      case LINUX_X64_MUSL -> "/analyzer/linux-x64-musl/analyzer";
-      case DARWIN_ARM64 -> "/analyzer/darwin-arm64/analyzer";
-      default -> throw new IllegalStateException("Unsupported platform");
-    };
-  }
+
 
   /**
    * @return The platform where this code is running

@@ -30,8 +30,9 @@ public class AnalyzerFactory {
   }
 
   Analyzer create(Platform platform) throws IOException {
-    LOG.debug("Extracting analyzer from {}", platform.pathInJar());
-    try (var stream = getClass().getResourceAsStream(platform.pathInJar())) {
+    String pathInJar = pathInJar(platform);
+    LOG.debug("Extracting analyzer from {}", pathInJar);
+    try (var stream = getClass().getResourceAsStream(pathInJar)) {
       if (stream == null) {
         throw new IllegalStateException("Analyzer binary not found");
       }
@@ -45,6 +46,16 @@ public class AnalyzerFactory {
       }
       return new Analyzer(List.of(path.toString()));
     }
+  }
+
+  private static String pathInJar(Platform platform) {
+    return switch (platform) {
+      case WIN_X64 -> "/analyzer/win-x64/analyzer.exe";
+      case LINUX_X64 -> "/analyzer/linux-x64/analyzer";
+      case LINUX_X64_MUSL -> "/analyzer/linux-x64-musl/analyzer";
+      case DARWIN_ARM64 -> "/analyzer/darwin-arm64/analyzer";
+      default -> throw new IllegalStateException("Unsupported platform");
+    };
   }
 
 }
