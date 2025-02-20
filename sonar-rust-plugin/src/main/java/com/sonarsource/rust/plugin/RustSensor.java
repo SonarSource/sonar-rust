@@ -42,7 +42,13 @@ public class RustSensor implements Sensor {
   @Override
   public void execute(SensorContext sensorContext) {
     List<InputFile> inputFiles = inputFiles(sensorContext);
-    try (Analyzer analyzer = analyzerFactory.create()) {
+    var platform = Platform.detect();
+    if (platform == Platform.UNSUPPORTED) {
+      LOG.error("Unsupported platform: {}", Platform.detect());
+      return;
+    }
+    LOG.info("Detected platform: {}", platform);
+    try (Analyzer analyzer = analyzerFactory.create(platform)) {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }

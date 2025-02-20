@@ -80,6 +80,33 @@ tasks.jar {
   }
 }
 
+tasks.register<Copy>("copyRustOutputs") {
+  description = "Copy native analyzer binary to the build/classes dir for packaging"
+  val compileRustLinux = project(":analyzer").tasks.named("compileRustLinux").get()
+  val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
+  val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
+  val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
+
+  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin, compileRustDarwin)
+  from(compileRustLinux.outputs.files) {
+    into("linux-x64")
+  }
+  from(compileRustLinuxMusl.outputs.files) {
+    into("linux-x64-musl")
+  }
+  from(compileRustWin.outputs.files) {
+    into("win-x64")
+  }
+  from(compileRustDarwin.outputs.files) {
+    into("darwin-arm64")
+  }
+  into("${layout.buildDirectory.get()}/resources/main/analyzer")
+}
+
+tasks.named("processResources") {
+  dependsOn("copyRustOutputs")
+}
+
 tasks.shadowJar {
   dependsOn(":analyzer:compileRust")
   from(project(":analyzer").tasks.named("compileRust").get().outputs.files) {

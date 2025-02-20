@@ -91,7 +91,7 @@ class RustSensorTest {
   private RustSensor sensor() {
     return new RustSensor(new AnalyzerFactory(null) {
       @Override
-      public Analyzer create() {
+      public Analyzer create(Platform platform) {
         return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND);
       }
     });

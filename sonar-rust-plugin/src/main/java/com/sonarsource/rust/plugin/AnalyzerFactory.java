@@ -29,8 +29,9 @@ public class AnalyzerFactory {
     this.tempFolder = tempFolder;
   }
 
-  public Analyzer create() throws IOException {
-    try (var stream = getClass().getResourceAsStream("/analyzer/analyzer")) {
+  Analyzer create(Platform platform) throws IOException {
+    LOG.debug("Extracting analyzer from {}", platform.pathInJar());
+    try (var stream = getClass().getResourceAsStream(platform.pathInJar())) {
       if (stream == null) {
         throw new IllegalStateException("Analyzer binary not found");
       }
@@ -39,8 +40,9 @@ public class AnalyzerFactory {
       Path path = tempFolder.newDir().toPath();
       LOG.debug("Copying analyzer to {}", path);
       Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
-      Files.setPosixFilePermissions(path, Set.of(OWNER_EXECUTE));
-
+      if (!Files.isExecutable(path)) {
+        Files.setPosixFilePermissions(path, Set.of(OWNER_EXECUTE));
+      }
       return new Analyzer(List.of(path.toString()));
     }
   }
