@@ -114,10 +114,6 @@ tasks.named("processResources") {
 }
 
 tasks.shadowJar {
-  dependsOn(":analyzer:compileRust")
-  from(project(":analyzer").tasks.named("compileRust").get().outputs.files) {
-    into("analyzer")
-  }
   archiveClassifier.set("")
 }
 
