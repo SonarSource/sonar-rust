@@ -3,7 +3,9 @@ FROM ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:j17-latest
 
 USER root
 
-RUN apt-get update && apt-get -y install rustup gcc-mingw-w64 musl-tools && apt-get clean
+RUN apt-get update && \
+    apt-get -y install rustup gcc-mingw-w64 musl-tools build-essential autoconf libtool pkg-config && \
+    apt-get clean
 
 
 USER sonarsource
