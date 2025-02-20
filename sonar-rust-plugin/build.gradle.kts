@@ -1,3 +1,4 @@
+import org.gradle.internal.os.OperatingSystem
 import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
 
@@ -87,7 +88,10 @@ tasks.register<Copy>("copyRustOutputs") {
   val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
   val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
 
-  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin, compileRustDarwin)
+  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin)
+  if (OperatingSystem.current().isMacOsX) {
+    dependsOn(compileRustDarwin)
+  }
   from(compileRustLinux.outputs.files) {
     into("linux-x64")
   }
@@ -97,8 +101,10 @@ tasks.register<Copy>("copyRustOutputs") {
   from(compileRustWin.outputs.files) {
     into("win-x64")
   }
-  from(compileRustDarwin.outputs.files) {
-    into("darwin-arm64")
+  if (OperatingSystem.current().isMacOsX) {
+    from(compileRustDarwin.outputs.files) {
+      into("darwin-arm64")
+    }
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
 }

@@ -1,4 +1,3 @@
-import org.gradle.internal.os.OperatingSystem
 
 fun createCompileRustTask(target: String, name: String, envVars: Map<String, String> = emptyMap()): TaskProvider<Exec> {
   return tasks.register<Exec>("compileRust$name") {
@@ -25,16 +24,6 @@ val compileRustLinuxMusl = createCompileRustTask(
 val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
 val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin", "Darwin")
 
-task("compileRust") {
-  description = "Compiles Rust code."
-  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin)
-  if (OperatingSystem.current().isMacOsX) {
-    dependsOn(compileRustDarwin)
-  }
-  doLast {
-    println("Rust code compiled successfully")
-  }
-}
 
 task<Exec>("testRust") {
   description = "Runs Rust tests."
