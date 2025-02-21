@@ -25,9 +25,38 @@ class AnalyzerTest {
       assertThat(result2.highlightTokens()).containsExactly(
         new Analyzer.HighlightTokens("KEYWORD", 1, 0, 1, 2),
         new Analyzer.HighlightTokens("CONSTANT", 1, 18, 1, 20));
-      assertThat(result1.measures()).isEqualTo(new Analyzer.Measures(1, 0, 1, 0, 0));
-      assertThat(result2.measures()).isEqualTo(new Analyzer.Measures(1, 0, 1, 0, 0));
+      assertThat(result1.measures()).isEqualTo(new Analyzer.Measures(1, 0, 1, 0, 0, 0));
+      assertThat(result2.measures()).isEqualTo(new Analyzer.Measures(1, 0, 1, 0, 0, 0));
     }
   }
 
+  @Test
+  void cognitive_complexity() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND)) {
+      var result = analyzer.analyze("""
+        fn foo(x: bool, y: bool) -> i32 {
+          if x { // +1
+            if y { // +2
+              42
+            } else { // +1
+              43
+            }
+          } else { // +1
+            44
+          }
+        }
+
+        fn bar(x: bool) -> i32 {
+          match x { // +1
+            true => 1,
+            false => 0
+          }
+        }
+        """);
+
+      assertThat(result.measures().cognitiveComplexity()).isEqualTo(6);
+
+    }
+
+  }
 }

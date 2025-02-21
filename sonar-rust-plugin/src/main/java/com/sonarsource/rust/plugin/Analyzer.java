@@ -61,8 +61,9 @@ public class Analyzer implements AutoCloseable {
         int functions = inputStream.readInt();
         int statements = inputStream.readInt();
         int classes = inputStream.readInt();
+        int cognitiveComplexity = inputStream.readInt();
 
-        measures = new Measures(ncloc, commentLines, functions, statements, classes);
+        measures = new Measures(ncloc, commentLines, functions, statements, classes, cognitiveComplexity);
       } else {
         break;
       }
@@ -105,9 +106,9 @@ public class Analyzer implements AutoCloseable {
   public record HighlightTokens(String tokenType, int startLine, int startColumn, int endLine, int endColumn) {
   }
 
-  public record Measures(int ncloc, int commentLines, int functions, int statements, int classes) {
+  public record Measures(int ncloc, int commentLines, int functions, int statements, int classes, int cognitiveComplexity) {
     public Measures() {
-      this(0, 0, 0, 0, 0);
+      this(0, 0, 0, 0, 0, 0);
     }
   }
 

@@ -5,15 +5,15 @@
  */
 package com.sonarsource.rust.plugin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.sonar.api.impl.utils.DefaultTempFolder;
 import org.sonar.api.utils.TempFolder;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class AnalyzerFactoryTest {
 
@@ -26,8 +26,9 @@ class AnalyzerFactoryTest {
     assertNotEquals(Platform.UNSUPPORTED, platform);
     TempFolder tempFolder = new DefaultTempFolder(temp.toFile(), false);
     var analyzerFactory = new AnalyzerFactory(tempFolder);
-    var analyzer = analyzerFactory.create(platform);
-    assertNotNull(analyzer);
-    assertThat(temp).isDirectoryContaining(f -> f.getFileName().toString().startsWith("analyzer-"));
+    try (var analyzer = analyzerFactory.create(platform)) {
+      assertNotNull(analyzer);
+      assertThat(temp).isDirectoryContaining(f -> f.getFileName().toString().startsWith("analyzer-"));
+    }
   }
 }
