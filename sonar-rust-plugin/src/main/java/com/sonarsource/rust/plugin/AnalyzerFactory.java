@@ -38,7 +38,8 @@ public class AnalyzerFactory {
       }
 
       // Save the stream into temporary file and set it as executable
-      Path path = tempFolder.newDir().toPath();
+      String suffix = platform == Platform.WIN_X64 ? ".exe" : "";
+      Path path = tempFolder.newFile("analyzer-", suffix).toPath();
       LOG.debug("Copying analyzer to {}", path);
       Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
       if (!Files.isExecutable(path)) {
@@ -48,7 +49,7 @@ public class AnalyzerFactory {
     }
   }
 
-  private static String pathInJar(Platform platform) {
+  static String pathInJar(Platform platform) {
     return switch (platform) {
       case WIN_X64 -> "/analyzer/win-x64/analyzer.exe";
       case LINUX_X64 -> "/analyzer/linux-x64/analyzer";

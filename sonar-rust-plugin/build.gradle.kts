@@ -29,10 +29,10 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 dependencies {
   implementation("com.google.code.gson:gson:2.11.0")
   implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:2.16.0.3141")
-  compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:10.1.0.809")
+  compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:11.1.0.2693")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
-  testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:10.1.0.809")
-  testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:10.1.0.73491")
+  testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:11.1.0.2693")
+  testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:25.2.0.102705")
   testImplementation(platform("org.junit:junit-bom:5.10.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.26.0")

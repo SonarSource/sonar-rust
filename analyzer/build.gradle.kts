@@ -23,13 +23,18 @@ val compileRustLinux = createCompileRustTask(
   "x86_64-unknown-linux-gnu", "Linux",
   mapOf("TARGET_CC" to linuxCcEnv, "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER" to linuxCcEnv)
 )
+val muslAr = if (OperatingSystem.current().isMacOsX) {
+  "x86_64-linux-musl-ar"
+} else {
+  "x86_64-linux-gnu-ar"
+}
 val compileRustLinuxMusl = createCompileRustTask(
   "x86_64-unknown-linux-musl", "LinuxMusl",
   mapOf(
     "TARGET_CC" to "x86_64-linux-musl-gcc",
     "CARGO_TARGET_X86_64_UNKNOWN_LINUX_MUSL_LINKER" to "x86_64-linux-musl-gcc",
     // For some reason musl-tools don't provide ar, so we need to use the one from the gnu toolchain. Not sure if this is OK
-    "AR_x86_64_unknown_linux_musl" to "x86_64-linux-gnu-ar"
+    "AR_x86_64_unknown_linux_musl" to muslAr
   )
 )
 val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
