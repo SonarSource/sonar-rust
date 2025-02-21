@@ -30,8 +30,8 @@ cross-compilers for different platforms:
 
 ```shell
 brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu
+brew install filosottile/musl-cross/musl-cross
 brew install mingw-w64
-
 ```
 
 #### Ubuntu

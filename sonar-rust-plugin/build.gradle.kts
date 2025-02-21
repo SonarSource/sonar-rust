@@ -26,13 +26,16 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
+val sonarApiVersion = "11.1.0.2693"
+val sonarApiImplVersion = "25.2.0.102705"
+
 dependencies {
   implementation("com.google.code.gson:gson:2.11.0")
   implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:2.16.0.3141")
-  compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:11.1.0.2693")
+  compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
-  testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:11.1.0.2693")
-  testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:25.2.0.102705")
+  testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
+  testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
   testImplementation(platform("org.junit:junit-bom:5.10.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.26.0")
