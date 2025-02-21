@@ -45,3 +45,8 @@ Desktop.ini
 # ---- Sonar
 .sonar
 .scannerwork
+
+# Rust
+.cargo
+.rustup
+

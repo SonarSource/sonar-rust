@@ -29,20 +29,34 @@ public class AnalyzerFactory {
     this.tempFolder = tempFolder;
   }
 
-  public Analyzer create() throws IOException {
-    try (var stream = getClass().getResourceAsStream("/analyzer/analyzer")) {
+  Analyzer create(Platform platform) throws IOException {
+    String pathInJar = pathInJar(platform);
+    LOG.debug("Extracting analyzer from {}", pathInJar);
+    try (var stream = getClass().getResourceAsStream(pathInJar)) {
       if (stream == null) {
         throw new IllegalStateException("Analyzer binary not found");
       }
 
       // Save the stream into temporary file and set it as executable
-      Path path = tempFolder.newDir().toPath();
+      String suffix = platform == Platform.WIN_X64 ? ".exe" : "";
+      Path path = tempFolder.newFile("analyzer-", suffix).toPath();
       LOG.debug("Copying analyzer to {}", path);
       Files.copy(stream, path, StandardCopyOption.REPLACE_EXISTING);
-      Files.setPosixFilePermissions(path, Set.of(OWNER_EXECUTE));
-
+      if (!Files.isExecutable(path)) {
+        Files.setPosixFilePermissions(path, Set.of(OWNER_EXECUTE));
+      }
       return new Analyzer(List.of(path.toString()));
     }
+  }
+
+  static String pathInJar(Platform platform) {
+    return switch (platform) {
+      case WIN_X64 -> "/analyzer/win-x64/analyzer.exe";
+      case LINUX_X64 -> "/analyzer/linux-x64/analyzer";
+      case LINUX_X64_MUSL -> "/analyzer/linux-x64-musl/analyzer";
+      case DARWIN_ARM64 -> "/analyzer/darwin-arm64/analyzer";
+      default -> throw new IllegalStateException("Unsupported platform");
+    };
   }
 
 }

@@ -79,6 +79,21 @@ e2e_task:
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION}
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
+e2e_win_task:
+  depends_on:
+    - build
+  ec2_instance:
+    experimental: true # see https://github.com/cirruslabs/cirrus-ci-docs/issues/1051
+    platform: windows
+    image: base-windows-jdk17-v*
+    type: c6i.xlarge # 4 vCPU, 8 GiB
+    region: eu-central-1
+  script:
+    - source cirrus-env QA
+    - source .cirrus/use-gradle-wrapper.sh
+    - source set_gradle_build_version
+    - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION}
+
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
   depends_on:
