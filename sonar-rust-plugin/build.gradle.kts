@@ -83,6 +83,7 @@ tasks.jar {
 
 tasks.register<Copy>("copyRustOutputs") {
   description = "Copy native analyzer binary to the build/classes dir for packaging"
+  group = "Build"
   val compileRustLinux = project(":analyzer").tasks.named("compileRustLinux").get()
   val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
   val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
@@ -109,6 +110,9 @@ tasks.register<Copy>("copyRustOutputs") {
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
 }
 
+/**
+ * Copy the native analyzer binary to the resources directory so it can be packaged in the jar.
+ */
 tasks.named("processResources") {
   dependsOn("copyRustOutputs")
 }

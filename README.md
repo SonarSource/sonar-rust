@@ -22,9 +22,38 @@ To build the project, you can use the following Gradle commands:
 
 ### Cross-Compilation
 
-The project includes a native Rust analyzer that needs to be cross-compiled for different platforms. To cross-compile the Rust analyzer, you can use the following Gradle tasks:
+The project includes a native Rust analyzer that needs to be cross-compiled for different platforms. To cross-compile the Rust analyzer, 
+you need to install cross-compilers and Rust toolchains for the target platforms. Below are the instructions for installing the 
+cross-compilers for different platforms:
 
+#### Mac OS X
 
+```shell
+brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu
+brew install mingw-w64
+
+```
+
+#### Ubuntu
+
+```shell
+apt-get -y install rustup gcc-mingw-w64 musl-tools musl-dev build-essential autoconf libtool pkg-config
+```
+
+You also need to install the Rust toolchains for the target platforms:
+
+```shell
+rustup target add x86_64-pc-windows-gnu
+rustup target add x86_64-unknown-linux-musl
+rustup target add x86_64-unknown-linux-gnu
+rustup target add x86_64-apple-darwin
+```
+
+To verify installed toolchains, you can run the following command:
+
+```shell
+rustup target list
+```
 
 
 ## Running End-to-End Tests
