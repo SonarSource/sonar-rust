@@ -1,0 +1,31 @@
+<h2>Why is this an issue?</h2>
+<p>The <code>std::cmp::min</code> and <code>std::cmp::max</code> functions in Rust are useful for clamping values within a specified range. However,
+if these functions are mistakenly swapped, the result will not behave as intended. Instead of clamping the value within the desired range, the outcome
+will be a constant value, which is likely not the intended behavior.</p>
+<h2>How to fix it</h2>
+<p>To fix this issue, ensure that <code>min</code> and <code>max</code> are used correctly to clamp the value between the desired range. The correct
+usage should ensure that the value is clamped between the minimum and maximum bounds.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+min(0, max(100, x))
+
+// or
+
+x.max(100).min(0)
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+max(0, min(100, x))
+
+// or
+
+x.min(100).max(0)
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#min_max">https://rust-lang.github.io/rust-clippy/master/index.html#min_max</a> </li>
+</ul>
+

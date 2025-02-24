@@ -1,0 +1,18 @@
+<h2>Why is this an issue?</h2>
+<p>Floating-point literals that approximate constants defined in <code>std::f32::consts</code> or <code>std::f64::consts</code> should be replaced
+with the predefined constants. Using the standard library constants ensures higher precision and avoids potential rounding errors that can occur when
+manually approximating these values. It also improves code readability and maintainability, as it clearly indicates the intended constant value.</p>
+<h3>Noncompliant code example</h3>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let x = 3.14; // Noncompliant: Approximates PI
+let y = 1_f64 / 3.1415926535; // Noncompliant: Approximates FRAC_1_PI
+</pre>
+<h3>Compliant solution</h3>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::f32::consts::PI;
+use std::f64::consts::FRAC_1_PI;
+
+let x = PI; // Compliant: Uses the predefined PI constant
+let y = FRAC_1_PI; // Compliant: Uses the predefined FRAC_1_PI constant
+</pre>
+

@@ -1,0 +1,23 @@
+{
+  "title": "Clamping values with `cmp::min` and `cmp::max` should use correct ranges",
+  "type": "BUG",
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "5min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "RSPEC-6913",
+  "sqKey": "S6913",
+  "scope": "Main",
+  "quickfix": "covered",
+  "code": {
+    "impacts": {
+      "RELIABILITY": "MEDIUM"
+    },
+    "attribute": "LOGICAL"
+  }
+}

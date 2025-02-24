@@ -1,0 +1,22 @@
+<h2>Why is this an issue?</h2>
+<p>Using closures when a function pointer can be used instead can negatively impact readability and maintainability of the code. Closures can obscure
+the intent of the code, making it harder for other developers to understand what the code is doing at a glance. Function pointers, on the other hand,
+are more explicit and can make the code more concise and easier to read.</p>
+<h2>How to fix it</h2>
+<p>Replace closures with function pointers when the closure simply calls a function. This makes the code more readable and easier to understand.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let result = Some('a').map(|s| s.to_uppercase());
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let result = Some('a').map(char::to_uppercase);
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#redundant_closure_for_method_calls">https://rust-lang.github.io/rust-clippy/master/index.html#redundant_closure_for_method_calls</a> </li>
+</ul>
+

@@ -1,0 +1,26 @@
+<h2>Why is this an issue?</h2>
+<p>Using <code>0 as *const T</code> or <code>0 as *mut T</code> to represent a null pointer is error-prone and less readable. It can lead to confusion
+and potential bugs, as it is not immediately clear that <code>0</code> is intended to represent a null pointer. Additionally, using <code>0</code> for
+null pointers is not idiomatic Rust, and it can make the code harder to understand and maintain.</p>
+<h2>How to fix it</h2>
+<p>Use <code>std::ptr::null</code> or <code>std::ptr::null_mut</code> to represent null pointers. These functions are explicitly designed for this
+purpose and make the intent of the code clear.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let ptr = 0 as *const i32;
+let mut_ptr = 0 as *mut i32;
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let ptr = std::ptr::null::&lt;i32&gt;();
+let mut_ptr = std::ptr::null_mut::&lt;i32&gt;();
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#zero_ptr">https://rust-lang.github.io/rust-clippy/master/index.html#zero_ptr</a>
+  </li>
+</ul>
+

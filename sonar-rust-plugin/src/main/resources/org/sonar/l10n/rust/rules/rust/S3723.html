@@ -1,0 +1,29 @@
+<h2>Why is this an issue?</h2>
+<p>When defining arrays in Rust, it is possible to forget a comma between elements, especially when the elements are binary operator expressions that
+span multiple lines. This can lead to unexpected results, causing logical errors or runtime issues.</p>
+<p>The origin of this problem is often due to oversight or formatting changes that split expressions across lines without adding the necessary
+comma.</p>
+<h2>How to fix it</h2>
+<p>To fix this issue, add commas after each element or write the entire array on a single line.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let a = &amp;[
+    -1, -2, -3 // Noncompliant: &lt;= no comma here
+    -4, -5, -6
+];
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let a = &amp;[
+    -1, -2, -3,
+    -4, -5, -6,
+];
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#possible_missing_comma">https://rust-lang.github.io/rust-clippy/master/index.html#possible_missing_comma</a> </li>
+</ul>
+

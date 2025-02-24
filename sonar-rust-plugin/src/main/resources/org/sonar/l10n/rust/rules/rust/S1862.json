@@ -1,0 +1,25 @@
+{
+  "title": "Related \"if\/else if\" statements should not have the same condition",
+  "type": "BUG",
+  "code": {
+    "impacts": {
+      "RELIABILITY": "MEDIUM"
+    },
+    "attribute": "LOGICAL"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "10min"
+  },
+  "tags": [
+    "clippy",
+    "unused",
+    "pitfall"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "RSPEC-1862",
+  "sqKey": "S1862",
+  "scope": "All",
+  "quickfix": "unknown"
+}
