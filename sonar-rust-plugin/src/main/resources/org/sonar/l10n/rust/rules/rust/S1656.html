@@ -1,0 +1,20 @@
+<h2>Why is this an issue?</h2>
+<p>There is no reason to re-assign a variable to itself. Either this statement is redundant and should be removed, or the re-assignment is a mistake
+and some other value or variable was intended for the assignment instead.</p>
+<h3>Noncompliant code example</h3>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut x = 5;
+x = x; // Self-assignment - does nothing
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let mut x = 5;
+// Removed the self-assignment
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#self_assignment">https://rust-lang.github.io/rust-clippy/master/index.html#self_assignment</a> </li>
+</ul>
+

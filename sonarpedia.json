@@ -1,0 +1,10 @@
+{
+  "rules-metadata-path": "sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/rust",
+  "languages": [
+    "RUST"
+  ],
+  "options": {
+    "no-language-in-filenames": true,
+    "preserve-filenames": true
+  }
+}

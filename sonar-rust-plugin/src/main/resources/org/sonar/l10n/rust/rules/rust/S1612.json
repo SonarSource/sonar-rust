@@ -1,0 +1,23 @@
+{
+  "title": "Closures should be replaced with function pointers",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "LOW"
+    },
+    "attribute": "CLEAR"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "2min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Minor",
+  "ruleSpecification": "RSPEC-1612",
+  "sqKey": "S1612",
+  "scope": "All",
+  "quickfix": "covered"
+}

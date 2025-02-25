@@ -1,0 +1,23 @@
+{
+  "title": "Array elements should be separated by commas",
+  "type": "CODE_SMELL",
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "2min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "RSPEC-3723",
+  "sqKey": "S3723",
+  "scope": "All",
+  "quickfix": "unknown",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "MEDIUM"
+    },
+    "attribute": "FORMATTED"
+  }
+}

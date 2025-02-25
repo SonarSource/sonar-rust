@@ -1,0 +1,24 @@
+<h2>Why is this an issue?</h2>
+<p>Resizing a vector to zero using <code>vec.resize(0, value)</code> is misleading. It’s either unreadable if the intent was simply to clear the
+vector, making the code harder to understand, or suspicious and unintentional if a resize was actually expected, but the arguments were accidentally
+swapped.</p>
+<h2>How to fix it</h2>
+<p>Replace <code>vec.resize(0, value)</code> with <code>vec.clear()</code>, or swap the <code>vec.resize</code> arguments.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut vec = vec![1, 2, 3, 4, 5];
+vec.resize(0, 5); // Noncompliant: Resizing the vector to 0.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let mut vec = vec![1, 2, 3, 4, 5];
+vec.clear(); // Compliant: Clear the vector.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#vec_resize_to_zero">https://rust-lang.github.io/rust-clippy/master/index.html#vec_resize_to_zero</a> </li>
+</ul>
+
