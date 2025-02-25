@@ -5,8 +5,6 @@
  */
 package com.sonarsource.rust.e2e;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
@@ -14,11 +12,13 @@ import com.sonarsource.rust.e2e.helpers.OrchestratorHelper;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.RegisterExtension;
 import org.sonarqube.ws.client.HttpConnector;
-import org.sonarqube.ws.client.measures.ComponentRequest;
 import org.sonarqube.ws.client.WsClientFactories;
+import org.sonarqube.ws.client.measures.ComponentRequest;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class MetricsTest {
 
@@ -53,15 +53,18 @@ class MetricsTest {
         "classes",
         "functions",
         "statements",
-        "comment_lines"));;
+        "comment_lines",
+        "cognitive_complexity"));
     var measures = wsClient.measures().component(request).getComponent().getMeasuresList();
-    assertThat(measures).hasSize(5);
+    assertThat(measures).hasSize(6);
 
     var metrics = measures.stream().collect(Collectors.toMap(m -> m.getMetric(), m -> m.getValue()));
-    assertThat(metrics).containsEntry("ncloc", "15");
-    assertThat(metrics).containsEntry("classes", "2");
-    assertThat(metrics).containsEntry("functions", "2");
-    assertThat(metrics).containsEntry("statements", "4");
-    assertThat(metrics).containsEntry("comment_lines", "7");
+    assertThat(metrics)
+      .containsEntry("ncloc", "26")
+      .containsEntry("classes", "2")
+      .containsEntry("functions", "3")
+      .containsEntry("statements", "9")
+      .containsEntry("comment_lines", "7")
+      .containsEntry("cognitive_complexity", "4");
   }
 }

@@ -26,3 +26,15 @@ fn hello() {
     let message = "Hello, world!";
     println!("{}", message);
 }
+
+fn goodbye(lang: &str) {
+    if lang == "en" {
+        println!("Goodbye!");
+    } else if lang == "es" {
+        println!("Adios!");
+    } else if lang == "hu" {
+        println!("Viszlát!");
+    } else {
+        println!("Au revoir!");
+    }
+}

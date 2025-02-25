@@ -20,7 +20,7 @@ public class OrchestratorHelper {
 
   static {
     var version = System.getProperty("pluginVersion");
-    if (version == null) {
+    if (version == null || version.equals("")) {
       pluginLocation = FileLocation.byWildcardMavenFilename(new File("../sonar-rust-plugin/build/libs"), "sonar-rust-plugin-*.jar");
     } else {
       pluginLocation = MavenLocation.of("com.sonarsource.rust", "sonar-rust-plugin", version);

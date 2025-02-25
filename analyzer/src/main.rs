@@ -4,10 +4,13 @@
  * mailto:info AT sonarsource DOT com
  */
 mod analyze;
+mod cognitive_complexity;
+mod tree;
 
 use std::io::{self, Read, Write};
 
-use analyze::{process_code, Location};
+use analyze::process_code;
+use tree::SonarLocation;
 
 fn main() {
     loop {
@@ -33,6 +36,7 @@ fn main() {
         write_int(output.metrics.functions);
         write_int(output.metrics.statements);
         write_int(output.metrics.classes);
+        write_int(output.metrics.cognitive_complexity);
 
         write_string("end");
     }
@@ -66,7 +70,7 @@ fn write_string(value: &str) {
     io::stdout().flush().expect("flush stdout");
 }
 
-fn write_location(location: &Location) {
+fn write_location(location: &SonarLocation) {
     write_int(location.start_line as i32);
     write_int(location.start_column as i32);
     write_int(location.end_line as i32);
