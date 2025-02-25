@@ -21,7 +21,7 @@ import org.sonarqube.ws.client.issues.SearchRequest;
 import org.sonarqube.ws.client.WsClientFactories;
 import org.sonarqube.ws.Issues;
 
-class ClippyTest {
+class ClippyReportTest {
 
   @RegisterExtension
   static final OrchestratorExtension orchestrator = OrchestratorHelper.createOrchestrator();

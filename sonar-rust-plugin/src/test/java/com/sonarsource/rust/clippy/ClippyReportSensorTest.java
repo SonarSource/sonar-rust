@@ -20,7 +20,7 @@ import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-class ClippySensorTest {
+class ClippyReportSensorTest {
 
   @RegisterExtension
   final LogTesterJUnit5 logTester = new LogTesterJUnit5().setLevel(Level.WARN);
@@ -30,11 +30,11 @@ class ClippySensorTest {
 
   @Test
   void testDescribe() {
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 
-    assertThat(descriptor.name()).isEqualTo("Clippy");
+    assertThat(descriptor.name()).isEqualTo("Clippy Report Import Sensor");
     assertThat(descriptor.languages()).containsOnly(RustLanguage.KEY);
     assertThat(descriptor.configurationPredicate()).isNotNull();
   }
@@ -42,7 +42,7 @@ class ClippySensorTest {
   @Test
   void testExecuteWithNoReportsFound() {
     var context = SensorContextTester.create(baseDir);
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("No Clippy report files found");
@@ -57,9 +57,9 @@ class ClippySensorTest {
     Files.writeString(tempFile, json);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(ClippySensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to parse Clippy report");
@@ -81,9 +81,9 @@ class ClippySensorTest {
     Files.writeString(tempFile, json);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(ClippySensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Empty spans");
@@ -109,9 +109,9 @@ class ClippySensorTest {
     Files.writeString(tempFile, json);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(ClippySensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Unknown file: src/main.rs");
@@ -137,10 +137,10 @@ class ClippySensorTest {
     Files.writeString(tempFile, json);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(ClippySensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
     context.fileSystem().add(new TestInputFileBuilder("moduleKey", "src/main.rs").build());
 
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Unknown rule: unknown_rule");
@@ -171,7 +171,7 @@ class ClippySensorTest {
     Files.writeString(tempFile, json);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(ClippySensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
     var sourceCode = """
       fn main() {
@@ -184,7 +184,7 @@ class ClippySensorTest {
       .setContents(sourceCode)
       .build());
 
-    var sensor = new ClippySensor();
+    var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
     var issues = context.allExternalIssues();
