@@ -54,7 +54,10 @@ impl ComplexityVisitor {
 impl NodeVisitor for ComplexityVisitor {
     fn enter_node(&mut self, node: Node<'_>) {
         match node.kind() {
-            "function_item" => self.current_nesting = 0,
+            "function_item" => {
+                // TODO SKUNK-28: We should consider nested functions and recursion.
+                self.current_nesting = 0
+            }
             "if_expression" => {
                 if !is_else_if(node) {
                     self.increment_with_nesting(node, self.current_nesting);
@@ -70,11 +73,10 @@ impl NodeVisitor for ComplexityVisitor {
             }
             "label" => {
                 // break and continue only increase complexity if label is used
-                match node.parent().map(|n| n.kind()) {
-                    Some("break_expression") | Some("continue_expression") => {
-                        self.increment_without_nesting(node)
+                if let Some(parent) = node.parent() {
+                    if matches!(parent.kind(), "break_expression" | "continue_expression") {
+                        self.increment_without_nesting(parent);
                     }
-                    _ => {}
                 }
             }
             "binary_expression" if is_logical_operator(node) => {
