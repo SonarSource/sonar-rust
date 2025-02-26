@@ -59,4 +59,31 @@ class AnalyzerTest {
     }
 
   }
+
+  @Test
+  void cpd_tokens() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND)) {
+      var result = analyzer.analyze("""
+        fn main() {
+          println!("Hello, world!");
+        }
+        """);
+
+      assertThat(result.cpdTokens()).containsExactly(
+        new Analyzer.CpdToken("fn", 1, 0, 1, 2),
+        new Analyzer.CpdToken("main", 1, 3, 1, 7),
+        new Analyzer.CpdToken("(", 1, 7, 1, 8),
+        new Analyzer.CpdToken(")", 1, 8, 1, 9),
+        new Analyzer.CpdToken("{", 1, 10, 1, 11),
+        new Analyzer.CpdToken("println", 2, 2, 2, 9),
+        new Analyzer.CpdToken("!", 2, 9, 2, 10),
+        new Analyzer.CpdToken("(", 2, 10, 2, 11),
+        new Analyzer.CpdToken("\"", 2, 11, 2, 12),
+        new Analyzer.CpdToken("STRING", 2, 12, 2, 25),
+        new Analyzer.CpdToken("\"", 2, 25, 2, 26),
+        new Analyzer.CpdToken(")", 2, 26, 2, 27),
+        new Analyzer.CpdToken(";", 2, 27, 2, 28),
+        new Analyzer.CpdToken("}",3, 0, 3, 1));
+    }
+  }
 }
