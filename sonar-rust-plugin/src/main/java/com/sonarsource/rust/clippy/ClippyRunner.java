@@ -19,27 +19,25 @@ public class ClippyRunner {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClippyRunner.class);
 
-  private final Path workDir;
-  private final List<String> lints;
+  private final ProcessWrapper processWrapper;
 
-  ClippyRunner(Path workDir, List<String> lints) {
-    this.workDir = workDir;
-    this.lints = lints;
+  ClippyRunner() {
+    this(new ProcessWrapper());
   }
 
-  public List<ClippyDiagnostic> run() {
-    var command = new ArrayList<>(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--", "-A", "clippy::all"));
-    command.addAll(lints);
+  ClippyRunner(ProcessWrapper processWrapper) {
+    this.processWrapper = processWrapper;
+  }
+
+  public List<ClippyDiagnostic> run(Path workDir, List<String> lints) {
+    var command = buildCommand(lints);
     LOG.debug("Running Clippy: {}", command);
-    var processBuilder = new ProcessBuilder(command)
-      .directory(workDir.toFile())
-      .redirectErrorStream(true);
     try {
-      var process = processBuilder.start();
-      var clippyDiagnostics = readOutput(process.getInputStream());
-      process.waitFor();
-      if (process.exitValue() != 0) {
-        throw new IllegalStateException("Clippy failed with exit code " + process.exitValue());
+      processWrapper.start(command, workDir);
+      var clippyDiagnostics = readOutput(processWrapper.getInputStream());
+      int exitValue = processWrapper.waitFor();
+      if (exitValue != 0) {
+        throw new IllegalStateException("Clippy failed with exit code " + exitValue);
       }
       return clippyDiagnostics;
     } catch (InterruptedException e) {
@@ -48,6 +46,12 @@ public class ClippyRunner {
     } catch (IOException e) {
       throw new IllegalStateException("Failed to run Clippy ", e);
     }
+  }
+
+  private static List<String> buildCommand(List<String> lints) {
+    var cmd = new ArrayList<>(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--", "-A", "clippy::all"));
+    lints.stream().map(lint -> String.format("-W%s", lint)).forEach(cmd::add);
+    return cmd;
   }
 
   private static List<ClippyDiagnostic> readOutput(InputStream inputStream) {

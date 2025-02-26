@@ -9,8 +9,6 @@ import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
 
 import com.sonarsource.rust.plugin.RustLanguage;
 import com.sonarsource.rust.plugin.RustRulesDefinition;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.Sensor;
@@ -22,9 +20,15 @@ public class ClippySensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClippySensor.class);
 
-  // TODO load from resources
-  private static final Map<String, String> SONARKEY_TO_LINTS = RustRulesDefinition.RULES.entrySet().stream()
-    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+  private final ClippyRunner clippy;
+
+  public ClippySensor() {
+    this(new ClippyRunner());
+  }
+
+  ClippySensor(ClippyRunner clippy) {
+    this.clippy = clippy;
+  }
 
   @Override
   public void describe(SensorDescriptor descriptor) {
@@ -35,14 +39,12 @@ public class ClippySensor implements Sensor {
 
   @Override
   public void execute(SensorContext context) {
-    var lints = context.activeRules().findByLanguage(RustLanguage.KEY).stream()
+    var lints = context.activeRules().findByRepository(RustLanguage.KEY).stream()
       .map(rule -> sonarKeyToLint(rule.ruleKey()))
-      .map(lint -> String.format("-W%s", lint))
       .toList();
 
-    var clippy = new ClippyRunner(context.fileSystem().baseDir().toPath(), lints);
     try {
-      var diagnostics = clippy.run();
+      var diagnostics = clippy.run(context.fileSystem().baseDir().toPath(), lints);
       for (var diagnostic : diagnostics) {
         saveIssue(context, diagnostic);
       }
@@ -51,18 +53,18 @@ public class ClippySensor implements Sensor {
     }
   }
 
-  private static String sonarKeyToLint(RuleKey sonarKey) {
-    String clippyKey = SONARKEY_TO_LINTS.get(sonarKey.rule());
-    if (clippyKey == null) {
+  static String sonarKeyToLint(RuleKey sonarKey) {
+    String lintId = RustRulesDefinition.ruleKeyToLintId(sonarKey.rule());
+    if (lintId == null) {
       throw new IllegalStateException("No mapping found for rule " + sonarKey);
     }
-    return clippyKey;
+    return lintId;
   }
 
   private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {
     LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
     String lintId = diagnostic.lintId();
-    String ruleKey = RustRulesDefinition.RULES.get(lintId);
+    String ruleKey = RustRulesDefinition.lintIdToRuleKey(lintId);
     if (ruleKey == null) {
       LOG.debug("No rule key found for Clippy lint: {}", lintId);
       return;
@@ -70,6 +72,10 @@ public class ClippySensor implements Sensor {
     var issue = context.newIssue()
       .forRule(RuleKey.of(RustLanguage.KEY, ruleKey));
     var location = diagnosticToLocation(issue.newLocation(), diagnostic, context.fileSystem());
+    if (location == null) {
+      LOG.debug("No InputFile found for Clippy diagnostic: {}", diagnostic);
+      return;
+    }
     issue.at(location);
     issue.save();
   }

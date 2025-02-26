@@ -9,6 +9,7 @@ import static java.util.Map.entry;
 
 import java.util.ArrayList;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.sonar.api.SonarRuntime;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonarsource.analyzer.commons.RuleMetadataLoader;
@@ -18,7 +19,7 @@ public class RustRulesDefinition implements RulesDefinition {
   private static final String RESOURCE_BASE_PATH = "/org/sonar/l10n/rust/rules/rust";
   private static final String SONAR_WAY_PATH = "/org/sonar/l10n/rust/rules/rust/Sonar_way_profile.json";
 
-  public static final Map<String, String> RULES = Map.ofEntries(
+  static final Map<String, String> RULES = Map.ofEntries(
     entry("clippy::absurd_extreme_comparisons", "S2198"),
     entry("clippy::approx_constant", "S6164"),
     entry("clippy::eq_op", "S1764"),
@@ -36,6 +37,9 @@ public class RustRulesDefinition implements RulesDefinition {
     entry("clippy::zero_ptr", "S4962")
   );
 
+  private static final Map<String, String> RULE_KEY_TO_LINT_ID = RULES.entrySet().stream()
+    .collect(Collectors.toMap(Map.Entry::getValue, Map.Entry::getKey));
+
   private final SonarRuntime sonarRuntime;
 
   public RustRulesDefinition(SonarRuntime sonarRuntime) {
@@ -49,5 +53,13 @@ public class RustRulesDefinition implements RulesDefinition {
     var ruleKeys = new ArrayList<>(RULES.values());
     loader.addRulesByRuleKey(repository, ruleKeys);
     repository.done();
+  }
+
+  public static String lintIdToRuleKey(String lintId) {
+    return RULES.get(lintId);
+  }
+
+  public static String ruleKeyToLintId(String ruleKey) {
+    return RULE_KEY_TO_LINT_ID.get(ruleKey);
   }
 }

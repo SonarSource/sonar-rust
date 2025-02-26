@@ -84,6 +84,9 @@ public class ClippyReportSensor implements Sensor {
       .remediationEffortMinutes(loader.ruleConstantDebtMinutes(ruleId));
 
     var location = diagnosticToLocation(issue.newLocation(), diagnostic, context.fileSystem());
+    if (location == null) {
+      throw new IllegalStateException("Unknown file: " + diagnostic.message().spans().get(0).file_name());
+    }
     issue.at(location);
     issue.save();
   }

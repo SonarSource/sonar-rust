@@ -61,9 +61,8 @@ class ClippyUtils {
     var predicates = fs.predicates().hasPath(fileName);
     var inputFile = fs.inputFile(predicates);
     if (inputFile == null) {
-      throw new IllegalStateException("Unknown file: " + fileName);
+      return null;
     }
-
     location
       .on(inputFile)
       .at(inputFile.newRange(span.line_start(), span.column_start() - 1, span.line_end(), span.column_end() - 1))
