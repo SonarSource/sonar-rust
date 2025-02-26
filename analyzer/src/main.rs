@@ -5,6 +5,7 @@
  */
 mod analyze;
 mod cognitive_complexity;
+mod cyclomatic_complexity;
 mod tree;
 
 use std::io::{self, Read, Write};
@@ -38,6 +39,7 @@ fn main() {
         write_int(output.metrics.statements);
         write_int(output.metrics.classes);
         write_int(output.metrics.cognitive_complexity);
+        write_int(output.metrics.cyclomatic_complexity);
 
         for token in &output.cpd_tokens {
             write_string("cpd");

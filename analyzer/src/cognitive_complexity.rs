@@ -127,7 +127,7 @@ fn is_else_if(node: Node<'_>) -> bool {
     false
 }
 
-fn is_logical_operator(node: Node<'_>) -> bool {
+pub(crate) fn is_logical_operator(node: Node<'_>) -> bool {
     if node.kind() != "binary_expression" {
         return false;
     }
