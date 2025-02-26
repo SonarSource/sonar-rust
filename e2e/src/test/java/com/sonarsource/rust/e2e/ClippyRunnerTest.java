@@ -54,7 +54,7 @@ class ClippyRunnerTest {
     assertThat(issues)
       .extracting(Issues.Issue::getLine, Issues.Issue::getComponent, Issues.Issue::getRule)
       .containsExactlyInAnyOrder(
-        tuple(3, "clippy-runner:src/foo.rs", "rust:S2198")
+        tuple(8, "clippy-runner:src/main.rs", "rust:S2198")
       );
   }
 }

@@ -20,6 +20,8 @@ public class ClippySensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClippySensor.class);
 
+  public static final String CLIPPY_SENSOR_ENABLED = "sonar.rust.clippy.enabled";
+
   private final ClippyRunner clippy;
 
   public ClippySensor() {
@@ -34,11 +36,16 @@ public class ClippySensor implements Sensor {
   public void describe(SensorDescriptor descriptor) {
     descriptor
       .name("Clippy Sensor")
+      .onlyWhenConfiguration(config -> config.getBoolean(CLIPPY_SENSOR_ENABLED).orElse(true))
       .onlyOnLanguage(RustLanguage.KEY);
   }
 
   @Override
   public void execute(SensorContext context) {
+    if (!context.config().getBoolean(CLIPPY_SENSOR_ENABLED).orElse(true)) {
+      LOG.debug("Clippy sensor is disabled");
+      return;
+    }
     var lints = context.activeRules().findByRepository(RustLanguage.KEY).stream()
       .map(rule -> sonarKeyToLint(rule.ruleKey()))
       .toList();

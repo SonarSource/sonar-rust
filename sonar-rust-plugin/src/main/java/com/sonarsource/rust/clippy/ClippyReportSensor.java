@@ -22,6 +22,7 @@ public class ClippyReportSensor implements Sensor {
 
   public static final String CLIPPY_REPORT_PATHS = "sonar.rust.clippy.reportPaths";
 
+
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor

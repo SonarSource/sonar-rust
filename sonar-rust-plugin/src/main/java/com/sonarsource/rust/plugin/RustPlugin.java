@@ -60,6 +60,18 @@ public class RustPlugin implements Plugin {
         .multiValues(true)
         .build());
 
+    // Clippy report paths
+    context.addExtension(
+      PropertyDefinition
+        .builder(ClippySensor.CLIPPY_SENSOR_ENABLED)
+        .category("Rust")
+        .subCategory("Clippy")
+        .name("Execute Clippy analysis")
+        .description("Whether to execute Clippy analysis.")
+        .onQualifiers(Qualifiers.PROJECT)
+        .defaultValue("true")
+        .build());
+
     ////////////////////////// COVERAGE //////////////////////////
 
     // LCOV report paths
