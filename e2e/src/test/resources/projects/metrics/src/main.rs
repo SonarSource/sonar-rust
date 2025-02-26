@@ -1,9 +1,11 @@
 /**
- * #ncloc:         15
+ * #ncloc:         26
  * #classes:        2
- * #functions:      2
- * #statements:     4
- * #comment lines:  7
+ * #functions:      3
+ * #statements:     9
+ * #comment lines:  9
+ * cognitive complexity: 4
+ * cyclomatic complexity: 6
  */
 
 struct Foo {

@@ -54,9 +54,11 @@ class MetricsTest {
         "functions",
         "statements",
         "comment_lines",
-        "cognitive_complexity"));
+        "cognitive_complexity",
+        "complexity"
+        ));
     var measures = wsClient.measures().component(request).getComponent().getMeasuresList();
-    assertThat(measures).hasSize(6);
+    assertThat(measures).hasSize(7);
 
     var metrics = measures.stream().collect(Collectors.toMap(m -> m.getMetric(), m -> m.getValue()));
     assertThat(metrics)
@@ -64,7 +66,8 @@ class MetricsTest {
       .containsEntry("classes", "2")
       .containsEntry("functions", "3")
       .containsEntry("statements", "9")
-      .containsEntry("comment_lines", "7")
-      .containsEntry("cognitive_complexity", "4");
+      .containsEntry("comment_lines", "9")
+      .containsEntry("cognitive_complexity", "4")
+      .containsEntry("complexity", "6");
   }
 }

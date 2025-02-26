@@ -5,6 +5,7 @@
  */
 use crate::{
     cognitive_complexity::calculate_total_cognitive_complexity,
+    cyclomatic_complexity::calculate_cyclomatic_complexity,
     tree::{parse_rust_code, walk_tree, NodeVisitor, SonarLocation, TreeSitterLocation},
 };
 use std::collections::HashSet;
@@ -46,6 +47,7 @@ pub struct Metrics {
     pub statements: i32,
     pub classes: i32,
     pub cognitive_complexity: i32,
+    pub cyclomatic_complexity: i32,
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -192,6 +194,7 @@ fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
     let mut metrics = Metrics::default();
     metrics_visitor.update_metrics(&mut metrics);
     metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree);
+    metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree);
 
     metrics
 }
@@ -301,7 +304,8 @@ fn main() {
                 functions: 1,
                 statements: 2,
                 classes: 0,
-                cognitive_complexity: 0
+                cognitive_complexity: 0,
+                cyclomatic_complexity: 1
             }
         );
 
@@ -486,7 +490,8 @@ fn main() {
                 functions: 1,
                 statements: 1,
                 classes: 0,
-                cognitive_complexity: 0
+                cognitive_complexity: 0,
+                cyclomatic_complexity: 1
             }
         );
     }
@@ -512,7 +517,8 @@ fn main() {
                 functions: 1,
                 statements: 1,
                 classes: 0,
-                cognitive_complexity: 0
+                cognitive_complexity: 0,
+                cyclomatic_complexity: 1
             }
         );
     }
@@ -544,6 +550,7 @@ fn main() {
                 statements: 1,
                 classes: 0,
                 cognitive_complexity: 0,
+                cyclomatic_complexity: 1,
             }
         );
     }
@@ -586,6 +593,7 @@ fn main() {
                 statements: 2,
                 classes: 2,
                 cognitive_complexity: 0,
+                cyclomatic_complexity: 2
             }
         );
     }

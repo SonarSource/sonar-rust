@@ -63,8 +63,9 @@ public class Analyzer implements AutoCloseable {
         int statements = inputStream.readInt();
         int classes = inputStream.readInt();
         int cognitiveComplexity = inputStream.readInt();
+        int cyclomaticComplexity = inputStream.readInt();
 
-        measures = new Measures(ncloc, commentLines, functions, statements, classes, cognitiveComplexity);
+        measures = new Measures(ncloc, commentLines, functions, statements, classes, cognitiveComplexity, cyclomaticComplexity);
       } else if ("cpd".equals(messageType)) {
         String image = readString();
         int startLine = inputStream.readInt();
@@ -114,9 +115,9 @@ public class Analyzer implements AutoCloseable {
   public record HighlightTokens(String tokenType, int startLine, int startColumn, int endLine, int endColumn) {
   }
 
-  public record Measures(int ncloc, int commentLines, int functions, int statements, int classes, int cognitiveComplexity) {
+  public record Measures(int ncloc, int commentLines, int functions, int statements, int classes, int cognitiveComplexity, int cyclomaticComplexity) {
     public Measures() {
-      this(0, 0, 0, 0, 0, 0);
+      this(0, 0, 0, 0, 0, 0, 0);
     }
   }
 

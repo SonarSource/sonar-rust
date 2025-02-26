@@ -97,6 +97,7 @@ public class RustSensor implements Sensor {
     saveMetric(sensorContext, inputFile, CoreMetrics.STATEMENTS, measures.statements());
     saveMetric(sensorContext, inputFile, CoreMetrics.CLASSES, measures.classes());
     saveMetric(sensorContext, inputFile, CoreMetrics.COGNITIVE_COMPLEXITY, measures.cognitiveComplexity());
+    saveMetric(sensorContext, inputFile, CoreMetrics.COMPLEXITY, measures.cyclomaticComplexity());
   }
   private static void saveMetric(SensorContext sensorContext, InputFile inputFile, Metric<Integer> metric, Integer value) {
     sensorContext.<Integer>newMeasure()
