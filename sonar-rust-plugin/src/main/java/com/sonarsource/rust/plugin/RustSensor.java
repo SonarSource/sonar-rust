@@ -63,6 +63,7 @@ public class RustSensor implements Sensor {
 
       reportMeasures(sensorContext, inputFile, result.measures());
       reportHighlighting(sensorContext, inputFile, result.highlightTokens());
+      reportCopyPasteDetection(sensorContext, inputFile, result.cpdTokens());
     } catch (IOException ex) {
       LOG.error("Failed to analyze file: {} ({})", inputFile.filename(), ex.getMessage());
     }
@@ -103,5 +104,17 @@ public class RustSensor implements Sensor {
       .forMetric(metric)
       .withValue(value)
       .save();
+  }
+
+  private static void reportCopyPasteDetection(SensorContext sensorContext, InputFile inputFile, List<Analyzer.CpdToken> tokens) {
+    var newCpdTokens = sensorContext.newCpdTokens().onFile(inputFile);
+    for (var token : tokens) {
+      try {
+        newCpdTokens.addToken(token.startLine(), token.startColumn(), token.endLine(), token.endColumn(), token.image());
+      } catch (IllegalArgumentException e) {
+        LOG.error("Invalid CPD token: {}", e.getMessage());
+      }
+    }
+    newCpdTokens.save();
   }
 }

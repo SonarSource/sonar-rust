@@ -30,6 +30,7 @@ fn main() {
             write_string(token.token_type.to_sonar_api_name());
             write_location(&token.location);
         }
+
         write_string("metrics");
         write_int(output.metrics.ncloc);
         write_int(output.metrics.comment_lines);
@@ -37,6 +38,12 @@ fn main() {
         write_int(output.metrics.statements);
         write_int(output.metrics.classes);
         write_int(output.metrics.cognitive_complexity);
+
+        for token in &output.cpd_tokens {
+            write_string("cpd");
+            write_string(&token.image);
+            write_location(&token.location);
+        }
 
         write_string("end");
     }

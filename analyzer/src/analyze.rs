@@ -14,6 +14,7 @@ use tree_sitter::{Node, Query, QueryCursor, StreamingIterator, Tree};
 pub struct Output {
     pub highlight_tokens: Vec<HighlightToken>,
     pub metrics: Metrics,
+    pub cpd_tokens: Vec<CpdToken>,
 }
 
 // Highlighting token types, as defined by sonar-plugin-api:
@@ -47,12 +48,19 @@ pub struct Metrics {
     pub cognitive_complexity: i32,
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub struct CpdToken {
+    pub image: String,
+    pub location: SonarLocation,
+}
+
 pub fn process_code(source_code: &str) -> Output {
     let tree = parse_rust_code(source_code);
 
     Output {
         highlight_tokens: highlight(&tree, source_code),
         metrics: calculate_metrics(&tree, source_code),
+        cpd_tokens: calculate_cpd_tokens(&tree, source_code),
     }
 }
 
@@ -186,6 +194,53 @@ fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
     metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree);
 
     metrics
+}
+
+#[derive(Debug)]
+struct CPDVisitor<'a> {
+    source_code: &'a str,
+    tokens: Vec<CpdToken>,
+    is_string_literal: bool,
+}
+
+impl<'a> CPDVisitor<'a> {
+    fn new(source_code: &'a str) -> Self {
+        Self {
+            source_code,
+            tokens: Vec::new(),
+            is_string_literal: false,
+        }
+    }
+}
+
+impl NodeVisitor for CPDVisitor<'_> {
+    fn enter_node(&mut self, node: Node<'_>) {
+        if node.child_count() == 0 {
+            let token_text = &self.source_code[node.start_byte()..node.end_byte()];
+            let image = if token_text == "\"" {
+                self.is_string_literal = !self.is_string_literal;
+                token_text
+            } else if token_text.parse::<f64>().is_ok() {
+                "NUMBER"
+            } else if self.is_string_literal {
+                "STRING"
+            } else {
+                token_text
+            };
+
+            self.tokens.push(CpdToken {
+                image: image.to_string(),
+                location: TreeSitterLocation::from_tree_sitter_node(node)
+                    .to_sonar_location(&self.source_code),
+            });
+        }
+    }
+}
+
+fn calculate_cpd_tokens(tree: &Tree, source_code: &str) -> Vec<CpdToken> {
+    let mut cpd_visitor = CPDVisitor::new(source_code);
+    walk_tree(tree.root_node(), &mut cpd_visitor);
+    cpd_visitor.tokens
 }
 
 fn is_blank(line: &str) -> bool {
@@ -533,5 +588,59 @@ fn main() {
                 cognitive_complexity: 0,
             }
         );
+    }
+
+    #[test]
+    fn test_cpd_tokens() {
+        fn cpd(
+            image: &str,
+            start_line: usize,
+            start_column: usize,
+            end_line: usize,
+            end_column: usize,
+        ) -> CpdToken {
+            CpdToken {
+                location: SonarLocation {
+                    start_line,
+                    start_column,
+                    end_line,
+                    end_column,
+                },
+                image: image.to_string(),
+            }
+        }
+
+        let actual = process_code(
+            r#"
+fn main() {
+    let s = "foo";
+    '"';
+    42;
+}
+"#,
+        )
+        .cpd_tokens;
+
+        let expected = vec![
+            cpd("fn", 2, 0, 2, 2),
+            cpd("main", 2, 3, 2, 7),
+            cpd("(", 2, 7, 2, 8),
+            cpd(")", 2, 8, 2, 9),
+            cpd("{", 2, 10, 2, 11),
+            cpd("let", 3, 4, 3, 7),
+            cpd("s", 3, 8, 3, 9),
+            cpd("=", 3, 10, 3, 11),
+            cpd("\"", 3, 12, 3, 13),
+            cpd("STRING", 3, 13, 3, 16),
+            cpd("\"", 3, 16, 3, 17),
+            cpd(";", 3, 17, 3, 18),
+            cpd("'\"'", 4, 4, 4, 7),
+            cpd(";", 4, 7, 4, 8),
+            cpd("NUMBER", 5, 4, 5, 6),
+            cpd(";", 5, 6, 5, 7),
+            cpd("}", 6, 0, 6, 1),
+        ];
+
+        assert_eq!(actual, expected);
     }
 }
