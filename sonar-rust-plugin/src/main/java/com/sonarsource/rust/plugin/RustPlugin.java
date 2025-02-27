@@ -5,13 +5,13 @@
  */
 package com.sonarsource.rust.plugin;
 
-import com.sonarsource.rust.clippy.ClippySensor;
-import com.sonarsource.rust.clippy.ClippyRulesDefinition;
 import com.sonarsource.rust.clippy.ClippyReportSensor;
+import com.sonarsource.rust.clippy.ClippyRulesDefinition;
+import com.sonarsource.rust.clippy.ClippySensor;
 import com.sonarsource.rust.coverage.CoverageSensor;
 import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
-import org.sonar.api.resources.Qualifiers;
+import org.sonar.api.config.PropertyDefinition.ConfigScope;
 
 public class RustPlugin implements Plugin {
 
@@ -40,7 +40,7 @@ public class RustPlugin implements Plugin {
         .subCategory("Analysis Scope")
         .name("Rust file suffixes")
         .description("List of suffixes of Rust files to index and consider for analyses.")
-        .onQualifiers(Qualifiers.PROJECT)
+        .onConfigScopes(ConfigScope.PROJECT)
         .multiValues(true)
         .defaultValue(RustLanguage.FILE_SUFFIXES_DEFAULT_VALUE)
         .build());
@@ -56,7 +56,7 @@ public class RustPlugin implements Plugin {
         .name("Clippy report paths")
         .description("Comma-delimited list of paths to Clippy reports generated with the command "
           + "<code>cargo clippy --message-format=json</code>.")
-        .onQualifiers(Qualifiers.PROJECT)
+        .onConfigScopes(ConfigScope.PROJECT)
         .multiValues(true)
         .build());
 
@@ -68,7 +68,7 @@ public class RustPlugin implements Plugin {
         .subCategory("Clippy")
         .name("Execute Clippy analysis")
         .description("Whether to execute Clippy analysis.")
-        .onQualifiers(Qualifiers.PROJECT)
+        .onConfigScopes(ConfigScope.PROJECT)
         .defaultValue("true")
         .build());
 
@@ -82,7 +82,7 @@ public class RustPlugin implements Plugin {
         .subCategory("Coverage")
         .name("LCOV report paths")
         .description("Comma-delimited list of paths to LCOV reports.")
-        .onQualifiers(Qualifiers.PROJECT)
+        .onConfigScopes(ConfigScope.PROJECT)
         .multiValues(true)
         .build());
   }
