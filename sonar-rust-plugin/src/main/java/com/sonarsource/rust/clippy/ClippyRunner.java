@@ -35,7 +35,8 @@ public class ClippyRunner {
     try {
       processWrapper.start(command, workDir);
       var clippyDiagnostics = readOutput(processWrapper.getInputStream());
-      // Note that by default, Clippy can return non-zero exit code in case of a high severity lint violation. We avoid this by re-defining all lints as warnings when constructing the Clippy command below.
+      // Note that by default, Clippy can return non-zero exit code in case of a high severity lint violation. We avoid this by
+      // re-defining all lints as warnings when constructing the Clippy command below.
       int exitValue = processWrapper.waitFor();
       if (exitValue != 0) {
         throw new IllegalStateException("Clippy failed with exit code " + exitValue);
