@@ -3,3 +3,7 @@ fn main() {
         loop {}          // Noncompliant: clippy::empty_loop
     }
 }
+
+fn foo() {
+  if 100 > i32::MAX {}  // Noncompliant S2198
+}

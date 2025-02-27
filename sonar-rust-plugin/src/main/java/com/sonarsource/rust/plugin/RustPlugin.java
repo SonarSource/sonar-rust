@@ -5,8 +5,9 @@
  */
 package com.sonarsource.rust.plugin;
 
-import com.sonarsource.rust.clippy.ClippyRulesDefinition;
 import com.sonarsource.rust.clippy.ClippySensor;
+import com.sonarsource.rust.clippy.ClippyRulesDefinition;
+import com.sonarsource.rust.clippy.ClippyReportSensor;
 import com.sonarsource.rust.coverage.CoverageSensor;
 import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
@@ -17,14 +18,16 @@ public class RustPlugin implements Plugin {
   @Override
   public void define(Context context) {
     context.addExtensions(
+      // keep sorted alphabetically
+      AnalyzerFactory.class,
+      ClippyRulesDefinition.class,
+      ClippyReportSensor.class,
+      ClippySensor.class,
+      CoverageSensor.class,
       RustLanguage.class,
       RustProfile.class,
       RustRulesDefinition.class,
-      RustSensor.class,
-      AnalyzerFactory.class,
-      ClippyRulesDefinition.class,
-      ClippySensor.class,
-      CoverageSensor.class
+      RustSensor.class
     );
 
     ////////////////////////// ANALYSIS SCOPE //////////////////////////
@@ -47,7 +50,7 @@ public class RustPlugin implements Plugin {
     // Clippy report paths
     context.addExtension(
       PropertyDefinition
-        .builder(ClippySensor.CLIPPY_REPORT_PATHS)
+        .builder(ClippyReportSensor.CLIPPY_REPORT_PATHS)
         .category("Rust")
         .subCategory("Clippy")
         .name("Clippy report paths")
@@ -55,6 +58,18 @@ public class RustPlugin implements Plugin {
           + "<code>cargo clippy --message-format=json</code>.")
         .onQualifiers(Qualifiers.PROJECT)
         .multiValues(true)
+        .build());
+
+    // Clippy report paths
+    context.addExtension(
+      PropertyDefinition
+        .builder(ClippySensor.CLIPPY_SENSOR_ENABLED)
+        .category("Rust")
+        .subCategory("Clippy")
+        .name("Execute Clippy analysis")
+        .description("Whether to execute Clippy analysis.")
+        .onQualifiers(Qualifiers.PROJECT)
+        .defaultValue("true")
         .build());
 
     ////////////////////////// COVERAGE //////////////////////////

@@ -21,7 +21,7 @@ import org.sonarqube.ws.client.issues.SearchRequest;
 import org.sonarqube.ws.client.WsClientFactories;
 import org.sonarqube.ws.Issues;
 
-class ClippyTest {
+class ClippyReportTest {
 
   @RegisterExtension
   static final OrchestratorExtension orchestrator = OrchestratorHelper.createOrchestrator();
@@ -37,7 +37,8 @@ class ClippyTest {
       .setProjectName(projectName)
       .setProjectDir(projectDir)
       .setSourceDirs("src")
-      .setProperty("sonar.rust.clippy.reportPaths", "report.json");
+      .setProperty("sonar.rust.clippy.enabled", "false")
+      .setProperty("sonar.rust.clippyReport.reportPaths", "report.json");
 
     var wsClient = WsClientFactories.getDefault()
       .newClient(HttpConnector.newBuilder()
