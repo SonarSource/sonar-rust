@@ -21,6 +21,7 @@ import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonar.api.measures.CoreMetrics;
+import org.sonar.api.rule.RuleKey;
 
 public class RustSensor implements Sensor {
 
@@ -64,6 +65,7 @@ public class RustSensor implements Sensor {
       reportMeasures(sensorContext, inputFile, result.measures());
       reportHighlighting(sensorContext, inputFile, result.highlightTokens());
       reportCopyPasteDetection(sensorContext, inputFile, result.cpdTokens());
+      reportSyntaxErrors(sensorContext, inputFile, result.syntaxErrors());
     } catch (IOException ex) {
       LOG.error("Failed to analyze file: {} ({})", inputFile.filename(), ex.getMessage());
     }
@@ -117,5 +119,23 @@ public class RustSensor implements Sensor {
       }
     }
     newCpdTokens.save();
+  }
+
+  private static void reportSyntaxErrors(SensorContext sensorContext, InputFile inputFile, List<Analyzer.SyntaxError> syntaxErrors) {
+    for (var error : syntaxErrors) {
+      try {
+        var newIssue = sensorContext.newIssue();
+        var location = newIssue.newLocation()
+          .on(inputFile)
+          .at(inputFile.newRange(error.startLine(), error.startColumn(), error.endLine(), error.endColumn()))
+          .message(error.message());
+        newIssue
+          .forRule(RuleKey.of(RustLanguage.KEY, "S2260"))
+          .at(location)
+          .save();
+      } catch (IllegalArgumentException e) {
+        LOG.error("Failed to report syntax error: {}", e.getMessage());
+      }
+    }
   }
 }

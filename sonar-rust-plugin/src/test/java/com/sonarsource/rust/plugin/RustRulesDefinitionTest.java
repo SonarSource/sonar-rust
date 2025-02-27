@@ -19,10 +19,16 @@ import org.sonar.api.utils.Version;
 class RustRulesDefinitionTest {
 
   @Test
-  void testRules() {
-    var rules = RustRulesDefinition.RULES;
+  void testClippyRules() {
+    var rules = RustRulesDefinition.CLIPPY_RULES;
     assertThat(rules.keySet()).hasSize(new HashSet<>(rules.values()).size());
     assertThat(rules.keySet()).hasSize(15);
+  }
+
+  @Test
+  void testSonarRules() {
+    var rules = RustRulesDefinition.SONAR_RULES;
+    assertThat(rules).hasSize(1);
   }
 
   @Test
@@ -36,11 +42,11 @@ class RustRulesDefinitionTest {
     assertThat(repository).isNotNull();
     assertThat(repository.name()).isEqualTo("Sonar");
     assertThat(repository.language()).isEqualTo(RustLanguage.KEY);
-    assertThat(repository.rules()).hasSize(RustRulesDefinition.RULES.size());
+    assertThat(repository.rules()).hasSize(RustRulesDefinition.CLIPPY_RULES.size() + RustRulesDefinition.SONAR_RULES.size());
   }
 
   @Test
-  void testProfile() {
+  void testSonarWay() {
     var runtime = SonarRuntimeImpl.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
     var definition = new RustRulesDefinition(runtime);
     var definitionContext = new RulesDefinition.Context();
@@ -51,7 +57,7 @@ class RustRulesDefinitionTest {
     new RustProfile().define(profileContext);
 
     var profile = profileContext.profile(RustLanguage.KEY, "Sonar way");
-    assertThat(profile.rules()).hasSize(RustRulesDefinition.RULES.size());
+    assertThat(profile.rules()).hasSize(RustRulesDefinition.CLIPPY_RULES.size() + RustRulesDefinition.SONAR_RULES.size());
 
     for (var rule : profile.rules()) {
       assertThat(repository.rule(rule.ruleKey())).isNotNull();

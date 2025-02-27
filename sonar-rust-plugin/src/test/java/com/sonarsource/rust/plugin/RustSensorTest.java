@@ -78,6 +78,21 @@ class RustSensorTest {
       .isOne();
   }
 
+  @Test
+  void analyze_syntax_errors() {
+    var sensor = sensor();
+    context.fileSystem().add(inputFile("test.rs", "fn main() { let x = 42 }"));
+
+    sensor.execute(context);
+
+    assertThat(context.allIssues()).hasSize(1);
+
+    var issue = context.allIssues().iterator().next();
+    assertThat(issue.ruleKey().rule()).isEqualTo("S2260");
+    assertThat(issue.primaryLocation().message()).isEqualTo("MISSING \";\"");
+    assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
+  }
+
   private InputFile inputFile(String relativePath, String content) {
     return new TestInputFileBuilder(PROJECT_KEY, relativePath)
       .setModuleBaseDir(baseDir.toPath())

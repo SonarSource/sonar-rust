@@ -16,6 +16,7 @@ pub struct Output {
     pub highlight_tokens: Vec<HighlightToken>,
     pub metrics: Metrics,
     pub cpd_tokens: Vec<CpdToken>,
+    pub syntax_errors: Vec<SyntaxError>,
 }
 
 // Highlighting token types, as defined by sonar-plugin-api:
@@ -56,6 +57,12 @@ pub struct CpdToken {
     pub location: SonarLocation,
 }
 
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub struct SyntaxError {
+    pub message: String,
+    pub location: SonarLocation,
+}
+
 pub fn process_code(source_code: &str) -> Output {
     let tree = parse_rust_code(source_code);
 
@@ -63,6 +70,7 @@ pub fn process_code(source_code: &str) -> Output {
         highlight_tokens: highlight(&tree, source_code),
         metrics: calculate_metrics(&tree, source_code),
         cpd_tokens: calculate_cpd_tokens(&tree, source_code),
+        syntax_errors: find_syntax_errors(&tree, source_code),
     }
 }
 
@@ -244,6 +252,73 @@ fn calculate_cpd_tokens(tree: &Tree, source_code: &str) -> Vec<CpdToken> {
     let mut cpd_visitor = CPDVisitor::new(source_code);
     walk_tree(tree.root_node(), &mut cpd_visitor);
     cpd_visitor.tokens
+}
+
+#[derive(Debug)]
+struct SyntaxErrorVisitor<'a> {
+    source_code: &'a str,
+    syntax_errors: Vec<SyntaxError>,
+}
+
+impl<'a> SyntaxErrorVisitor<'a> {
+    fn new(source_code: &'a str) -> Self {
+        Self {
+            source_code,
+            syntax_errors: Vec::new(),
+        }
+    }
+}
+
+impl NodeVisitor for SyntaxErrorVisitor<'_> {
+    fn exit_node(&mut self, node: Node<'_>) {
+        // Tree-sitter defines two types of error nodes to represent syntax errors:
+        // - Error nodes: Syntax errors representing parts of the code that could not be incorporated into a valid syntax tree.
+        // - Missing nodes: Missing nodes that are inserted by the parser in order to recover from certain kinds of syntax errors.
+
+        if node.is_error() {
+            // Error nodes don't include a comprehensive syntax error message and can spread over multiple nodes.
+            // Tree-sitter supposedly introduced some undocumented API supposed to help in that direction, but it's low-level.
+            // Therefore, we only emit a generic parsing error message until the following ticket is fixed:
+            // https://github.com/tree-sitter/tree-sitter/issues/255
+            let message = "A syntax error occurred during parsing.".to_string();
+            let location = TreeSitterLocation::from_tree_sitter_node(node)
+                .to_sonar_location(&self.source_code);
+
+            self.syntax_errors.push(SyntaxError { message, location });
+        }
+
+        if node.is_missing() {
+            // Missing nodes include a comprehensive syntax error message in the form of a S-expression.
+            // The syntax of this S-expression is '(' 'MISSING' <token> ')', e.g. '(MISSING "}")'.
+            let sexp = node.to_sexp();
+            let message = sexp[1..sexp.len() - 1].to_string();
+
+            // The Sonar location API expects the end column to be greater than the start column.
+            // However, the end column of a missing node seems to be the same as the start column.
+            // By precaution, we increment the end column by one to avoid potential failures.
+            let location = TreeSitterLocation::from_tree_sitter_node(node)
+                .to_sonar_location(&self.source_code);
+            let sonar_location = SonarLocation {
+                end_column: if location.start_column == location.end_column {
+                    location.start_column + 1
+                } else {
+                    location.end_column
+                },
+                ..location
+            };
+
+            self.syntax_errors.push(SyntaxError {
+                message,
+                location: sonar_location,
+            });
+        }
+    }
+}
+
+fn find_syntax_errors(tree: &Tree, source_code: &str) -> Vec<SyntaxError> {
+    let mut syntax_error_visitor = SyntaxErrorVisitor::new(source_code);
+    walk_tree(tree.root_node(), &mut syntax_error_visitor);
+    syntax_error_visitor.syntax_errors
 }
 
 fn is_blank(line: &str) -> bool {
@@ -650,5 +725,42 @@ fn main() {
         ];
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_syntax_errors() {
+        let actual = process_code(
+            r#"
+fn main() {
+    let x = 42
+}
+
+fn
+"#,
+        );
+        assert_eq!(actual.syntax_errors.len(), 2);
+        assert_eq!(
+            actual.syntax_errors,
+            vec![
+                SyntaxError {
+                    message: "MISSING \";\"".to_string(),
+                    location: SonarLocation {
+                        start_line: 3,
+                        start_column: 14,
+                        end_line: 3,
+                        end_column: 15,
+                    },
+                },
+                SyntaxError {
+                    message: "A syntax error occurred during parsing.".to_string(),
+                    location: SonarLocation {
+                        start_line: 6,
+                        start_column: 0,
+                        end_line: 6,
+                        end_column: 2,
+                    },
+                },
+            ]
+        );
     }
 }

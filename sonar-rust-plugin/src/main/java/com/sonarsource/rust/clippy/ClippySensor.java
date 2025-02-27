@@ -15,6 +15,7 @@ import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.rule.RuleKey;
+import java.util.Objects;
 
 public class ClippySensor implements Sensor {
 
@@ -47,7 +48,9 @@ public class ClippySensor implements Sensor {
       return;
     }
     var lints = context.activeRules().findByRepository(RustLanguage.KEY).stream()
-      .map(rule -> sonarKeyToLint(rule.ruleKey()))
+      .map(rule -> RustRulesDefinition.ruleKeyToLintId(rule.ruleKey().rule()))
+      // Not all rules can be mapped to Clippy lints, e.g. S2260 (syntax errors)
+      .filter(Objects::nonNull)
       .toList();
 
     try {
@@ -58,14 +61,6 @@ public class ClippySensor implements Sensor {
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);
     }
-  }
-
-  static String sonarKeyToLint(RuleKey sonarKey) {
-    String lintId = RustRulesDefinition.ruleKeyToLintId(sonarKey.rule());
-    if (lintId == null) {
-      throw new IllegalStateException("No mapping found for rule " + sonarKey);
-    }
-    return lintId;
   }
 
   private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {

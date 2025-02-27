@@ -47,6 +47,12 @@ fn main() {
             write_location(&token.location);
         }
 
+        for error in &output.syntax_errors {
+            write_string("syntax error");
+            write_string(&error.message);
+            write_location(&error.location);
+        }
+
         write_string("end");
     }
 }
