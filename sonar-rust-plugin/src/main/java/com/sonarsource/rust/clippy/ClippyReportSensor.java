@@ -20,7 +20,7 @@ public class ClippyReportSensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClippyReportSensor.class);
 
-  public static final String CLIPPY_REPORT_PATHS = "sonar.rust.clippy.reportPaths";
+  public static final String CLIPPY_REPORT_PATHS = "sonar.rust.clippyReport.reportPaths";
 
 
   @Override

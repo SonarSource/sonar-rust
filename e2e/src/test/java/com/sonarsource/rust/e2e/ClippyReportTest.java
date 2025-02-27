@@ -38,7 +38,7 @@ class ClippyReportTest {
       .setProjectDir(projectDir)
       .setSourceDirs("src")
       .setProperty("sonar.rust.clippy.enabled", "false")
-      .setProperty("sonar.rust.clippy.reportPaths", "report.json");
+      .setProperty("sonar.rust.clippyReport.reportPaths", "report.json");
 
     var wsClient = WsClientFactories.getDefault()
       .newClient(HttpConnector.newBuilder()
