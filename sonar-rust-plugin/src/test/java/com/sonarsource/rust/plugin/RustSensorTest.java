@@ -89,7 +89,7 @@ class RustSensorTest {
 
     var issue = context.allIssues().iterator().next();
     assertThat(issue.ruleKey().rule()).isEqualTo("S2260");
-    assertThat(issue.primaryLocation().message()).isEqualTo("MISSING \";\"");
+    assertThat(issue.primaryLocation().message()).isEqualTo("A syntax error occurred during parsing: missing \";\".");
     assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
   }
 

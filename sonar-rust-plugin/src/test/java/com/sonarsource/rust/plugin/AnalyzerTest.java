@@ -100,7 +100,7 @@ class AnalyzerTest {
         """);
 
       assertThat(result.syntaxErrors()).containsExactly(
-        new Analyzer.SyntaxError("MISSING \";\"", 2, 12, 2, 13));
+        new Analyzer.SyntaxError("A syntax error occurred during parsing: missing \";\".", 2, 12, 2, 13));
     }
   }
 }

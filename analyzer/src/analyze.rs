@@ -291,7 +291,8 @@ impl NodeVisitor for SyntaxErrorVisitor<'_> {
             // Missing nodes include a comprehensive syntax error message in the form of a S-expression.
             // The syntax of this S-expression is '(' 'MISSING' <token> ')', e.g. '(MISSING "}")'.
             let sexp = node.to_sexp();
-            let message = sexp[1..sexp.len() - 1].to_string();
+            let error = sexp[1..sexp.len() - 1].to_string().to_lowercase();
+            let message = format!("A syntax error occurred during parsing: {}.", error);
 
             // The Sonar location API expects the end column to be greater than the start column.
             // However, the end column of a missing node seems to be the same as the start column.
@@ -743,7 +744,7 @@ fn
             actual.syntax_errors,
             vec![
                 SyntaxError {
-                    message: "MISSING \";\"".to_string(),
+                    message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                     location: SonarLocation {
                         start_line: 3,
                         start_column: 14,
