@@ -4,11 +4,13 @@
  * mailto:info AT sonarsource DOT com
  */
 use crate::{
+    issue::{find_issues, Issue},
     tree::parse_rust_code,
-    visitors::cpd::{calculate_cpd_tokens, CpdToken},
-    visitors::highlight::{highlight, HighlightToken},
-    visitors::metrics::{calculate_metrics, Metrics},
-    visitors::syntax_error::{find_syntax_errors, SyntaxError},
+    visitors::{
+        cpd::{calculate_cpd_tokens, CpdToken},
+        highlight::{highlight, HighlightToken},
+        metrics::{calculate_metrics, Metrics},
+    },
 };
 
 #[derive(Debug)]
@@ -16,7 +18,7 @@ pub struct Output {
     pub highlight_tokens: Vec<HighlightToken>,
     pub metrics: Metrics,
     pub cpd_tokens: Vec<CpdToken>,
-    pub syntax_errors: Vec<SyntaxError>,
+    pub issues: Vec<Issue>,
 }
 
 pub fn analyze(source_code: &str) -> Output {
@@ -26,7 +28,7 @@ pub fn analyze(source_code: &str) -> Output {
         highlight_tokens: highlight(&tree, source_code),
         metrics: calculate_metrics(&tree, source_code),
         cpd_tokens: calculate_cpd_tokens(&tree, source_code),
-        syntax_errors: find_syntax_errors(&tree, source_code),
+        issues: find_issues(&tree, source_code),
     }
 }
 
@@ -126,6 +128,9 @@ fn main() {
         expected_highlighting.sort();
 
         assert_eq!(expected_highlighting, actual_highlighting);
+
+        let issues = output.issues;
+        assert_eq!(issues.len(), 0);
     }
 
     #[test]

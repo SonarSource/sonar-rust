@@ -3,37 +3,59 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-use crate::tree::{walk_tree, NodeVisitor, SonarLocation, TreeSitterLocation};
+
+use crate::{
+    issue::Issue,
+    rules::rule::Rule,
+    tree::{walk_tree, NodeVisitor, SonarLocation, TreeSitterLocation},
+};
 use tree_sitter::{Node, Tree};
 
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
-pub struct SyntaxError {
-    pub message: String,
-    pub location: SonarLocation,
-}
+pub struct S2260;
 
-pub fn find_syntax_errors(tree: &Tree, source_code: &str) -> Vec<SyntaxError> {
-    let mut syntax_error_visitor = SyntaxErrorVisitor::new(source_code);
-    walk_tree(tree.root_node(), &mut syntax_error_visitor);
-    syntax_error_visitor.syntax_errors
-}
-
-#[derive(Debug)]
-struct SyntaxErrorVisitor<'a> {
-    source_code: &'a str,
-    syntax_errors: Vec<SyntaxError>,
-}
-
-impl<'a> SyntaxErrorVisitor<'a> {
-    fn new(source_code: &'a str) -> Self {
-        Self {
-            source_code,
-            syntax_errors: Vec::new(),
-        }
+impl S2260 {
+    pub fn new() -> Self {
+        S2260
     }
 }
 
-impl NodeVisitor for SyntaxErrorVisitor<'_> {
+impl Rule for S2260 {
+    fn key(&self) -> &str {
+        "S2260"
+    }
+
+    fn check(&self, tree: &Tree, source_code: &str) -> Vec<Issue> {
+        let mut visitor = RuleVisitor::new(self.key(), source_code);
+        walk_tree(tree.root_node(), &mut visitor);
+        visitor.issues
+    }
+}
+
+struct RuleVisitor<'a> {
+    rule_key: &'a str,
+    source_code: &'a str,
+    issues: Vec<Issue>,
+}
+
+impl<'a> RuleVisitor<'a> {
+    fn new(rule_key: &'a str, source_code: &'a str) -> Self {
+        Self {
+            rule_key,
+            source_code,
+            issues: Vec::new(),
+        }
+    }
+
+    fn new_issue(&mut self, message: String, location: SonarLocation) {
+        self.issues.push(Issue {
+            rule_key: self.rule_key.to_string(),
+            message,
+            location,
+        });
+    }
+}
+
+impl NodeVisitor for RuleVisitor<'_> {
     fn exit_node(&mut self, node: Node<'_>) {
         // Tree-sitter defines two types of error nodes to represent syntax errors:
         // - Error nodes: Syntax errors representing parts of the code that could not be incorporated into a valid syntax tree.
@@ -48,7 +70,7 @@ impl NodeVisitor for SyntaxErrorVisitor<'_> {
             let location = TreeSitterLocation::from_tree_sitter_node(node)
                 .to_sonar_location(&self.source_code);
 
-            self.syntax_errors.push(SyntaxError { message, location });
+            self.new_issue(message, location);
         }
 
         if node.is_missing() {
@@ -72,10 +94,7 @@ impl NodeVisitor for SyntaxErrorVisitor<'_> {
                 ..location
             };
 
-            self.syntax_errors.push(SyntaxError {
-                message,
-                location: sonar_location,
-            });
+            self.new_issue(message, sonar_location);
         }
     }
 }
@@ -86,7 +105,23 @@ mod tests {
     use crate::tree::parse_rust_code;
 
     #[test]
-    fn test_syntax_errors() {
+    fn test_compliant() {
+        let source_code = r#"
+fn main() {
+    let x = 42;
+}
+"#;
+        let rule = S2260::new();
+        let tree = parse_rust_code(source_code);
+
+        let actual = rule.check(&tree, source_code);
+        let expected = vec![];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_noncompliant() {
         let source_code = r#"
 fn main() {
     let x = 42
@@ -94,10 +129,13 @@ fn main() {
 
 fn
 "#;
+        let rule = S2260::new();
         let tree = parse_rust_code(source_code);
-        let actual = find_syntax_errors(&tree, source_code);
+
+        let actual = rule.check(&tree, source_code);
         let expected = vec![
-            SyntaxError {
+            Issue {
+                rule_key: "S2260".to_string(),
                 message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                 location: SonarLocation {
                     start_line: 3,
@@ -106,7 +144,8 @@ fn
                     end_column: 15,
                 },
             },
-            SyntaxError {
+            Issue {
+                rule_key: "S2260".to_string(),
                 message: "A syntax error occurred during parsing.".to_string(),
                 location: SonarLocation {
                     start_line: 6,
@@ -116,6 +155,7 @@ fn
                 },
             },
         ];
+
         assert_eq!(actual, expected);
     }
 }

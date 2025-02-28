@@ -4,6 +4,11 @@
  * mailto:info AT sonarsource DOT com
  */
 mod analyze;
+mod issue;
+mod rules {
+    pub mod rule;
+    pub mod s2260;
+}
 mod tree;
 mod visitors {
     pub mod cognitive_complexity;
@@ -11,7 +16,6 @@ mod visitors {
     pub mod cyclomatic_complexity;
     pub mod highlight;
     pub mod metrics;
-    pub mod syntax_error;
 }
 
 use analyze::analyze;
@@ -52,10 +56,11 @@ fn main() {
             write_location(&token.location);
         }
 
-        for error in &output.syntax_errors {
-            write_string("syntax error");
-            write_string(&error.message);
-            write_location(&error.location);
+        for issue in &output.issues {
+            write_string("issue");
+            write_string(&issue.rule_key);
+            write_string(&issue.message);
+            write_location(&issue.location);
         }
 
         write_string("end");
