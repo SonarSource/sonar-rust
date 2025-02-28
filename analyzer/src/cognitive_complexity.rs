@@ -33,6 +33,7 @@ struct ComplexityVisitor {
     current_increments: Vec<Increment>,
     visited_operators: HashSet<usize>,
     current_nesting: i32,
+    current_enclosing_functions: i32,
 }
 
 impl ComplexityVisitor {
@@ -55,8 +56,12 @@ impl NodeVisitor for ComplexityVisitor {
     fn enter_node(&mut self, node: Node<'_>) {
         match node.kind() {
             "function_item" => {
-                // TODO SKUNK-28: We should consider nested functions and recursion.
-                self.current_nesting = 0
+                if self.current_enclosing_functions > 0 {
+                    self.current_nesting += 1;
+                } else {
+                    self.current_nesting = 0;
+                }
+                self.current_enclosing_functions += 1;
             }
             "if_expression" => {
                 if !is_else_if(node) {
@@ -99,6 +104,10 @@ impl NodeVisitor for ComplexityVisitor {
                     self.visited_operators.insert(operator.id());
                 }
             }
+            "closure_expression" => {
+                self.current_nesting += 1;
+            }
+            // TODO SKUNK-29: Check calls and handle recursion if/when we are able to reliably infer the called function
             _ => {}
         }
     }
@@ -111,6 +120,15 @@ impl NodeVisitor for ComplexityVisitor {
                 }
             }
             "while_expression" | "loop_expression" | "for_expression" | "match_expression" => {
+                self.current_nesting -= 1;
+            }
+            "function_item" => {
+                self.current_enclosing_functions -= 1;
+                if self.current_enclosing_functions > 0 {
+                    self.current_nesting -= 1;
+                }
+            }
+            "closure_expression" => {
                 self.current_nesting -= 1;
             }
             _ => {}
@@ -375,6 +393,63 @@ match x { // +1
         );
     }
 
+    #[test]
+    fn test_nested_function() {
+        check_complexity(
+            r#"
+    if x { // +1
+    }
+    fn nested() {
+        if y { // +2
+        }
+    }
+    if z { // +1
+    }
+"#,
+        );
+    }
+
+    #[test]
+    fn test_closures() {
+        check_complexity(
+            r#"
+    if x { // +1
+    }
+    invoke(|a, b| {
+        if a { // +2
+        }    
+    });
+    if y { // +1
+    }
+"#,
+        );
+    }
+
+    #[test]
+    fn complex_nested_functions() {
+        check_complexity(
+            r#"
+    let y = foo(x);
+    if y == 0 { // +1
+        fn foo(x: i32) -> i32 { // this increases nesting level
+            if x > 0 { // +3
+                42
+            } else { // +1
+                43
+            }
+        }
+
+        if z == 0 { // +2
+            return 42;
+        }
+    } else { // +1
+        return 44;
+    }
+    return 45;
+        "#,
+        );
+    }
+
     fn total_complexity(source_code: &str) -> i32 {
         let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str());
         calculate_total_cognitive_complexity(&tree)
@@ -384,7 +459,7 @@ match x { // +1
         let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str());
 
         let increments = calculate_cognitive_complexity(&tree);
-        let expected_increments_by_line = collect_complexity_increments(source_code);
+        let mut expected_increments_by_line = collect_complexity_increments(source_code);
 
         let actual_total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();
         let expected_total: i32 = expected_increments_by_line
@@ -398,13 +473,18 @@ match x { // +1
             expected_total
         );
 
-        let actual_increments_by_line = increments
+        let mut actual_increments_by_line = increments
             .iter()
             .map(|inc| IncrementLines {
                 line: inc.location.start_position.row,
                 increment: inc.nesting + 1,
             })
             .collect::<Vec<_>>();
+
+        let sort_by_line = |a: &IncrementLines, b: &IncrementLines| a.line.cmp(&b.line);
+
+        actual_increments_by_line.sort_by(sort_by_line);
+        expected_increments_by_line.sort_by(sort_by_line);
 
         assert_eq!(actual_increments_by_line, expected_increments_by_line);
     }

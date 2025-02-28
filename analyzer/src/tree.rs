@@ -73,8 +73,7 @@ impl TreeSitterLocation {
     }
 }
 
-/// Performs a depth-first traversal of the tree, calling the provided callback for each node.
-/// The callback is called after all children of the node have been visited.
+/// Performs a depth-first traversal of the tree, calling the callbacks defined in the visitor whenever entering and leaving a node.
 /// The visitor visits "extra" nodes (e.g. comments) as well, however, it does not visit their children
 /// (i.e. comments are treated as leaves in the tree).
 pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
