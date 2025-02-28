@@ -3,13 +3,11 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-
-use tree_sitter::{Node, Tree};
-
 use crate::{
-    cognitive_complexity::is_logical_operator,
     tree::{walk_tree, NodeVisitor},
+    visitors::cognitive_complexity::is_logical_operator,
 };
+use tree_sitter::{Node, Tree};
 
 pub(crate) fn calculate_cyclomatic_complexity(tree: &Tree) -> i32 {
     let mut visitor = CyclomaticComplexityVisitor::default();

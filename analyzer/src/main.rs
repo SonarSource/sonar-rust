@@ -4,13 +4,18 @@
  * mailto:info AT sonarsource DOT com
  */
 mod analyze;
-mod cognitive_complexity;
-mod cyclomatic_complexity;
 mod tree;
+mod visitors {
+    pub mod cognitive_complexity;
+    pub mod cpd;
+    pub mod cyclomatic_complexity;
+    pub mod highlight;
+    pub mod metrics;
+    pub mod syntax_error;
+}
 
+use analyze::analyze;
 use std::io::{self, Read, Write};
-
-use analyze::process_code;
 use tree::SonarLocation;
 
 fn main() {
@@ -24,7 +29,7 @@ fn main() {
         let mut buf = vec![0u8; len as usize];
         io::stdin().read_exact(&mut buf).expect("read from stdin");
 
-        let output = process_code(std::str::from_utf8(&buf).expect("UTF-8 conversion error"));
+        let output = analyze(std::str::from_utf8(&buf).expect("UTF-8 conversion error"));
 
         for token in &output.highlight_tokens {
             write_string("highlight");

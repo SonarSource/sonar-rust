@@ -20,7 +20,7 @@ pub(crate) fn calculate_total_cognitive_complexity(tree: &Tree) -> i32 {
         .sum()
 }
 
-pub(crate) fn calculate_cognitive_complexity(tree: &Tree) -> Vec<Increment> {
+fn calculate_cognitive_complexity(tree: &Tree) -> Vec<Increment> {
     let mut visitor = ComplexityVisitor::default();
 
     walk_tree(tree.root_node(), &mut visitor);
