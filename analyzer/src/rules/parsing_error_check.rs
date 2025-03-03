@@ -22,10 +22,6 @@ impl ParsingErrorCheck {
 }
 
 impl Rule for ParsingErrorCheck {
-    fn key(&self) -> &str {
-        RULE_KEY
-    }
-
     fn check(&self, tree: &Tree, source_code: &str) -> Vec<Issue> {
         let mut visitor = RuleVisitor::new(source_code);
         walk_tree(tree.root_node(), &mut visitor);
@@ -135,7 +131,7 @@ fn
         let actual = rule.check(&tree, source_code);
         let expected = vec![
             Issue {
-                rule_key: rule.key().to_string(),
+                rule_key: RULE_KEY.to_string(),
                 message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                 location: SonarLocation {
                     start_line: 3,
@@ -145,7 +141,7 @@ fn
                 },
             },
             Issue {
-                rule_key: rule.key().to_string(),
+                rule_key: RULE_KEY.to_string(),
                 message: "A syntax error occurred during parsing.".to_string(),
                 location: SonarLocation {
                     start_line: 6,

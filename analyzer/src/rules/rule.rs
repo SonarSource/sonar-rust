@@ -8,7 +8,6 @@ use crate::{issue::Issue, rules::parsing_error_check::ParsingErrorCheck};
 use tree_sitter::Tree;
 
 pub trait Rule {
-    fn key(&self) -> &str;
     fn check(&self, tree: &Tree, source_code: &str) -> Vec<Issue>;
 }
 
