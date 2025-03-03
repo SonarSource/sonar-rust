@@ -21,6 +21,7 @@ import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.highlighting.TypeOfText;
 import org.sonar.api.measures.CoreMetrics;
+import org.sonar.api.rule.RuleKey;
 
 public class RustSensor implements Sensor {
 
@@ -61,9 +62,10 @@ public class RustSensor implements Sensor {
     try {
       var result = analyzer.analyze(inputFile.contents());
 
-      reportMeasures(sensorContext, inputFile, result.measures());
-      reportHighlighting(sensorContext, inputFile, result.highlightTokens());
-      reportCopyPasteDetection(sensorContext, inputFile, result.cpdTokens());
+      saveMeasures(sensorContext, inputFile, result.measures());
+      saveHighlighting(sensorContext, inputFile, result.highlightTokens());
+      saveCPD(sensorContext, inputFile, result.cpdTokens());
+      saveIssues(sensorContext, inputFile, result.issues());
     } catch (IOException ex) {
       LOG.error("Failed to analyze file: {} ({})", inputFile.filename(), ex.getMessage());
     }
@@ -76,7 +78,7 @@ public class RustSensor implements Sensor {
       .toList();
   }
 
-  private static void reportHighlighting(SensorContext sensorContext, InputFile inputFile, List<Analyzer.HighlightTokens> tokens) {
+  private static void saveHighlighting(SensorContext sensorContext, InputFile inputFile, List<Analyzer.HighlightTokens> tokens) {
     NewHighlighting highlighting = sensorContext.newHighlighting();
     highlighting.onFile(inputFile);
     for (var token : tokens) {
@@ -90,7 +92,7 @@ public class RustSensor implements Sensor {
     highlighting.save();
   }
 
-  private static void reportMeasures(SensorContext sensorContext, InputFile inputFile, Analyzer.Measures measures) {
+  private static void saveMeasures(SensorContext sensorContext, InputFile inputFile, Analyzer.Measures measures) {
     saveMetric(sensorContext, inputFile, CoreMetrics.NCLOC, measures.ncloc());
     saveMetric(sensorContext, inputFile, CoreMetrics.COMMENT_LINES, measures.commentLines());
     saveMetric(sensorContext, inputFile, CoreMetrics.FUNCTIONS, measures.functions());
@@ -107,7 +109,7 @@ public class RustSensor implements Sensor {
       .save();
   }
 
-  private static void reportCopyPasteDetection(SensorContext sensorContext, InputFile inputFile, List<Analyzer.CpdToken> tokens) {
+  private static void saveCPD(SensorContext sensorContext, InputFile inputFile, List<Analyzer.CpdToken> tokens) {
     var newCpdTokens = sensorContext.newCpdTokens().onFile(inputFile);
     for (var token : tokens) {
       try {
@@ -117,5 +119,23 @@ public class RustSensor implements Sensor {
       }
     }
     newCpdTokens.save();
+  }
+
+  private static void saveIssues(SensorContext sensorContext, InputFile inputFile, List<Analyzer.Issue> issues) {
+    for (var issue : issues) {
+      try {
+        var newIssue = sensorContext.newIssue();
+        var location = newIssue.newLocation()
+          .on(inputFile)
+          .at(inputFile.newRange(issue.startLine(), issue.startColumn(), issue.endLine(), issue.endColumn()))
+          .message(issue.message());
+        newIssue
+          .forRule(RuleKey.of(RustLanguage.KEY, issue.ruleKey()))
+          .at(location)
+          .save();
+      } catch (IllegalArgumentException e) {
+        LOG.error("Invalid issue: {}", e.getMessage());
+      }
+    }
   }
 }

@@ -89,4 +89,18 @@ class AnalyzerTest {
         new Analyzer.CpdToken("}",3, 0, 3, 1));
     }
   }
+
+  @Test
+  void syntax_errors() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND)) {
+      var result = analyzer.analyze("""
+        fn main() {
+          let x = 42
+        }
+        """);
+
+      assertThat(result.issues()).containsExactly(
+        new Analyzer.Issue("S2260", "A syntax error occurred during parsing: missing \";\".", 2, 12, 2, 13));
+    }
+  }
 }

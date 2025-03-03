@@ -46,6 +46,7 @@ public class Analyzer implements AutoCloseable {
     List<HighlightTokens> highlightTokens = new ArrayList<>();
     Measures measures = new Measures();
     List<CpdToken> cpdTokens = new ArrayList<>();
+    List<Issue> issues = new ArrayList<>();
 
     while (true) {
       String messageType = readString();
@@ -73,12 +74,20 @@ public class Analyzer implements AutoCloseable {
         int endLine = inputStream.readInt();
         int endColumn = inputStream.readInt();
         cpdTokens.add(new CpdToken(image, startLine, startColumn, endLine, endColumn));
+      } else if ("issue".endsWith(messageType)) {
+        String ruleKey = readString();
+        String message = readString();
+        int startLine = inputStream.readInt();
+        int startColumn = inputStream.readInt();
+        int endLine = inputStream.readInt();
+        int endColumn = inputStream.readInt();
+        issues.add(new Issue(ruleKey, message, startLine, startColumn, endLine, endColumn));
       } else {
         break;
       }
     }
 
-    return new AnalysisResult(highlightTokens, measures, cpdTokens);
+    return new AnalysisResult(highlightTokens, measures, cpdTokens, issues);
   }
 
   @Override
@@ -109,7 +118,7 @@ public class Analyzer implements AutoCloseable {
     outputStream.flush();
   }
 
-  public record AnalysisResult(List<HighlightTokens> highlightTokens, Measures measures, List<CpdToken> cpdTokens) {
+  public record AnalysisResult(List<HighlightTokens> highlightTokens, Measures measures, List<CpdToken> cpdTokens, List<Issue> issues) {
   }
 
   public record HighlightTokens(String tokenType, int startLine, int startColumn, int endLine, int endColumn) {
@@ -122,5 +131,8 @@ public class Analyzer implements AutoCloseable {
   }
 
   public record CpdToken(String image, int startLine, int startColumn, int endLine, int endColumn) {
+  }
+
+  public record Issue(String ruleKey, String message, int startLine, int startColumn, int endLine, int endColumn) {
   }
 }
