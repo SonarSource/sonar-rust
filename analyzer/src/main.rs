@@ -7,7 +7,7 @@ mod analyze;
 mod issue;
 mod rules {
     pub mod rule;
-    pub mod s2260;
+    pub mod parsing_error_check;
 }
 mod tree;
 mod visitors {

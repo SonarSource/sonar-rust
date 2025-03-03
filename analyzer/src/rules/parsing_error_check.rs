@@ -13,15 +13,15 @@ use tree_sitter::{Node, Tree};
 
 const RULE_KEY: &str = "S2260";
 
-pub struct S2260;
+pub struct ParsingErrorCheck;
 
-impl S2260 {
+impl ParsingErrorCheck {
     pub fn new() -> Self {
-        S2260
+        ParsingErrorCheck
     }
 }
 
-impl Rule for S2260 {
+impl Rule for ParsingErrorCheck {
     fn key(&self) -> &str {
         RULE_KEY
     }
@@ -111,7 +111,7 @@ fn main() {
     let x = 42;
 }
 "#;
-        let rule = S2260::new();
+        let rule = ParsingErrorCheck::new();
         let tree = parse_rust_code(source_code);
 
         let actual = rule.check(&tree, source_code);
@@ -129,13 +129,13 @@ fn main() {
 
 fn
 "#;
-        let rule = S2260::new();
+        let rule = ParsingErrorCheck::new();
         let tree = parse_rust_code(source_code);
 
         let actual = rule.check(&tree, source_code);
         let expected = vec![
             Issue {
-                rule_key: "S2260".to_string(),
+                rule_key: rule.key().to_string(),
                 message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                 location: SonarLocation {
                     start_line: 3,
@@ -145,7 +145,7 @@ fn
                 },
             },
             Issue {
-                rule_key: "S2260".to_string(),
+                rule_key: rule.key().to_string(),
                 message: "A syntax error occurred during parsing.".to_string(),
                 location: SonarLocation {
                     start_line: 6,
