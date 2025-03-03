@@ -11,6 +11,8 @@ use crate::{
 };
 use tree_sitter::{Node, Tree};
 
+const RULE_KEY: &str = "S2260";
+
 pub struct S2260;
 
 impl S2260 {
@@ -21,26 +23,24 @@ impl S2260 {
 
 impl Rule for S2260 {
     fn key(&self) -> &str {
-        "S2260"
+        RULE_KEY
     }
 
     fn check(&self, tree: &Tree, source_code: &str) -> Vec<Issue> {
-        let mut visitor = RuleVisitor::new(self.key(), source_code);
+        let mut visitor = RuleVisitor::new(source_code);
         walk_tree(tree.root_node(), &mut visitor);
         visitor.issues
     }
 }
 
 struct RuleVisitor<'a> {
-    rule_key: &'a str,
     source_code: &'a str,
     issues: Vec<Issue>,
 }
 
 impl<'a> RuleVisitor<'a> {
-    fn new(rule_key: &'a str, source_code: &'a str) -> Self {
+    fn new(source_code: &'a str) -> Self {
         Self {
-            rule_key,
             source_code,
             issues: Vec::new(),
         }
@@ -48,7 +48,7 @@ impl<'a> RuleVisitor<'a> {
 
     fn new_issue(&mut self, message: String, location: SonarLocation) {
         self.issues.push(Issue {
-            rule_key: self.rule_key.to_string(),
+            rule_key: RULE_KEY.to_string(),
             message,
             location,
         });
