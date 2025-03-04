@@ -451,12 +451,12 @@ match x { // +1
     }
 
     fn total_complexity(source_code: &str) -> i32 {
-        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str());
+        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
         calculate_total_cognitive_complexity(&tree)
     }
 
     fn check_complexity(source_code: &str) {
-        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str());
+        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
 
         let increments = calculate_cognitive_complexity(&tree);
         let mut expected_increments_by_line = collect_complexity_increments(source_code);
@@ -490,7 +490,7 @@ match x { // +1
     }
 
     fn collect_complexity_increments(source_code: &str) -> Vec<IncrementLines> {
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         let query = Query::new(
             &tree_sitter_rust::LANGUAGE.into(),
             "(line_comment) @comment",

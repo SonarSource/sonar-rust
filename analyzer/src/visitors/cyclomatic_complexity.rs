@@ -137,7 +137,7 @@ mod tests {
     }
 
     fn complexity(source_code: &str) -> i32 {
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         calculate_cyclomatic_complexity(&tree)
     }
 }

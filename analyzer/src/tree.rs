@@ -27,12 +27,26 @@ pub struct SonarLocation {
     pub end_column: usize,
 }
 
-pub(crate) trait NodeVisitor {
+pub trait NodeVisitor {
     /// Callback invoked the first time a node is visited.
     fn enter_node(&mut self, _node: Node<'_>) {}
 
     /// Callback invoked after all children of a node have been visited.
     fn exit_node(&mut self, _node: Node<'_>) {}
+}
+
+#[derive(Debug)]
+pub enum ErrorKind {
+    /// File-level errors that should only prevent the analysis of a single file.
+    FileError,
+    /// Global errors that prevent the analysis of all files.
+    GlobalError,
+}
+
+#[derive(Debug)]
+pub struct AnalyzerError {
+    pub message: String,
+    pub kind: ErrorKind,
 }
 
 impl TreeSitterLocation {
@@ -108,13 +122,19 @@ pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
     }
 }
 
-pub(crate) fn parse_rust_code(source_code: &str) -> Tree {
+pub(crate) fn parse_rust_code(source_code: &str) -> Result<Tree, AnalyzerError> {
     let mut parser = Parser::new();
     parser
         .set_language(&tree_sitter_rust::LANGUAGE.into())
-        .expect("Error loading Rust language");
+        .map_err(|err| AnalyzerError {
+            message: format!("failed to initialize parser: {:?}", err),
+            kind: ErrorKind::GlobalError,
+        })?;
 
-    parser
-        .parse(source_code, None)
-        .expect("Error parsing Rust code")
+    let tree = parser.parse(source_code, None).ok_or(AnalyzerError {
+        message: "failed to parse source code".to_string(),
+        kind: ErrorKind::FileError,
+    })?;
+
+    Ok(tree)
 }

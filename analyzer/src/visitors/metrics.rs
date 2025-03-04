@@ -117,7 +117,7 @@ fn main() {
     let x = "foo"; // Set 'x' to 'foo'
 }         
 "#;
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         let actual = calculate_metrics(&tree, source_code);
 
         assert_eq!(
@@ -143,7 +143,7 @@ fn main() {
     let x = "foo";
 }
 "#;
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         let actual = calculate_metrics(&tree, source_code);
 
         assert_eq!(
@@ -174,7 +174,7 @@ fn main() {
     let x = "foo";
 }
 "#;
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         let actual = calculate_metrics(&tree, source_code);
 
         assert_eq!(
@@ -216,7 +216,7 @@ fn main() {
     ; // Empty statement
 }
 "#;
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         let actual = calculate_metrics(&tree, source_code);
 
         assert_eq!(
