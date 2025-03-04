@@ -25,8 +25,8 @@ pub fn analyze(source_code: &str) -> Result<Output, AnalyzerError> {
     let tree = parse_rust_code(source_code)?;
 
     Ok(Output {
-        highlight_tokens: highlight(&tree, source_code),
-        metrics: calculate_metrics(&tree, source_code),
+        highlight_tokens: highlight(&tree, source_code)?,
+        metrics: calculate_metrics(&tree, source_code)?,
         cpd_tokens: calculate_cpd_tokens(&tree, source_code),
         issues: find_issues(&tree, source_code),
     })

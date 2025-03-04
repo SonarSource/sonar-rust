@@ -3,7 +3,7 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-use crate::tree::{walk_tree, NodeVisitor};
+use crate::tree::{walk_tree, AnalyzerError, NodeVisitor};
 use crate::visitors::cognitive_complexity::calculate_total_cognitive_complexity;
 use crate::visitors::cyclomatic_complexity::calculate_cyclomatic_complexity;
 use std::collections::HashSet;
@@ -20,16 +20,16 @@ pub struct Metrics {
     pub cyclomatic_complexity: i32,
 }
 
-pub fn calculate_metrics(tree: &Tree, source_code: &str) -> Metrics {
+pub fn calculate_metrics(tree: &Tree, source_code: &str) -> Result<Metrics, AnalyzerError> {
     let mut metrics_visitor = MetricsVisitor::new(source_code);
     walk_tree(tree.root_node(), &mut metrics_visitor);
 
     let mut metrics = Metrics::default();
     metrics_visitor.update_metrics(&mut metrics);
-    metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree);
+    metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree)?;
     metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree);
 
-    metrics
+    Ok(metrics)
 }
 
 #[derive(Debug)]
@@ -118,7 +118,7 @@ fn main() {
 }         
 "#;
         let tree = parse_rust_code(source_code).unwrap();
-        let actual = calculate_metrics(&tree, source_code);
+        let actual = calculate_metrics(&tree, source_code).unwrap();
 
         assert_eq!(
             actual,
@@ -144,7 +144,7 @@ fn main() {
 }
 "#;
         let tree = parse_rust_code(source_code).unwrap();
-        let actual = calculate_metrics(&tree, source_code);
+        let actual = calculate_metrics(&tree, source_code).unwrap();
 
         assert_eq!(
             actual,
@@ -175,7 +175,7 @@ fn main() {
 }
 "#;
         let tree = parse_rust_code(source_code).unwrap();
-        let actual = calculate_metrics(&tree, source_code);
+        let actual = calculate_metrics(&tree, source_code).unwrap();
 
         assert_eq!(
             actual,
@@ -217,7 +217,7 @@ fn main() {
 }
 "#;
         let tree = parse_rust_code(source_code).unwrap();
-        let actual = calculate_metrics(&tree, source_code);
+        let actual = calculate_metrics(&tree, source_code).unwrap();
 
         assert_eq!(
             actual,

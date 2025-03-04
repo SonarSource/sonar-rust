@@ -36,17 +36,11 @@ pub trait NodeVisitor {
 }
 
 #[derive(Debug)]
-pub enum ErrorKind {
+pub enum AnalyzerError {
     /// File-level errors that should only prevent the analysis of a single file.
-    FileError,
+    FileError(String),
     /// Global errors that prevent the analysis of all files.
-    GlobalError,
-}
-
-#[derive(Debug)]
-pub struct AnalyzerError {
-    pub message: String,
-    pub kind: ErrorKind,
+    GlobalError(String),
 }
 
 impl TreeSitterLocation {
@@ -126,15 +120,15 @@ pub(crate) fn parse_rust_code(source_code: &str) -> Result<Tree, AnalyzerError> 
     let mut parser = Parser::new();
     parser
         .set_language(&tree_sitter_rust::LANGUAGE.into())
-        .map_err(|err| AnalyzerError {
-            message: format!("failed to initialize parser: {:?}", err),
-            kind: ErrorKind::GlobalError,
+        .map_err(|err| {
+            AnalyzerError::GlobalError(format!("failed to initialize parser: {:?}", err))
         })?;
 
-    let tree = parser.parse(source_code, None).ok_or(AnalyzerError {
-        message: "failed to parse source code".to_string(),
-        kind: ErrorKind::FileError,
-    })?;
+    let tree = parser
+        .parse(source_code, None)
+        .ok_or(AnalyzerError::FileError(
+            "failed to parse the source code".to_string(),
+        ))?;
 
     Ok(tree)
 }

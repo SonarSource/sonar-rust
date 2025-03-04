@@ -20,7 +20,7 @@ mod visitors {
 
 use analyze::analyze;
 use std::io::{self, Read, Write};
-use tree::{AnalyzerError, ErrorKind, SonarLocation};
+use tree::{AnalyzerError, SonarLocation};
 
 fn main() {
     loop {
@@ -37,17 +37,11 @@ fn main() {
 
         let output = match analyze(source_code) {
             Ok(output) => output,
-            Err(AnalyzerError {
-                message,
-                kind: ErrorKind::FileError,
-            }) => {
+            Err(AnalyzerError::FileError(message)) => {
                 eprintln!("warn {}", message);
                 continue;
             }
-            Err(AnalyzerError {
-                message,
-                kind: ErrorKind::GlobalError,
-            }) => {
+            Err(AnalyzerError::GlobalError(message)) => {
                 eprintln!("error {}", message);
                 return;
             }
