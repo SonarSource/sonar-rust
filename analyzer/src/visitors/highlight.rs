@@ -3,7 +3,7 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-use crate::tree::{SonarLocation, TreeSitterLocation};
+use crate::tree::{AnalyzerError, SonarLocation, TreeSitterLocation};
 use std::collections::HashSet;
 use tree_sitter::{Node, Query, QueryCursor, StreamingIterator, Tree};
 
@@ -53,12 +53,14 @@ impl HighlightTokenType {
     }
 }
 
-pub fn highlight(tree: &Tree, source_code: &str) -> Vec<HighlightToken> {
+pub fn highlight(tree: &Tree, source_code: &str) -> Result<Vec<HighlightToken>, AnalyzerError> {
     let highlight_query = Query::new(
         &tree_sitter_rust::LANGUAGE.into(),
         tree_sitter_rust::HIGHLIGHTS_QUERY,
     )
-    .expect("Query parsing error");
+    .map_err(|err| {
+        AnalyzerError::GlobalError(format!("Failed to create highlight query: {}", err))
+    })?;
 
     let mut cursor = QueryCursor::new();
     let mut query_matches =
@@ -102,5 +104,5 @@ pub fn highlight(tree: &Tree, source_code: &str) -> Vec<HighlightToken> {
         });
     }
 
-    tokens
+    Ok(tokens)
 }

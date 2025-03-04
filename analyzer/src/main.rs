@@ -20,7 +20,7 @@ mod visitors {
 
 use analyze::analyze;
 use std::io::{self, Read, Write};
-use tree::SonarLocation;
+use tree::{AnalyzerError, SonarLocation};
 
 fn main() {
     loop {
@@ -33,7 +33,19 @@ fn main() {
         let mut buf = vec![0u8; len as usize];
         io::stdin().read_exact(&mut buf).expect("read from stdin");
 
-        let output = analyze(std::str::from_utf8(&buf).expect("UTF-8 conversion error"));
+        let source_code = std::str::from_utf8(&buf).expect("UTF-8 conversion error");
+
+        let output = match analyze(source_code) {
+            Ok(output) => output,
+            Err(AnalyzerError::FileError(message)) => {
+                eprintln!("warn {}", message);
+                continue;
+            }
+            Err(AnalyzerError::GlobalError(message)) => {
+                eprintln!("error {}", message);
+                return;
+            }
+        };
 
         for token in &output.highlight_tokens {
             write_string("highlight");

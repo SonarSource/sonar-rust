@@ -54,7 +54,7 @@ impl NodeVisitor for CPDVisitor<'_> {
             self.tokens.push(CpdToken {
                 image: image.to_string(),
                 location: TreeSitterLocation::from_tree_sitter_node(node)
-                    .to_sonar_location(&self.source_code),
+                    .to_sonar_location(self.source_code),
             });
         }
     }
@@ -92,7 +92,7 @@ fn main() {
     42;
 }
 "#;
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
 
         let actual = calculate_cpd_tokens(&tree, source_code);
         let expected = vec![

@@ -63,8 +63,8 @@ impl NodeVisitor for RuleVisitor<'_> {
             // Therefore, we only emit a generic parsing error message until the following ticket is fixed:
             // https://github.com/tree-sitter/tree-sitter/issues/255
             let message = "A syntax error occurred during parsing.".to_string();
-            let location = TreeSitterLocation::from_tree_sitter_node(node)
-                .to_sonar_location(&self.source_code);
+            let location =
+                TreeSitterLocation::from_tree_sitter_node(node).to_sonar_location(self.source_code);
 
             self.new_issue(message, location);
         }
@@ -79,8 +79,8 @@ impl NodeVisitor for RuleVisitor<'_> {
             // The Sonar location API expects the end column to be greater than the start column.
             // However, the end column of a missing node seems to be the same as the start column.
             // By precaution, we increment the end column by one to avoid potential failures.
-            let location = TreeSitterLocation::from_tree_sitter_node(node)
-                .to_sonar_location(&self.source_code);
+            let location =
+                TreeSitterLocation::from_tree_sitter_node(node).to_sonar_location(self.source_code);
             let sonar_location = SonarLocation {
                 end_column: if location.start_column == location.end_column {
                     location.start_column + 1
@@ -108,7 +108,7 @@ fn main() {
 }
 "#;
         let rule = ParsingErrorCheck::new();
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
 
         let actual = rule.check(&tree, source_code);
         let expected = vec![];
@@ -126,7 +126,7 @@ fn main() {
 fn
 "#;
         let rule = ParsingErrorCheck::new();
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
 
         let actual = rule.check(&tree, source_code);
         let expected = vec![

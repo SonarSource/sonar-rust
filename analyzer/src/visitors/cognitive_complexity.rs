@@ -3,7 +3,7 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-use crate::tree::{walk_tree, NodeVisitor, TreeSitterLocation};
+use crate::tree::{walk_tree, AnalyzerError, NodeVisitor, TreeSitterLocation};
 use std::collections::HashSet;
 use tree_sitter::{Node, Tree};
 
@@ -13,19 +13,23 @@ pub(crate) struct Increment {
     nesting: i32,
 }
 
-pub(crate) fn calculate_total_cognitive_complexity(tree: &Tree) -> i32 {
-    calculate_cognitive_complexity(tree)
+pub(crate) fn calculate_total_cognitive_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
+    Ok(calculate_cognitive_complexity(tree)?
         .iter()
         .map(|inc| inc.nesting + 1)
-        .sum()
+        .sum())
 }
 
-fn calculate_cognitive_complexity(tree: &Tree) -> Vec<Increment> {
+fn calculate_cognitive_complexity(tree: &Tree) -> Result<Vec<Increment>, AnalyzerError> {
     let mut visitor = ComplexityVisitor::default();
 
     walk_tree(tree.root_node(), &mut visitor);
 
-    visitor.current_increments
+    if let Some(error) = visitor.error {
+        return Err(error);
+    }
+
+    Ok(visitor.current_increments)
 }
 
 #[derive(Default)]
@@ -34,6 +38,7 @@ struct ComplexityVisitor {
     visited_operators: HashSet<usize>,
     current_nesting: i32,
     current_enclosing_functions: i32,
+    error: Option<AnalyzerError>,
 }
 
 impl ComplexityVisitor {
@@ -85,15 +90,27 @@ impl NodeVisitor for ComplexityVisitor {
                 }
             }
             "binary_expression" if is_logical_operator(node) => {
-                let operator_token = node
-                    .child_by_field_name("operator")
-                    .expect("operator must be present in a binary expression");
+                let operator_token = match node.child_by_field_name("operator") {
+                    Some(token) => token,
+                    None => {
+                        self.error = Some(AnalyzerError::FileError(
+                            "operator must be present in binary expression".to_string(),
+                        ));
+                        return;
+                    }
+                };
 
                 if self.visited_operators.contains(&operator_token.id()) {
                     return;
                 }
 
-                let mut operators = flatten_operators(node);
+                let mut operators = match flatten_operators(node) {
+                    Ok(operators) => operators,
+                    Err(err) => {
+                        self.error = Some(err);
+                        return;
+                    }
+                };
                 let mut prev: Option<&str> = None;
 
                 while let Some(operator) = operators.pop() {
@@ -157,27 +174,29 @@ pub(crate) fn is_logical_operator(node: Node<'_>) -> bool {
     }
 }
 
-fn flatten_operators(node: Node<'_>) -> Vec<Node<'_>> {
-    let mut operators = vec![];
+fn flatten_operators(node: Node<'_>) -> Result<Vec<Node<'_>>, AnalyzerError> {
+    let mut operators: Vec<Node<'_>> = vec![];
 
     if let Some(left) = node.child_by_field_name("left") {
         if is_logical_operator(left) {
-            operators.extend(flatten_operators(left));
+            operators.extend(flatten_operators(left)?);
         }
     }
 
     operators.push(
         node.child_by_field_name("operator")
-            .expect("operator must be present in a binary expression"),
+            .ok_or(AnalyzerError::FileError(
+                "operator must be present in a binary expression".to_string(),
+            ))?,
     );
 
     if let Some(right) = node.child_by_field_name("right") {
         if is_logical_operator(right) {
-            operators.extend(flatten_operators(right));
+            operators.extend(flatten_operators(right)?);
         }
     }
 
-    operators
+    Ok(operators)
 }
 
 #[cfg(test)]
@@ -451,14 +470,14 @@ match x { // +1
     }
 
     fn total_complexity(source_code: &str) -> i32 {
-        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str());
-        calculate_total_cognitive_complexity(&tree)
+        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
+        calculate_total_cognitive_complexity(&tree).unwrap()
     }
 
     fn check_complexity(source_code: &str) {
-        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str());
+        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
 
-        let increments = calculate_cognitive_complexity(&tree);
+        let increments = calculate_cognitive_complexity(&tree).unwrap();
         let mut expected_increments_by_line = collect_complexity_increments(source_code);
 
         let actual_total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();
@@ -490,7 +509,7 @@ match x { // +1
     }
 
     fn collect_complexity_increments(source_code: &str) -> Vec<IncrementLines> {
-        let tree = parse_rust_code(source_code);
+        let tree = parse_rust_code(source_code).unwrap();
         let query = Query::new(
             &tree_sitter_rust::LANGUAGE.into(),
             "(line_comment) @comment",
