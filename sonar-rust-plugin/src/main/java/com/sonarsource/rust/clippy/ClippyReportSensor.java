@@ -26,7 +26,7 @@ public class ClippyReportSensor implements Sensor {
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor
-      .name("Clippy Report Import Sensor")
+      .name("Clippy Report Import")
       .onlyOnLanguage(RustLanguage.KEY)
       .onlyWhenConfiguration(config -> config.hasKey(CLIPPY_REPORT_PATHS));
   }
