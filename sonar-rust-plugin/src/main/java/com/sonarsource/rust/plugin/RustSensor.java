@@ -67,7 +67,7 @@ public class RustSensor implements Sensor {
       saveCPD(sensorContext, inputFile, result.cpdTokens());
       saveIssues(sensorContext, inputFile, result.issues());
     } catch (IOException ex) {
-      LOG.error("Failed to analyze file: {} ({})", inputFile.filename(), ex.getMessage());
+      LOG.error("Failed to analyze file: {}. Reason: {}", inputFile.filename(), ex.getMessage());
     }
   }
 
@@ -86,7 +86,7 @@ public class RustSensor implements Sensor {
         TextRange range = inputFile.newRange(token.startLine(), token.startColumn(), token.endLine(), token.endColumn());
         highlighting.highlight(range, TypeOfText.valueOf(token.tokenType()));
       } catch (IllegalArgumentException e) {
-        LOG.error("Invalid highlighting: {}", e.getMessage());
+        LOG.error("Invalid highlighting: {}. Reason: {}", token, e.getMessage());
       }
     }
     highlighting.save();
@@ -115,7 +115,7 @@ public class RustSensor implements Sensor {
       try {
         newCpdTokens.addToken(token.startLine(), token.startColumn(), token.endLine(), token.endColumn(), token.image());
       } catch (IllegalArgumentException e) {
-        LOG.error("Invalid CPD token: {}", e.getMessage());
+        LOG.error("Invalid CPD token: {}. Reason: {}", token, e.getMessage());
       }
     }
     newCpdTokens.save();
@@ -134,7 +134,7 @@ public class RustSensor implements Sensor {
           .at(location)
           .save();
       } catch (IllegalArgumentException e) {
-        LOG.error("Invalid issue: {}", e.getMessage());
+        LOG.error("Invalid issue: {}. Reason: {}", issue, e.getMessage());
       }
     }
   }

@@ -23,7 +23,6 @@ pub fn calculate_cpd_tokens(tree: &Tree, source_code: &str) -> Vec<CpdToken> {
 struct CPDVisitor<'a> {
     source_code: &'a str,
     tokens: Vec<CpdToken>,
-    is_string_literal: bool,
 }
 
 impl<'a> CPDVisitor<'a> {
@@ -31,31 +30,61 @@ impl<'a> CPDVisitor<'a> {
         Self {
             source_code,
             tokens: Vec::new(),
-            is_string_literal: false,
         }
+    }
+
+    fn new_token(&mut self, image: &str, node: Node) {
+        self.tokens.push(CpdToken {
+            image: image.to_string(),
+            location: TreeSitterLocation::from_tree_sitter_node(node)
+                .to_sonar_location(&self.source_code),
+        });
     }
 }
 
 impl NodeVisitor for CPDVisitor<'_> {
     fn enter_node(&mut self, node: Node<'_>) {
         if node.child_count() == 0 {
-            let token_text = &self.source_code[node.start_byte()..node.end_byte()];
-            let image = if token_text == "\"" {
-                self.is_string_literal = !self.is_string_literal;
-                token_text
-            } else if token_text.parse::<f64>().is_ok() {
-                "NUMBER"
-            } else if self.is_string_literal {
-                "STRING"
-            } else {
-                token_text
-            };
+            // Ignore source files
+            // We wrongly consider them as tokens when they denote empty files
+            if node.kind() == "source_file" {
+                return;
+            }
 
-            self.tokens.push(CpdToken {
-                image: image.to_string(),
-                location: TreeSitterLocation::from_tree_sitter_node(node)
-                    .to_sonar_location(self.source_code),
-            });
+            // Ignore missing nodes
+            // They denote syntax errors and can have identical starting and ending columns
+            if node.is_missing() {
+                return;
+            }
+
+            // Ignore error nodes
+            // They denote syntax errors and can be unpredictable
+            if node.is_error() {
+                return;
+            }
+
+            // Number-like tokens
+            if node.kind() == "integer_literal" || node.kind() == "float_literal" {
+                self.new_token("NUMBER", node);
+                return;
+            }
+
+            // String-like tokens
+            if node.kind() == "string_content" {
+                if let Some(parent) = node
+                    .parent()
+                    .filter(|parent| parent.kind() == "raw_string_literal")
+                {
+                    self.new_token("STRING", parent);
+                } else {
+                    self.new_token("STRING", node);
+                }
+                return;
+            }
+
+            // Default case
+            let image = &self.source_code[node.start_byte()..node.end_byte()];
+            self.new_token(image, node);
         }
     }
 }
@@ -90,6 +119,10 @@ fn main() {
     let s = "foo";
     '"';
     42;
+    3.14;
+    r"
+bar
+";
 }
 "#;
         let tree = parse_rust_code(source_code).unwrap();
@@ -112,7 +145,42 @@ fn main() {
             token(";", 4, 7, 4, 8),
             token("NUMBER", 5, 4, 5, 6),
             token(";", 5, 6, 5, 7),
-            token("}", 6, 0, 6, 1),
+            token("NUMBER", 6, 4, 6, 8),
+            token(";", 6, 8, 6, 9),
+            token("STRING", 7, 4, 9, 1),
+            token(";", 9, 1, 9, 2),
+            token("}", 10, 0, 10, 1),
+        ];
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_empty_source() {
+        let source_code = "";
+        let tree = parse_rust_code(source_code).unwrap();
+        let actual = calculate_cpd_tokens(&tree, source_code);
+        assert_eq!(actual, Vec::new());
+    }
+
+    #[test]
+    fn test_malformed_source() {
+        let source_code = r#"
+fn main() {
+    let s
+}"#;
+
+        let tree = parse_rust_code(source_code).unwrap();
+        let actual = calculate_cpd_tokens(&tree, source_code);
+        let expected = vec![
+            token("fn", 2, 0, 2, 2),
+            token("main", 2, 3, 2, 7),
+            token("(", 2, 7, 2, 8),
+            token(")", 2, 8, 2, 9),
+            token("{", 2, 10, 2, 11),
+            token("let", 3, 4, 3, 7),
+            token("s", 3, 8, 3, 9),
+            token("}", 4, 0, 4, 1),
         ];
 
         assert_eq!(actual, expected);
