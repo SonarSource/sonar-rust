@@ -36,7 +36,7 @@ public class ClippySensor implements Sensor {
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor
-      .name("Clippy Sensor")
+      .name("Clippy")
       .onlyWhenConfiguration(config -> config.getBoolean(CLIPPY_SENSOR_ENABLED).orElse(true))
       .onlyOnLanguage(RustLanguage.KEY);
   }

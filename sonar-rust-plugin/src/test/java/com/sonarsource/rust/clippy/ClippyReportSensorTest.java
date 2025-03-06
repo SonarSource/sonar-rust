@@ -34,7 +34,7 @@ class ClippyReportSensorTest {
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 
-    assertThat(descriptor.name()).isEqualTo("Clippy Report Import Sensor");
+    assertThat(descriptor.name()).isEqualTo("Clippy Report Import");
     assertThat(descriptor.languages()).containsOnly(RustLanguage.KEY);
     assertThat(descriptor.configurationPredicate()).isNotNull();
   }
