@@ -8,6 +8,7 @@ package com.sonarsource.rust.clippy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -54,6 +55,9 @@ class ClippySensorTest {
       .build();
     context.fileSystem().add(inputFile);
 
+    ClippyPrerequisite clippyPrerequisite = mock(ClippyPrerequisite.class);
+    doNothing().when(clippyPrerequisite).check(any());
+
     ClippyRunner clippyRunner = mock(ClippyRunner.class);
     when(clippyRunner.run(any(), any())).thenReturn(List.of(
       new ClippyDiagnostic(new ClippyMessage(
@@ -71,7 +75,7 @@ class ClippySensorTest {
         "message",
         List.of(new ClippySpan("excluded.rs", 1, 2, 1, 4))))
     ));
-    ClippySensor sensor = new ClippySensor(clippyRunner);
+    ClippySensor sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
     sensor.execute(context);
 
     ArgumentCaptor<Path> pathCaptor = forClass(Path.class);

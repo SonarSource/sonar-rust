@@ -23,13 +23,15 @@ public class ClippySensor implements Sensor {
 
   public static final String CLIPPY_SENSOR_ENABLED = "sonar.rust.clippy.enabled";
 
+  private final ClippyPrerequisite clippyPrerequisite;
   private final ClippyRunner clippy;
 
   public ClippySensor() {
-    this(new ClippyRunner());
+    this(new ClippyPrerequisite(), new ClippyRunner());
   }
 
-  ClippySensor(ClippyRunner clippy) {
+  ClippySensor(ClippyPrerequisite clippyPrerequisite, ClippyRunner clippy) {
+    this.clippyPrerequisite = clippyPrerequisite;
     this.clippy = clippy;
   }
 
@@ -47,6 +49,16 @@ public class ClippySensor implements Sensor {
       LOG.debug("Clippy sensor is disabled");
       return;
     }
+
+    var baseDir = context.fileSystem().baseDir().toPath();
+
+    try {
+      clippyPrerequisite.check(baseDir);
+    } catch (Exception e) {
+      LOG.error("Failed to check Clippy prerequisites", e);
+      return;
+    }
+
     var lints = context.activeRules().findByRepository(RustLanguage.KEY).stream()
       .map(rule -> RustRulesDefinition.ruleKeyToLintId(rule.ruleKey().rule()))
       // Not all rules can be mapped to Clippy lints, e.g. S2260 (syntax errors)
@@ -54,7 +66,7 @@ public class ClippySensor implements Sensor {
       .toList();
 
     try {
-      var diagnostics = clippy.run(context.fileSystem().baseDir().toPath(), lints);
+      var diagnostics = clippy.run(baseDir, lints);
       for (var diagnostic : diagnostics) {
         saveIssue(context, diagnostic);
       }
