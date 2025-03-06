@@ -13,10 +13,14 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.fs.FileSystem;
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 
 class ClippyUtils {
+
+  private static Logger LOG = LoggerFactory.getLogger(ClippyUtils.class);
 
   private static final Gson GSON = new Gson();
 
@@ -40,13 +44,24 @@ class ClippyUtils {
 
   static Stream<ClippyDiagnostic> parse(Stream<String> lines) {
     return lines
-      .filter(line -> line.startsWith("{"))
+      .filter(line -> {
+        if (line.startsWith("{")) {
+          return true;
+        } else {
+          LOG.debug("Skipped output: {}", line);
+          return false;
+        }
+      })
       .map(line -> GSON.fromJson(line, ClippyDiagnostic.class))
       .filter(ClippyUtils::isClippyDiagnostic);
   }
 
   private static boolean isClippyDiagnostic(@Nullable ClippyDiagnostic diagnostic) {
-    return diagnostic != null && diagnostic.message() != null && diagnostic.message().code().code().startsWith("clippy");
+    return diagnostic != null
+      && diagnostic.message() != null
+      && diagnostic.message().code() != null
+      && diagnostic.message().code().code() != null
+      && diagnostic.message().code().code().startsWith("clippy");
   }
 
   static NewIssueLocation diagnosticToLocation(NewIssueLocation location, ClippyDiagnostic diagnostic, FileSystem fs) {
