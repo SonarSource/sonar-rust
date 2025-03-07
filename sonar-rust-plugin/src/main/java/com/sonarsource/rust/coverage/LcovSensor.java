@@ -53,7 +53,7 @@ public class LcovSensor implements Sensor {
     for (var reportFile : reportFiles) {
       try {
         LOG.debug("Parsing LCOV report: {}", reportFile);
-        var parser = LCOVParser.create(context, reportFile, fileLocator);
+        var parser = LcovParser.create(context, reportFile, fileLocator);
         var parsingResult = parser.parse();
         var problems = parsingResult.problems();
         if (!problems.isEmpty()) {
