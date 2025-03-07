@@ -5,8 +5,6 @@
  */
 package com.sonarsource.rust.coverage;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,6 +18,8 @@ import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class CoverageSensorTest {
 
@@ -40,7 +40,7 @@ class CoverageSensorTest {
     assertThat(descriptor.configurationPredicate()).isNotNull();
   }
 
-    @Test
+  @Test
   void testExecuteWithNoReportsFound() {
     var context = SensorContextTester.create(baseDir);
     var sensor = new CoverageSensor();
