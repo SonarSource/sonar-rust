@@ -3,11 +3,10 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-package com.sonarsource.rust.cobertura;
+package com.sonarsource.rust.coverage;
 
 import com.sonarsource.rust.common.FileLocator;
 import com.sonarsource.rust.common.ReportProvider;
-import com.sonarsource.rust.coverage.CodeCoverage;
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -50,7 +49,6 @@ public class CoberturaSensor implements Sensor {
       fs.predicates().hasLanguage(RustLanguage.KEY));
     var fileLocator = new FileLocator(fs.inputFiles(predicate));
 
-
     var coverages = new ArrayList<CodeCoverage>();
     for (var reportFile : reportFiles) {
       try {
@@ -74,7 +72,7 @@ public class CoberturaSensor implements Sensor {
     for (var coverage : coverages) {
       try {
         LOG.debug("Saving coverage for file: {}", coverage.getInputFile());
-        saveCoverage(context, coverage);
+        CoverageUtils.saveCoverage(context, coverage);
         LOG.debug("Successfully saved coverage");
       } catch (Exception e) {
         LOG.warn("Failed to save coverage", e);
@@ -82,30 +80,5 @@ public class CoberturaSensor implements Sensor {
     }
 
     LOG.debug("Processed Corbetura coverage reports");
-  }
-
-  private static void saveCoverage(SensorContext context, CodeCoverage coverage) {
-    var newCoverage = context.newCoverage()
-      .onFile(coverage.getInputFile());
-
-    for (var entry : coverage.getLineHits().entrySet()) {
-      newCoverage.lineHits(entry.getKey(), entry.getValue());
-    }
-
-    for (var entry : coverage.getBranchHits().entrySet()) {
-      var line = entry.getKey();
-      var conditions = entry.getValue().size();
-      var coveredConditions = 0;
-      for (var taken : entry.getValue().values()) {
-        if (taken > 0) {
-          coveredConditions++;
-        }
-      }
-
-      newCoverage.conditions(line, conditions, coveredConditions);
-      newCoverage.lineHits(line, coverage.getLineHits().getOrDefault(line, 0) + coveredConditions);
-    }
-
-    newCoverage.save();
   }
 }

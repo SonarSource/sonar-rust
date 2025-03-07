@@ -3,10 +3,9 @@
  * All rights reserved
  * mailto:info AT sonarsource DOT com
  */
-package com.sonarsource.rust.cobertura;
+package com.sonarsource.rust.coverage;
 
 import com.sonarsource.rust.common.FileLocator;
-import com.sonarsource.rust.coverage.CodeCoverage;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;

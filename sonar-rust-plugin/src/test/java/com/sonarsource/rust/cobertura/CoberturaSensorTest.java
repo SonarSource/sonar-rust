@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.cobertura;
 
+import com.sonarsource.rust.coverage.CoberturaSensor;
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
 import java.nio.file.Files;

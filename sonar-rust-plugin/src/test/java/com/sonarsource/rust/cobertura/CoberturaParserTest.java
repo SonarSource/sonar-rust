@@ -6,6 +6,7 @@
 package com.sonarsource.rust.cobertura;
 
 import com.sonarsource.rust.common.FileLocator;
+import com.sonarsource.rust.coverage.CoberturaParser;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -272,14 +273,14 @@ class CoberturaParserTest {
   }
 
   private SensorContextTester createSensorContext() throws IOException {
-    SensorContextTester sct = SensorContextTester.create(tempDir);
+    SensorContextTester context = SensorContextTester.create(tempDir);
 
-    sct.fileSystem().add(inputFile("src/abs.rs", "abs.rs"));
-    sct.fileSystem().add(inputFile("src/sign.rs", "sign.rs"));
-    sct.fileSystem().add(inputFile("src/main.rs", "main.rs"));
-    sct.fileSystem().add(inputFile("src/fizzbuzz.rs", "fizzbuzz.rs"));
+    context.fileSystem().add(inputFile("src/abs.rs", "abs.rs"));
+    context.fileSystem().add(inputFile("src/sign.rs", "sign.rs"));
+    context.fileSystem().add(inputFile("src/main.rs", "main.rs"));
+    context.fileSystem().add(inputFile("src/fizzbuzz.rs", "fizzbuzz.rs"));
 
-    return sct;
+    return context;
   }
 
   private static InputFile inputFile(String pathInProject, String contentPath) throws IOException {
