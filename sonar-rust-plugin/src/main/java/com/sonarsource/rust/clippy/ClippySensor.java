@@ -7,6 +7,7 @@ package com.sonarsource.rust.clippy;
 
 import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
 
+import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
 import com.sonarsource.rust.plugin.RustRulesDefinition;
 import org.slf4j.Logger;
@@ -15,6 +16,7 @@ import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.rule.RuleKey;
+import java.nio.file.Path;
 import java.util.Objects;
 
 public class ClippySensor implements Sensor {
@@ -50,6 +52,12 @@ public class ClippySensor implements Sensor {
       return;
     }
 
+    var manifests = CargoManifestProvider.getManifests(context);
+    if (manifests.isEmpty()) {
+      LOG.debug("No Cargo manifest found, skipping Clippy analysis");
+      return;
+    }
+
     var baseDir = context.fileSystem().baseDir().toPath();
 
     try {
@@ -66,16 +74,19 @@ public class ClippySensor implements Sensor {
       .toList();
 
     try {
-      var diagnostics = clippy.run(baseDir, lints);
-      for (var diagnostic : diagnostics) {
-        saveIssue(context, diagnostic);
+      for (var manifest : manifests) {
+        var workDir = manifest.toPath().getParent();
+        var diagnostics = clippy.run(workDir, lints);
+        for (var diagnostic : diagnostics) {
+          saveIssue(context, diagnostic, workDir);
+        }
       }
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);
     }
   }
 
-  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {
+  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic, Path workDir) {
     LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
     String lintId = diagnostic.lintId();
     String ruleKey = RustRulesDefinition.lintIdToRuleKey(lintId);
@@ -85,7 +96,7 @@ public class ClippySensor implements Sensor {
     }
     var issue = context.newIssue()
       .forRule(RuleKey.of(RustLanguage.KEY, ruleKey));
-    var location = diagnosticToLocation(issue.newLocation(), diagnostic, context.fileSystem());
+    var location = diagnosticToLocation(issue.newLocation(), diagnostic, context, workDir);
     if (location == null) {
       LOG.debug("No InputFile found for Clippy diagnostic: {}", diagnostic);
       return;

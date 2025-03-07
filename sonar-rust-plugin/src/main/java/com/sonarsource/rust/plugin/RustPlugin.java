@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.clippy.ClippyReportSensor;
 import com.sonarsource.rust.clippy.ClippyRulesDefinition;
 import com.sonarsource.rust.clippy.ClippySensor;
@@ -43,6 +44,18 @@ public class RustPlugin implements Plugin {
         .onConfigScopes(ConfigScope.PROJECT)
         .multiValues(true)
         .defaultValue(RustLanguage.FILE_SUFFIXES_DEFAULT_VALUE)
+        .build());
+
+    // Cargo manifest paths
+    context.addExtension(
+      PropertyDefinition
+        .builder(CargoManifestProvider.CARGO_MANIFEST_PATHS)
+        .category("Rust")
+        .subCategory("Analysis Scope")
+        .name("Cargo manifest paths")
+        .description("Comma-delimited list of paths to Cargo.toml files. The root Cargo.toml, if any, is considered by default.")
+        .onConfigScopes(ConfigScope.PROJECT)
+        .multiValues(true)
         .build());
 
     ////////////////////////// CLIPPY //////////////////////////
