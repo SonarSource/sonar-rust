@@ -8,7 +8,8 @@ package com.sonarsource.rust.plugin;
 import com.sonarsource.rust.clippy.ClippyReportSensor;
 import com.sonarsource.rust.clippy.ClippyRulesDefinition;
 import com.sonarsource.rust.clippy.ClippySensor;
-import com.sonarsource.rust.coverage.CoverageSensor;
+import com.sonarsource.rust.coverage.CoberturaSensor;
+import com.sonarsource.rust.coverage.LcovSensor;
 import org.sonar.api.Plugin;
 import org.sonar.api.config.PropertyDefinition;
 import org.sonar.api.config.PropertyDefinition.ConfigScope;
@@ -23,7 +24,8 @@ public class RustPlugin implements Plugin {
       ClippyRulesDefinition.class,
       ClippyReportSensor.class,
       ClippySensor.class,
-      CoverageSensor.class,
+      LcovSensor.class,
+      CoberturaSensor.class,
       RustLanguage.class,
       RustProfile.class,
       RustRulesDefinition.class,
@@ -77,11 +79,23 @@ public class RustPlugin implements Plugin {
     // LCOV report paths
     context.addExtension(
       PropertyDefinition
-        .builder(CoverageSensor.COVERAGE_REPORT_PATHS)
+        .builder(LcovSensor.COVERAGE_REPORT_PATHS)
         .category("Rust")
         .subCategory("Coverage")
         .name("LCOV report paths")
         .description("Comma-delimited list of paths to LCOV reports.")
+        .onConfigScopes(ConfigScope.PROJECT)
+        .multiValues(true)
+        .build());
+
+    // Cobertura report paths
+    context.addExtension(
+      PropertyDefinition
+        .builder(CoberturaSensor.COBERTURA_REPORT_PATHS)
+        .category("Rust")
+        .subCategory("Coverage")
+        .name("Cobertura report paths")
+        .description("Comma-delimited list of paths to Cobertura reports.")
         .onConfigScopes(ConfigScope.PROJECT)
         .multiValues(true)
         .build());

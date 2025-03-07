@@ -16,16 +16,16 @@ import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 
-public class CoverageSensor implements Sensor {
+public class LcovSensor implements Sensor {
 
-  private static final Logger LOG = LoggerFactory.getLogger(CoverageSensor.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LcovSensor.class);
 
   public static final String COVERAGE_REPORT_PATHS = "sonar.rust.lcov.reportPaths";
 
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor
-      .name("Rust Coverage")
+      .name("Rust LCOV Coverage")
       .onlyOnLanguage(RustLanguage.KEY)
       .onlyWhenConfiguration(config -> config.hasKey(COVERAGE_REPORT_PATHS));
   }
@@ -53,7 +53,7 @@ public class CoverageSensor implements Sensor {
     for (var reportFile : reportFiles) {
       try {
         LOG.debug("Parsing LCOV report: {}", reportFile);
-        var parser = LCOVParser.create(context, reportFile, fileLocator);
+        var parser = LcovParser.create(context, reportFile, fileLocator);
         var parsingResult = parser.parse();
         var problems = parsingResult.problems();
         if (!problems.isEmpty()) {
@@ -71,7 +71,7 @@ public class CoverageSensor implements Sensor {
     for (var coverage : coverages) {
       try {
         LOG.debug("Saving coverage for file: {}", coverage.getInputFile());
-        saveCoverage(context, coverage);
+        CoverageUtils.saveCoverage(context, coverage);
         LOG.debug("Successfully saved coverage");
       } catch (Exception e) {
         LOG.warn("Failed to save coverage", e);
@@ -81,28 +81,5 @@ public class CoverageSensor implements Sensor {
     LOG.debug("Processed LCOV coverage reports");
   }
 
-  private static void saveCoverage(SensorContext context, CodeCoverage coverage) {
-    var newCoverage = context.newCoverage()
-      .onFile(coverage.getInputFile());
 
-    for (var entry : coverage.getLineHits().entrySet()) {
-      newCoverage.lineHits(entry.getKey(), entry.getValue());
-    }
-
-    for (var entry : coverage.getBranchHits().entrySet()) {
-      var line = entry.getKey();
-      var conditions = entry.getValue().size();
-      var coveredConditions = 0;
-      for (var taken : entry.getValue().values()) {
-        if (taken > 0) {
-          coveredConditions++;
-        }
-      }
-
-      newCoverage.conditions(line, conditions, coveredConditions);
-      newCoverage.lineHits(line, coverage.getLineHits().getOrDefault(line, 0) + coveredConditions);
-    }
-
-    newCoverage.save();
-  }
 }
