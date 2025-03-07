@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -107,9 +108,13 @@ class ClippyUtilsTest {
   @Test
   void parseNonClippyDiagnostic() {
     var diagnostics = ClippyUtils.parse(Arrays.stream("""
+      {}
+      {"message": {}}
       {"message": {"code": {}}}
       {"message": {"code": {"code": "clippy::some_lint"}}}
       """.split("\n")));
     assertThat(diagnostics).hasSize(1);
+    var empty = ClippyUtils.parse(Stream.of(""));
+    assertThat(empty).isEmpty();
   }
 }
