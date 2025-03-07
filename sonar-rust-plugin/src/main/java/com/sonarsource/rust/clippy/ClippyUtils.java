@@ -20,7 +20,7 @@ import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 
 class ClippyUtils {
 
-  private static Logger LOG = LoggerFactory.getLogger(ClippyUtils.class);
+  private static final Logger LOG = LoggerFactory.getLogger(ClippyUtils.class);
 
   private static final Gson GSON = new Gson();
 

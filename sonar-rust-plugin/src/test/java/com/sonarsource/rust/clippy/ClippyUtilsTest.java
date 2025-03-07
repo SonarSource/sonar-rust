@@ -105,7 +105,7 @@ class ClippyUtilsTest {
   }
 
   @Test
-  void parseNonClippyDiagnostic() throws IOException {
+  void parseNonClippyDiagnostic() {
     var diagnostics = ClippyUtils.parse(Arrays.stream("""
       {"message": {"code": {}}}
       {"message": {"code": {"code": "clippy::some_lint"}}}
