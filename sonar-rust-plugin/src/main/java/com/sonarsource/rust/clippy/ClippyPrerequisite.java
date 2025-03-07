@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.clippy;
 
+import com.sonarsource.rust.common.ProcessWrapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -35,7 +36,7 @@ public class ClippyPrerequisite {
   private void checkVersion(List<String> command, String prerequisite, Path workDir) {
     LOG.debug("Checking {} version", prerequisite);
     try {
-      processWrapper.start(command, workDir);
+      processWrapper.start(command, workDir, LOG::debug, LOG::warn);
       try (var reader = new BufferedReader(new InputStreamReader(processWrapper.getInputStream()))) {
         var version = reader.readLine();
         LOG.debug("{} version: {}", prerequisite, version);
