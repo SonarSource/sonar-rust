@@ -11,20 +11,19 @@ import static org.assertj.core.api.Assertions.tuple;
 import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
-import com.sonarsource.rust.e2e.helpers.OrchestratorHelper;
 import java.nio.file.Paths;
 import java.util.List;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.sonarqube.ws.Issues;
 import org.sonarqube.ws.client.HttpConnector;
 import org.sonarqube.ws.client.WsClientFactories;
 import org.sonarqube.ws.client.issues.SearchRequest;
 
+@ExtendWith(OrchestratorHelper.class)
 class ProjectLayoutTest {
-  
-  @RegisterExtension
-  static final OrchestratorExtension orchestrator = OrchestratorHelper.createOrchestrator();
+
+  private static final OrchestratorExtension orchestrator = OrchestratorHelper.orchestrator();
 
   @Test
   void testPackageLayout() throws Exception {
