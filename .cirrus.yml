@@ -37,6 +37,19 @@ cleanup_gradle_cache_script_template: &CLEANUP_GRADLE_CACHE_SCRIPT
     rm -rf "${GRADLE_USER_HOME}"/.tmp
     /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete
 
+orchestrator_cache_preparation_definition: &ORCHESTRATOR_CACHE
+  set_orchestrator_home_script: |
+    export TODAY=$(date '+%Y-%m-%d')
+    echo "TODAY=${TODAY}" >> $CIRRUS_ENV
+    echo "ORCHESTRATOR_HOME=${CIRRUS_WORKING_DIR}/orchestrator/${TODAY}" >> $CIRRUS_ENV
+  mkdir_orchestrator_home_script: |
+    echo "Create dir ${ORCHESTRATOR_HOME} if needed"
+    mkdir -p ${ORCHESTRATOR_HOME}
+  orchestrator_cache:
+    folder: ${ORCHESTRATOR_HOME}
+    fingerprint_script: echo ${TODAY}
+    reupload_on_changes: 'true'
+
 # copy&paste from https://github.com/SonarSource/sonar-cpp/blob/a8c6f1e45a12393508682a013ac7ee35eb92bece/.cirrus.yml#L45
 win_ssd_and_clone: &WIN_SSD_AND_CLONE
   prepare_disk_script:
@@ -91,11 +104,12 @@ e2e_task:
     cpu: 4
     memory: 16G
   <<: *SETUP_GRADLE_CACHE
+  <<: *ORCHESTRATOR_CACHE
   script:
     - source cirrus-env QA
     - source .cirrus/use-gradle-wrapper.sh
     - source set_gradle_build_version
-    - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION}
+    - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 e2e_win_task:
@@ -109,19 +123,29 @@ e2e_win_task:
     region: eu-central-1
     use_ssd: true
   <<: *WIN_SSD_AND_CLONE
+  <<: *ORCHESTRATOR_CACHE
+  env:
+    GRADLE_USER_HOME: Z:/cirrus-ci-build/.gradle
   gradle_cache:
-    folder: ".gradle/caches"
+    folder: "${GRADLE_USER_HOME}/caches"
   install_rust_script:
     - curl -O https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
     - ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
     - export PATH=$PATH:$HOME/.cargo/bin
     - rustup component add clippy
   e2e_script:
+    - echo "org.gradle.daemon=false" >> "gradle.properties"
     - export PATH=$PATH:$HOME/.cargo/bin
     - source cirrus-env QA
     - source .cirrus/use-gradle-wrapper.sh
     - source set_gradle_build_version
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+  cleanup_before_cache_script:
+    - /usr/bin/find ${CIRRUS_WORKING_DIR}/orchestrator -name "sonar-rust-plugin*" -type f -delete
+    - rm -rf ${GRADLE_USER_HOME}/caches/transforms-1
+    - rm -rf ${GRADLE_USER_HOME}/caches/journal-1
+    - rm -rf ${GRADLE_USER_HOME}/caches/jars-3/*/buildSrc.jar
+    - /usr/bin/find ${GRADLE_USER_HOME} \( -name "*.lock" -o -name "*.bin" -o -name "gc.properties" \) -type f -delete
   always:
     report_artifacts:
       path: "e2e/build/reports/tests/**"
@@ -131,6 +155,7 @@ promote_task:
   depends_on:
     - build
     - e2e
+    - e2e_win
   eks_container:
     <<: *CONTAINER_DEFINITION
     cpu: 1
