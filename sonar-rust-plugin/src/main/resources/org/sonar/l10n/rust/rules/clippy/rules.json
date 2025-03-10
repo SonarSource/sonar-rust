@@ -353,5 +353,10 @@
     "lintId": "clippy::string_to_string",
     "ruleKey": "S1858",
     "message": "Remove the redundant `to_string()` call, or clone the string."
+  },
+  {
+    "lintId": "clippy::unnecessary_cast",
+    "ruleKey": "S4325",
+    "message": "Remove this unnecessary cast."
   }
 ]

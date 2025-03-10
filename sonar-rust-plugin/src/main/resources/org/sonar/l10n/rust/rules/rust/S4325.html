@@ -1,0 +1,26 @@
+<h2>Why is this an issue?</h2>
+<p>In Rust, type casting is a mechanism used to convert a value from one type to another. This is often necessary when working with different types
+that are compatible but not the same. However, unnecessary casts can occur when the type conversion is redundant because the compiler already knows
+the type based on the context or explicit type declarations.</p>
+<p>Unnecessary casts should be avoided in Rust code as they add unnecessary complexity, clutter the code, and can lead to confusion. They also make
+the code less idiomatic and harder to read.</p>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+fn get_length(value: &amp;str) -&gt; usize {
+    let length = value.len() as usize; // Noncompliant: 'value.len()' already returns a 'usize'
+    length
+}
+</pre>
+<p>Remove all unnecessary casts based on the contextual typing information, as inferred by the Rust compiler.</p>
+<pre data-diff-id="1" data-diff-type="compliant">
+fn get_length(value: &amp;str) -&gt; usize {
+    let length = value.len();
+    length
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_cast">https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_cast</a> </li>
+</ul>
+
