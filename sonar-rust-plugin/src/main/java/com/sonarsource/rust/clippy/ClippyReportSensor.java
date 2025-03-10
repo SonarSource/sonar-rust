@@ -9,6 +9,7 @@ import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
 
 import com.sonarsource.rust.common.ReportProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,7 +60,9 @@ public class ClippyReportSensor implements Sensor {
     for (var diagnostic : diagnostics) {
       try {
         LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
-        saveIssue(context, diagnostic);
+        // TODO SKUNK-42: Improve filename resolution when importing Clippy diagnostics
+        var baseDir = context.fileSystem().baseDir().toPath();
+        saveIssue(context, diagnostic, baseDir);
         LOG.debug("Successfully saved Clippy diagnostic");
       } catch (Exception e) {
         LOG.warn("Failed to save Clippy diagnostic. {}", e.getMessage());
@@ -70,7 +73,7 @@ public class ClippyReportSensor implements Sensor {
   }
 
   @SuppressWarnings("deprecation")
-  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {
+  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic, Path baseDir) {
     var ruleId = diagnostic.lintId().substring("clippy::".length());
     var loader = ClippyRulesDefinition.loader();
     if (!loader.ruleKeys().contains(ruleId)) {
@@ -84,7 +87,7 @@ public class ClippyReportSensor implements Sensor {
       .severity(loader.ruleSeverity(ruleId))
       .remediationEffortMinutes(loader.ruleConstantDebtMinutes(ruleId));
 
-    var location = diagnosticToLocation(issue.newLocation(), diagnostic, context.fileSystem());
+    var location = diagnosticToLocation(issue.newLocation(), diagnostic, context, baseDir);
     if (location == null) {
       throw new IllegalStateException("Unknown file: " + diagnostic.message().spans().get(0).file_name());
     }
