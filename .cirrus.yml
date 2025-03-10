@@ -105,10 +105,12 @@ e2e_win_task:
     experimental: true # see https://github.com/cirruslabs/cirrus-ci-docs/issues/1051
     platform: windows
     image: base-windows-jdk17-v*
-    type: c6id.4xlarge
+    type: c6id.xlarge
     region: eu-central-1
     use_ssd: true
   <<: *WIN_SSD_AND_CLONE
+  gradle_cache:
+    folder: ".gradle/caches"
   install_rust_script:
     - curl -O https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
     - ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
@@ -120,6 +122,12 @@ e2e_win_task:
     - source .cirrus/use-gradle-wrapper.sh
     - source set_gradle_build_version
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+  always:
+    test_artifacts:
+      path: "e2e/build/test-results/test/**.xml"
+      format: junit
+    report_artifacts:
+      path: "e2e/build/reports/tests/**"
 
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"

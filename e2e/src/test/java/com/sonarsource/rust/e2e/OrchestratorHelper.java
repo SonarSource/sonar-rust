@@ -26,7 +26,7 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
     // When running tests on CI, the jar is retrieved from JFrog, where it was published during the CI build process.
     Location pluginLocation;
     var version = System.getProperty("pluginVersion");
-    if (version == null || version.equals("")) {
+    if (version == null || version.isEmpty()) {
       pluginLocation = FileLocation.byWildcardMavenFilename(new File("../sonar-rust-plugin/build/libs"), "sonar-rust-plugin-*.jar");
     } else {
       pluginLocation = MavenLocation.of("com.sonarsource.rust", "sonar-rust-plugin", version);
