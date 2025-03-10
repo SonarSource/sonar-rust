@@ -388,5 +388,10 @@
     "lintId": "clippy::print_stdout",
     "ruleKey": "S106",
     "message": "Use a logging framework to log this message to the console."
+  },
+  {
+    "lintId": "clippy::while_float",
+    "ruleKey": "S2193",
+    "message": "Avoid using floating-point numbers as loop counters."
   }
 ]
