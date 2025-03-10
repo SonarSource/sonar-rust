@@ -8,11 +8,11 @@ package com.sonarsource.rust.clippy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
@@ -20,11 +20,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.event.Level;
+import org.sonar.api.batch.fs.TextRange;
 import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.batch.rule.internal.ActiveRulesBuilder;
@@ -104,8 +106,7 @@ class ClippySensorTest {
     doNothing().when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
-    when(clippyRunner.run(any(), any())).thenThrow(new IllegalStateException("error"));
-
+    doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
     sensor.execute(context);
 
@@ -130,8 +131,8 @@ class ClippySensorTest {
     ClippyPrerequisite clippyPrerequisite = mock(ClippyPrerequisite.class);
     doNothing().when(clippyPrerequisite).check(any());
 
-    ClippyRunner clippyRunner = mock(ClippyRunner.class);
-    when(clippyRunner.run(any(), any())).thenReturn(List.of(
+
+    List<ClippyDiagnostic> diagnostics = List.of(
       new ClippyDiagnostic(new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "message",
@@ -146,13 +147,20 @@ class ClippySensorTest {
         new ClippyCode("clippy::no_mapping"),
         "message",
         List.of(new ClippySpan("excluded.rs", 1, 2, 1, 4))))
-    ));
+    );
+    ClippyRunner clippyRunner = mock(ClippyRunner.class);
+    doAnswer(invocation -> {
+      Consumer<ClippyDiagnostic> diagnosticsConsumer = invocation.getArgument(2);
+      diagnostics.forEach(diagnosticsConsumer);
+      return null;
+    }).when(clippyRunner).run(any(), any(), any());
+
     ClippySensor sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
     sensor.execute(context);
 
     ArgumentCaptor<Path> pathCaptor = forClass(Path.class);
     @SuppressWarnings("unchecked") ArgumentCaptor<List<String>> lintsCaptor = forClass(List.class);
-    verify(clippyRunner).run(pathCaptor.capture(), lintsCaptor.capture());
+    verify(clippyRunner).run(pathCaptor.capture(), lintsCaptor.capture(), any());
     assertThat(pathCaptor.getValue()).isEqualTo(baseDir);
     assertThat(lintsCaptor.getValue()).containsExactly("clippy::absurd_extreme_comparisons");
 
@@ -160,10 +168,11 @@ class ClippySensorTest {
     Issue issue = context.allIssues().stream().findAny().get();
     assertThat(issue.ruleKey()).isEqualTo(RuleKey.of(RustLanguage.KEY, "S2198"));
     assertThat(issue.primaryLocation().message()).isEqualTo("message");
-    assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
-    assertThat(issue.primaryLocation().textRange().start().lineOffset()).isEqualTo(1);
-    assertThat(issue.primaryLocation().textRange().end().line()).isEqualTo(1);
-    assertThat(issue.primaryLocation().textRange().end().lineOffset()).isEqualTo(3);
+    TextRange textRange = issue.primaryLocation().textRange();
+    assertThat(textRange.start().line()).isEqualTo(1);
+    assertThat(textRange.start().lineOffset()).isEqualTo(1);
+    assertThat(textRange.end().line()).isEqualTo(1);
+    assertThat(textRange.end().lineOffset()).isEqualTo(3);
   }
 
   @Test
@@ -192,13 +201,18 @@ class ClippySensorTest {
     doNothing().when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
-    when(clippyRunner.run(any(), any())).thenReturn(List.of(
+    List<ClippyDiagnostic> diagnostics = List.of(
       new ClippyDiagnostic(new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "Unnecessary mathematical comparisons should not be made",
         // Note that the filename is relative to the Cargo.toml directory, not the project base directory
         List.of(new ClippySpan("src/file.rs", 1, 16, 1, 30)))
-    )));
+      ));
+    doAnswer(invocation -> {
+      Consumer<ClippyDiagnostic> diagnosticsConsumer = invocation.getArgument(2);
+      diagnostics.forEach(diagnosticsConsumer);
+      return null;
+    }).when(clippyRunner).run(any(), any(), any());
 
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
     sensor.execute(context);

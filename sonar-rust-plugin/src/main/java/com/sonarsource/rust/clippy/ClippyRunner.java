@@ -5,13 +5,13 @@
  */
 package com.sonarsource.rust.clippy;
 
-import java.io.BufferedReader;
+import com.sonarsource.rust.common.ProcessWrapper;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,19 +29,17 @@ public class ClippyRunner {
     this.processWrapper = processWrapper;
   }
 
-  public List<ClippyDiagnostic> run(Path workDir, List<String> lints) {
+  public void run(Path workDir, List<String> lints, Consumer<ClippyDiagnostic> consumer) {
     var command = buildCommand(lints);
     LOG.debug("Running Clippy: {}", command);
     try {
-      processWrapper.start(command, workDir);
-      var clippyDiagnostics = readOutput(processWrapper.getInputStream());
+      processWrapper.start(command, workDir, output -> readOutput(output, consumer), LOG::warn);
       // Note that by default, Clippy can return non-zero exit code in case of a high severity lint violation. We avoid this by
       // re-defining all lints as warnings when constructing the Clippy command below.
       int exitValue = processWrapper.waitFor();
       if (exitValue != 0) {
         throw new IllegalStateException("Clippy failed with exit code " + exitValue);
       }
-      return clippyDiagnostics;
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
       throw new IllegalStateException("Clippy was interrupted", e);
@@ -56,9 +54,8 @@ public class ClippyRunner {
     return cmd;
   }
 
-  private static List<ClippyDiagnostic> readOutput(InputStream inputStream) {
-    var lines = new BufferedReader(new InputStreamReader(inputStream)).lines();
-    return ClippyUtils.parse(lines).toList();
+  private static void readOutput(String output, Consumer<ClippyDiagnostic> consumer) {
+    ClippyUtils.parse(Stream.of(output)).forEach(consumer);
   }
 
 }

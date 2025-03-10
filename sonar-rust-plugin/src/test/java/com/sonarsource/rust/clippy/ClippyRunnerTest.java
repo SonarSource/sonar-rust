@@ -8,15 +8,20 @@ package com.sonarsource.rust.clippy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sonarsource.rust.common.ProcessWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import org.junit.jupiter.api.Test;
 
 class ClippyRunnerTest {
@@ -91,11 +96,18 @@ class ClippyRunnerTest {
     @Test
     void test() throws Exception {
       ProcessWrapper processWrapper = mock(ProcessWrapper.class);
-      when(processWrapper.getInputStream()).thenReturn(new ByteArrayInputStream(CLIPPY_MESSAGE.getBytes()));
+      doAnswer(invocation -> {
+        Consumer<String> outputConsumer = invocation.getArgument(2);
+        outputConsumer.accept(CLIPPY_MESSAGE);
+        return null;
+      }).when(processWrapper).start(any(), any(), any(), any());
       when(processWrapper.waitFor()).thenReturn(0);
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      var diagnostics = clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"));
-      verify(processWrapper).start(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--", "-A", "clippy::all", "-Wclippy::some_lint"), Path.of("path/workdir"));
+      List<ClippyDiagnostic>  diagnostics = new ArrayList<>();
+      clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), diagnostics::add);
+      verify(processWrapper).start(
+        eq(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--", "-A", "clippy::all", "-Wclippy::some_lint")),
+        eq(Path.of("path/workdir")), any(), any());
       assertThat(diagnostics).hasSize(1);
       assertThat(diagnostics.get(0).lintId()).isEqualTo("clippy::absolute_paths");
     }
@@ -106,16 +118,16 @@ class ClippyRunnerTest {
       when(processWrapper.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
       when(processWrapper.waitFor()).thenReturn(1);
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint")))
+      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}))
         .isInstanceOf(IllegalStateException.class).hasMessage("Clippy failed with exit code 1");
     }
 
     @Test
     void testIOException() throws Exception {
       ProcessWrapper processWrapper = mock(ProcessWrapper.class);
-      doThrow(new IOException("error")).when(processWrapper).start(any(), any());
+      doThrow(new IOException("error")).when(processWrapper).start(any(), any(), any(), any());
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint")))
+      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}))
         .isInstanceOf(IllegalStateException.class).hasMessage("Failed to run Clippy ");
     }
 
@@ -125,7 +137,7 @@ class ClippyRunnerTest {
       when(processWrapper.getInputStream()).thenReturn(new ByteArrayInputStream(CLIPPY_MESSAGE.getBytes()));
       doThrow(new InterruptedException("error")).when(processWrapper).waitFor();
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint")))
+      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}))
         .isInstanceOf(IllegalStateException.class).hasMessage("Clippy was interrupted");
     }
 

@@ -8,11 +8,13 @@ package com.sonarsource.rust.clippy;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.sonarsource.rust.common.ProcessWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -39,8 +41,8 @@ class ClippyPrerequisiteTest {
 
     clippyPrerequisite.check(workDir);
 
-    verify(process).start(List.of("cargo", "--version"), workDir);
-    verify(process).start(List.of("cargo", "clippy", "--version"), workDir);
+    verify(process).start(eq(List.of("cargo", "--version")), eq(workDir), any(), any());
+    verify(process).start(eq(List.of("cargo", "clippy", "--version")), eq(workDir), any(), any());
 
     assertThat(logTester.logs()).contains(
       "Checking Cargo version",
@@ -55,7 +57,7 @@ class ClippyPrerequisiteTest {
     var clippyPrerequisite = new ClippyPrerequisite(processWrapper);
     var workDir = Path.of("some/dir");
 
-    doThrow(new IOException("error")).when(processWrapper).start(any(), any());
+    doThrow(new IOException("error")).when(processWrapper).start(any(), any(),  any(), any());
 
     var exception = assertThrows(IllegalStateException.class, () -> clippyPrerequisite.check(workDir));
     assertThat(exception).hasMessageContaining("Failed to check Cargo version");
