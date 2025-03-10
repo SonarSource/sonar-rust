@@ -378,5 +378,10 @@
     "lintId": "clippy::match_bool",
     "ruleKey": "S920",
     "message": "Replace this `match` expression with an `if-else` expression."
+  },
+  {
+    "lintId": "clippy::misnamed_getter",
+    "ruleKey": "S4275",
+    "message": "Access the expected field of the getter."
   }
 ]

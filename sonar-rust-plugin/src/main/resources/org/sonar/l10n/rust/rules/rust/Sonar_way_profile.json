@@ -22,7 +22,11 @@
     "S2589",
     "S3498",
     "S3723",
+<<<<<<< HEAD
     "S4325",
+=======
+    "S4275",
+>>>>>>> f5f0c26 (Add rule S4275 (`misnamed_getters`): Getters should access the expected fields)
     "S4962",
     "S5856",
     "S6164",
