@@ -16,7 +16,7 @@ import javax.annotation.Nullable;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.sensor.SensorContext;
 
-public class LCOVParser {
+public class LcovParser {
 
   private static class LCOV {
 
@@ -44,17 +44,17 @@ public class LCOVParser {
   /* List of parsing problems */
   private final List<String> problems = new ArrayList<>();
 
-  private LCOVParser(SensorContext context, File report, List<String> lines, FileLocator fileLocator) {
+  private LcovParser(SensorContext context, File report, List<String> lines, FileLocator fileLocator) {
     this.context = context;
     this.reportFile = report;
     this.lines = lines;
     this.fileLocator = fileLocator;
   }
 
-  public static LCOVParser create(SensorContext context, File reportFile, FileLocator fileLocator) {
+  public static LcovParser create(SensorContext context, File reportFile, FileLocator fileLocator) {
     try {
       var lines = Files.readAllLines(reportFile.toPath());
-      return new LCOVParser(context, reportFile, lines, fileLocator);
+      return new LcovParser(context, reportFile, lines, fileLocator);
     } catch (Exception e) {
       throw new IllegalStateException("Failed to read LCOV report: " + reportFile, e);
     }
