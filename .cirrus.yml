@@ -115,6 +115,7 @@ e2e_win_task:
     - export PATH=$PATH:$HOME/.cargo/bin
     - rustup component add clippy
   e2e_script:
+    - export PATH=$PATH:$HOME/.cargo/bin
     - source cirrus-env QA
     - source .cirrus/use-gradle-wrapper.sh
     - source set_gradle_build_version
