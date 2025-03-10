@@ -37,6 +37,25 @@ cleanup_gradle_cache_script_template: &CLEANUP_GRADLE_CACHE_SCRIPT
     rm -rf "${GRADLE_USER_HOME}"/.tmp
     /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete
 
+# copy&paste from https://github.com/SonarSource/sonar-cpp/blob/a8c6f1e45a12393508682a013ac7ee35eb92bece/.cirrus.yml#L45
+win_ssd_and_clone: &WIN_SSD_AND_CLONE
+  prepare_disk_script:
+    - ps: |
+        Get-Disk -Number 2 | Initialize-Disk -PassThru | New-Partition -UseMaximumSize -DriveLetter Z
+        Format-Volume -DriveLetter Z -FileSystem NTFS -Confirm:$false
+    - echo "CIRRUS_WORKING_DIR=Z:/cirrus-ci-build" >> $CIRRUS_ENV
+  # we don't clone submodules because they are not needed for the tests
+  clone_script: |
+    git config --system core.longpaths true
+    if [ -z "$CIRRUS_PR" ]; then
+      git clone --branch=$CIRRUS_BRANCH https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+      git reset --hard $CIRRUS_CHANGE_IN_REPO
+    else
+      git clone https://x-access-token:${CIRRUS_REPO_CLONE_TOKEN}@github.com/${CIRRUS_REPO_FULL_NAME}.git $CIRRUS_WORKING_DIR
+      git fetch origin pull/$CIRRUS_PR/head:pull/$CIRRUS_PR
+      git reset --hard $CIRRUS_CHANGE_IN_REPO
+    fi
+
 build_task:
   eks_container:
     <<: *CONTAINER_DEFINITION
@@ -86,17 +105,26 @@ e2e_win_task:
     experimental: true # see https://github.com/cirruslabs/cirrus-ci-docs/issues/1051
     platform: windows
     image: base-windows-jdk17-v*
-    type: c6i.xlarge # 4 vCPU, 8 GiB
+    type: c6id.xlarge
     region: eu-central-1
-  script:
-    - source cirrus-env QA
-    - source .cirrus/use-gradle-wrapper.sh
+    use_ssd: true
+  <<: *WIN_SSD_AND_CLONE
+  gradle_cache:
+    folder: ".gradle/caches"
+  install_rust_script:
     - curl -O https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
     - ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
     - export PATH=$PATH:$HOME/.cargo/bin
     - rustup component add clippy
+  e2e_script:
+    - export PATH=$PATH:$HOME/.cargo/bin
+    - source cirrus-env QA
+    - source .cirrus/use-gradle-wrapper.sh
     - source set_gradle_build_version
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+  always:
+    report_artifacts:
+      path: "e2e/build/reports/tests/**"
 
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
