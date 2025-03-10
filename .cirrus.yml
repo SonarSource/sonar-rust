@@ -123,9 +123,6 @@ e2e_win_task:
     - source set_gradle_build_version
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
   always:
-    test_artifacts:
-      path: "e2e/build/test-results/test/**.xml"
-      format: junit
     report_artifacts:
       path: "e2e/build/reports/tests/**"
 
