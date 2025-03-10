@@ -4,10 +4,14 @@
     "S107",
     "S905",
 <<<<<<< HEAD
+<<<<<<< HEAD
     "S1116",
 =======
     "S1488",
 >>>>>>> 0768d19 (Add rule S1488 (`let_and_return`): Local variables should not be declared and then immediately returned)
+=======
+    "S920",
+>>>>>>> bf3f779 (Add rule S920 (`match_bool`): Match expression conditions should not have boolean type)
     "S1612",
     "S1656",
     "S1764",

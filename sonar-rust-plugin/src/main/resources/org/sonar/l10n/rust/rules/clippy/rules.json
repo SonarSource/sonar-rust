@@ -373,5 +373,10 @@
     "lintId": "clippy::let_and_return",
     "ruleKey": "S1488",
     "message": "Remove the `let` statement and return the expression directly."
+  },
+  {
+    "lintId": "clippy::match_bool",
+    "ruleKey": "S920",
+    "message": "Replace this `match` expression with an `if-else` expression."
   }
 ]
