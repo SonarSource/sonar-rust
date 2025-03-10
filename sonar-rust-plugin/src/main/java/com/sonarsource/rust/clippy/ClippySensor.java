@@ -76,10 +76,7 @@ public class ClippySensor implements Sensor {
     try {
       for (var manifest : manifests) {
         var workDir = manifest.toPath().getParent();
-        var diagnostics = clippy.run(workDir, lints);
-        for (var diagnostic : diagnostics) {
-          saveIssue(context, diagnostic, workDir);
-        }
+        clippy.run(workDir, lints, diagnostic -> saveIssue(context, diagnostic, workDir));
       }
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);

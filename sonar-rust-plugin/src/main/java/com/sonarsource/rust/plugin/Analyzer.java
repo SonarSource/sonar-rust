@@ -5,26 +5,28 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.common.ProcessWrapper;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Analyzer implements AutoCloseable {
 
-  private final Process process;
+  private static final Logger LOG = LoggerFactory.getLogger(Analyzer.class);
+
+  private final ProcessWrapper process;
   private final DataOutputStream outputStream;
   private final DataInputStream inputStream;
 
   public Analyzer(List<String> command) {
     try {
-      this.process = new ProcessBuilder(command)
-        .redirectError(ProcessBuilder.Redirect.INHERIT)
-        .redirectInput(ProcessBuilder.Redirect.PIPE)
-        .redirectOutput(ProcessBuilder.Redirect.PIPE)
-        .start();
+      process = new ProcessWrapper();
+      process.start(command, null, null, LOG::warn);
       this.outputStream = new DataOutputStream(process.getOutputStream());
       this.inputStream = new DataInputStream(process.getInputStream());
     } catch (IOException ex) {
