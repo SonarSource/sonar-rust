@@ -43,6 +43,7 @@ sonar {
     property("sonar.links.scm", "https://github.com/SonarSource/sonar-rust")
     property("sonar.links.issue", "https://jira.sonarsource.com/projects/SKUNK")
     property("sonar.rust.lcov.reportPaths", "analyzer/target/llvm-cov-target/coverage.lcov")
+    property("sonar.rust.cargo.manifestPaths", "analyzer/Cargo.toml")
   }
 }
 

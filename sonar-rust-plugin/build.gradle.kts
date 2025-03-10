@@ -28,10 +28,12 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 
 val sonarApiVersion = "11.1.0.2693"
 val sonarApiImplVersion = "25.2.0.102705"
+val analyzerCommonsVersion = "2.16.0.3141"
 
 dependencies {
   implementation("com.google.code.gson:gson:2.11.0")
-  implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:2.16.0.3141")
+  implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:$analyzerCommonsVersion")
+  implementation("org.sonarsource.analyzer-commons:sonar-xml-parsing:$analyzerCommonsVersion")
   compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")

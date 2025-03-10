@@ -5,8 +5,6 @@
  */
 package com.sonarsource.rust.coverage;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -21,7 +19,9 @@ import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
-class CoverageSensorTest {
+import static org.assertj.core.api.Assertions.assertThat;
+
+class LcovSensorTest {
 
   @RegisterExtension
   LogTesterJUnit5 logTester = new LogTesterJUnit5().setLevel(Level.WARN);
@@ -31,19 +31,19 @@ class CoverageSensorTest {
 
   @Test
   void testDescribe() {
-    var sensor = new CoverageSensor();
+    var sensor = new LcovSensor();
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 
-    assertThat(descriptor.name()).isEqualTo("Rust Coverage");
+    assertThat(descriptor.name()).isEqualTo("Rust LCOV Coverage");
     assertThat(descriptor.languages()).containsOnly(RustLanguage.KEY);
     assertThat(descriptor.configurationPredicate()).isNotNull();
   }
 
-    @Test
+  @Test
   void testExecuteWithNoReportsFound() {
     var context = SensorContextTester.create(baseDir);
-    var sensor = new CoverageSensor();
+    var sensor = new LcovSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("No LCOV report files found");
@@ -55,9 +55,9 @@ class CoverageSensorTest {
     Files.setPosixFilePermissions(tempFile, Collections.emptySet());
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(CoverageSensor.COVERAGE_REPORT_PATHS, tempFile.toString());
+    context.settings().setProperty(LcovSensor.COVERAGE_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new CoverageSensor();
+    var sensor = new LcovSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to parse LCOV report");
@@ -77,7 +77,7 @@ class CoverageSensorTest {
     Files.writeString(lcovFile, lcovData);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(CoverageSensor.COVERAGE_REPORT_PATHS, lcovFile.toString());
+    context.settings().setProperty(LcovSensor.COVERAGE_REPORT_PATHS, lcovFile.toString());
 
     var fs = context.fileSystem();
     var inputFile = TestInputFileBuilder.create("module", "src/main.rs")
@@ -85,7 +85,7 @@ class CoverageSensorTest {
       .build();
     fs.add(inputFile);
 
-    var sensor = new CoverageSensor();
+    var sensor = new LcovSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Found 2 problems in LCOV report: " + lcovFile + ". More details in verbose mode");
@@ -171,7 +171,7 @@ class CoverageSensorTest {
     Files.writeString(lcovFile2, lcovData2);
 
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(CoverageSensor.COVERAGE_REPORT_PATHS, "**/*.info");
+    context.settings().setProperty(LcovSensor.COVERAGE_REPORT_PATHS, "**/*.info");
 
     var fs = context.fileSystem();
 
@@ -190,7 +190,7 @@ class CoverageSensorTest {
       .build();
     fs.add(signFile);
 
-    var sensor = new CoverageSensor();
+    var sensor = new LcovSensor();
     sensor.execute(context);
 
     assertThat(logTester.logs()).noneSatisfy(log -> assertThat(log).contains("problems"));

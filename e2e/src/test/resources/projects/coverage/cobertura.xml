@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<!DOCTYPE coverage SYSTEM "https://cobertura.sourceforge.net/xml/coverage-04.dtd">
+<coverage branch-rate="0.75" branches-covered="3" branches-valid="4" complexity="0" line-rate="0.9090909090909091" lines-covered="10" lines-valid="11" timestamp="1741354788" version="2.0.3">
+    <sources>
+        <source>/Users/gyulasallai/projects/sonar/sonar-rust/e2e/src/test/resources/projects/coverage</source>
+    </sources>
+    <packages>
+        <package line-rate="0.9090909090909091" branch-rate="0.75" name="src" complexity="0">
+            <classes>
+                <class branch-rate="0.75" complexity="0" filename="src/lib.rs" line-rate="0.9090909090909091" name="src.lib.rs">
+                    <methods>
+                        <method name="lib::compare" signature="" complexity="0" line-rate="1" branch-rate="1">
+                            <lines>
+                                <line hits="2" number="8" branch="false"/>
+                            </lines>
+                        </method>
+                        <method name="lib::tests::test_compare" signature="" complexity="0" line-rate="1" branch-rate="1">
+                            <lines>
+                                <line hits="1" number="23" branch="false"/>
+                            </lines>
+                        </method>
+                    </methods>
+                    <lines>
+                        <line branch="false" hits="2" number="8"/>
+                        <line branch="true" hits="2" number="9" condition-coverage="100% (2/2)"/>
+                        <line branch="false" hits="1" number="10"/>
+                        <line branch="true" hits="1" number="11" condition-coverage="50% (1/2)"/>
+                        <line branch="false" hits="1" number="12"/>
+                        <line branch="false" hits="0" number="14"/>
+                        <line branch="false" hits="2" number="16"/>
+                        <line branch="false" hits="1" number="23"/>
+                        <line branch="false" hits="1" number="24"/>
+                        <line branch="false" hits="1" number="25"/>
+                        <line branch="false" hits="1" number="26"/>
+                    </lines>
+                </class>
+            </classes>
+        </package>
+    </packages>
+</coverage>

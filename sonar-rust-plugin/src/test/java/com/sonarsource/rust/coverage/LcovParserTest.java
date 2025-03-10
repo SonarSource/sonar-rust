@@ -5,10 +5,6 @@
  */
 package com.sonarsource.rust.coverage;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatNoException;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-
 import com.sonarsource.rust.common.FileLocator;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -20,7 +16,11 @@ import org.junit.jupiter.api.io.TempDir;
 import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 
-class LCOVParserTest {
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatNoException;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+class LcovParserTest {
 
   @TempDir
   Path baseDir;
@@ -34,7 +34,7 @@ class LCOVParserTest {
     var context = SensorContextTester.create(baseDir);
     var locator = new FileLocator(context.fileSystem().inputFiles());
 
-    assertThatNoException().isThrownBy(() -> LCOVParser.create(context, lcovFile.toFile(), locator));
+    assertThatNoException().isThrownBy(() -> LcovParser.create(context, lcovFile.toFile(), locator));
 
     Files.delete(lcovFile);
   }
@@ -46,7 +46,7 @@ class LCOVParserTest {
     var context = SensorContextTester.create(baseDir);
     var locator = new FileLocator(context.fileSystem().inputFiles());
 
-    assertThatThrownBy(() -> LCOVParser.create(context, lcovFile, locator))
+    assertThatThrownBy(() -> LcovParser.create(context, lcovFile, locator))
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("Failed to read LCOV report: " + lcovFile);
   }
@@ -124,7 +124,7 @@ class LCOVParserTest {
     fs.add(inputFile2);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
     var result = parser.parse();
 
     var problems = result.problems();
@@ -167,7 +167,7 @@ class LCOVParserTest {
     Files.writeString(lcovFile, lcovData);
 
     var locator = new FileLocator(Collections.emptyList());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
     var result = parser.parse();
 
     var problems = result.problems();
@@ -190,7 +190,7 @@ class LCOVParserTest {
 
     var context = SensorContextTester.create(baseDir);
     var locator = new FileLocator(context.fileSystem().inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var result = parser.parse();
     assertThat(result.problems()).isEmpty();
@@ -215,7 +215,7 @@ class LCOVParserTest {
     var fs = context.fileSystem();
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(2);
@@ -251,7 +251,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(1);
@@ -281,7 +281,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(1);
@@ -311,7 +311,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(1);
@@ -341,7 +341,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(1);
@@ -371,7 +371,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(1);
@@ -401,7 +401,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(1);
@@ -432,7 +432,7 @@ class LCOVParserTest {
     fs.add(inputFile);
 
     var locator = new FileLocator(fs.inputFiles());
-    var parser = LCOVParser.create(context, lcovFile.toFile(), locator);
+    var parser = LcovParser.create(context, lcovFile.toFile(), locator);
 
     var problems = parser.parse().problems();
     assertThat(problems).hasSize(2);
