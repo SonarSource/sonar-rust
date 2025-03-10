@@ -363,5 +363,10 @@
     "lintId": "clippy::redundant_field_names",
     "ruleKey": "S3498",
     "message": "Use the field init shorthand syntax."
+  },
+  {
+    "lintId": "clippy::unnecessary_semicolon",
+    "ruleKey": "S1116",
+    "message": "Remove this semicolon."
   }
 ]
