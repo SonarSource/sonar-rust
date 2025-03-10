@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::print_stdout",
+    "ruleKey": "S106",
+    "message": "Use a logging framework to log this message to the console."
   }
 ]
