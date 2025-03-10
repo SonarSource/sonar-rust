@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::string_to_string",
+    "ruleKey": "S1858",
+    "message": "Remove the redundant `to_string()` call, or clone the string."
   }
 ]
