@@ -358,5 +358,10 @@
     "lintId": "clippy::unnecessary_cast",
     "ruleKey": "S4325",
     "message": "Remove this unnecessary cast."
+  },
+  {
+    "lintId": "clippy::redundant_field_names",
+    "ruleKey": "S3498",
+    "message": "Use the field init shorthand syntax."
   }
 ]
