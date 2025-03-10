@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::misnamed_getter",
+    "ruleKey": "S4275",
+    "message": "Access the expected field of the getter."
   }
 ]

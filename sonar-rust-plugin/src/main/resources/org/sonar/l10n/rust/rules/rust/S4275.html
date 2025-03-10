@@ -1,0 +1,50 @@
+<h2>Why is this an issue?</h2>
+<p>Getters provide a way to enforce encapsulation by providing methods that give controlled access to struct fields. However, in structs with multiple
+fields, it is not unusual that copy and paste is used to quickly create the needed getters, which can result in the wrong field being accessed by a
+getter.</p>
+<h2>How to fix it</h2>
+<p>To fix the issue of incorrect field access in getters, ensure that each getter method correctly accesses the intended field.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+struct MyStruct {
+    field1: i32,
+    field2: i32,
+}
+
+impl MyStruct {
+    // Incorrectly accessing field2 instead of field1
+    fn get_field1(&amp;self) -&gt; i32 {
+        self.field2
+    }
+
+    fn get_field2(&amp;self) -&gt; i32 {
+        self.field2
+    }
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+struct MyStruct {
+    field1: i32,
+    field2: i32,
+}
+
+impl MyStruct {
+    // Correctly accessing field1
+    fn get_field1(&amp;self) -&gt; i32 {
+        self.field1
+    }
+
+    fn get_field2(&amp;self) -&gt; i32 {
+        self.field2
+    }
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#misnamed_getters">https://rust-lang.github.io/rust-clippy/master/index.html#misnamed_getters</a> </li>
+</ul>
+
