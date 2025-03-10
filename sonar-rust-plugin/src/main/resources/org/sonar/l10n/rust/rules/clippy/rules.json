@@ -368,5 +368,10 @@
     "lintId": "clippy::unnecessary_semicolon",
     "ruleKey": "S1116",
     "message": "Remove this semicolon."
+  },
+  {
+    "lintId": "clippy::let_and_return",
+    "ruleKey": "S1488",
+    "message": "Remove the `let` statement and return the expression directly."
   }
 ]
