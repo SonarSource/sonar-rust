@@ -1,0 +1,44 @@
+<h2>Why is this an issue?</h2>
+<p>Empty statements represented by a semicolon <code>;</code> are statements that do not perform any operation. They are often the result of a typo or
+a misunderstanding of the language syntax. It is a good practice to remove empty statements since they don’t add value and lead to confusion and
+errors.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+fn main() {
+    let x = 5;
+
+    if x &gt; 0 {
+        println!("x is positive");
+    }; // Noncompliant
+
+    match x {
+        1 =&gt; println!("x is one"),
+        2 =&gt; println!("x is two"),
+        _ =&gt; println!("x is something else"),
+    }; // Noncompliant
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+fn main() {
+    let x = 5;
+
+    if x &gt; 0 {
+        println!("x is positive");
+    }
+
+    match x {
+        1 =&gt; println!("x is one"),
+        2 =&gt; println!("x is two"),
+        _ =&gt; println!("x is something else"),
+    }
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_semicolon">https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_semicolon</a> </li>
+</ul>
+

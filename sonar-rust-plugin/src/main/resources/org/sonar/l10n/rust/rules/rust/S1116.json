@@ -1,0 +1,24 @@
+{
+  "title": "Empty statements should be removed",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "LOW"
+    },
+    "attribute": "CLEAR"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "2min"
+  },
+  "tags": [
+    "unused",
+    "clippy"
+  ],
+  "defaultSeverity": "Minor",
+  "ruleSpecification": "RSPEC-1116",
+  "sqKey": "S1116",
+  "scope": "All",
+  "quickfix": "unknown"
+}
