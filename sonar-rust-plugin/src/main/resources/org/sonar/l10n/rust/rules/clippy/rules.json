@@ -383,5 +383,10 @@
     "lintId": "clippy::misnamed_getter",
     "ruleKey": "S4275",
     "message": "Access the expected field of the getter."
+  },
+  {
+    "lintId": "clippy::print_stdout",
+    "ruleKey": "S106",
+    "message": "Use a logging framework to log this message to the console."
   }
 ]
