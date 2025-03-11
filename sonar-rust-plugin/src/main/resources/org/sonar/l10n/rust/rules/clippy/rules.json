@@ -408,5 +408,10 @@
     "lintId": "clippy::wildcard_imports",
     "ruleKey": "S2208",
     "message": "Replace this wildcard import with specific imports."
+  },
+  {
+    "lintId": "clippy::branches_sharing_code",
+    "ruleKey": "S7411",
+    "message": "Refactor the code to avoid duplicating logic in multiple branches."
   }
 ]
