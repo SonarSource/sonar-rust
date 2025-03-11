@@ -403,5 +403,10 @@
     "lintId": "clippy::unreadable_literal",
     "ruleKey": "S2148",
     "message": "Use underscore delimiters to make the literal easier to read."
+  },
+  {
+    "lintId": "clippy::wildcard_imports",
+    "ruleKey": "S2208",
+    "message": "Replace this wildcard import with specific imports."
   }
 ]
