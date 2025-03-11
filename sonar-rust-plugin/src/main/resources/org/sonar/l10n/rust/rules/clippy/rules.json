@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::branches_sharing_code",
+    "ruleKey": "S7411",
+    "message": "Refactor the code to avoid duplicating logic in multiple branches."
   }
 ]
