@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::else_if_without_else",
+    "ruleKey": "S126",
+    "message": "Add an `else` block to this `if`-`else if` chain."
   }
 ]
