@@ -1,0 +1,26 @@
+<h2>Why is this an issue?</h2>
+<p>Initializing a vector with a chain of <code>push</code> invocations is less efficient than making the initialization with a single vector literal.
+Each invocation has a cost in itself.</p>
+<p>On top of the performance argument, the vector literal is more concise and easier to read.</p>
+<h2>How to fix it</h2>
+<p>Introduce a single vector literal that includes all the elements that are added to the vector as arguments of the <code>push</code>
+invocations.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut v = Vec::new();
+v.push(0);
+v.push(1);
+v.push(2);
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let v = vec![0, 1, 2];
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#/vec_init_then_push">https://rust-lang.github.io/rust-clippy/master/index.html#/vec_init_then_push</a> </li>
+</ul>
+
