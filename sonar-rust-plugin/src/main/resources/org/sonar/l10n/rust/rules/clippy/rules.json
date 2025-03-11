@@ -413,5 +413,10 @@
     "lintId": "clippy::branches_sharing_code",
     "ruleKey": "S7411",
     "message": "Refactor the code to avoid duplicating logic in multiple branches."
+  },
+  {
+    "lintId": "clippy::else_if_without_else",
+    "ruleKey": "S126",
+    "message": "Add an `else` block to this `if`-`else if` chain."
   }
 ]
