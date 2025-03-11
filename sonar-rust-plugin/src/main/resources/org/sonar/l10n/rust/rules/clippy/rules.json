@@ -398,5 +398,10 @@
     "lintId": "clippy::vec_init_then_push",
     "ruleKey": "S7089",
     "message": "Use a vector literal to initialize the vector."
+  },
+  {
+    "lintId": "clippy::unreadable_literal",
+    "ruleKey": "S2148",
+    "message": "Use underscore delimiters to make the literal easier to read."
   }
 ]

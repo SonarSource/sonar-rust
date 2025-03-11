@@ -4,31 +4,23 @@
     "S106",
     "S107",
     "S905",
-<<<<<<< HEAD
-<<<<<<< HEAD
-    "S1116",
-=======
-    "S1488",
->>>>>>> 0768d19 (Add rule S1488 (`let_and_return`): Local variables should not be declared and then immediately returned)
-=======
     "S920",
->>>>>>> bf3f779 (Add rule S920 (`match_bool`): Match expression conditions should not have boolean type)
+    "S1116",
+    "S1488",
     "S1612",
     "S1656",
     "S1764",
     "S1858",
     "S1862",
+    "S2148",
     "S2193",
     "S2198",
     "S2260",
     "S2589",
     "S3498",
     "S3723",
-<<<<<<< HEAD
-    "S4325",
-=======
     "S4275",
->>>>>>> f5f0c26 (Add rule S4275 (`misnamed_getters`): Getters should access the expected fields)
+    "S4325",
     "S4962",
     "S5856",
     "S6164",
