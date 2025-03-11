@@ -35,6 +35,7 @@ public class RustRulesDefinition implements RulesDefinition {
     entry("clippy::redundant_closure_for_method_calls", "S1612"),
     entry("clippy::self_assignment", "S1656"),
     entry("clippy::too_many_arguments", "S107"),
+    entry("clippy::unreadable_literal", "S2148"),
     entry("clippy::vec_resize_to_zero", "S7200"),
     entry("clippy::zero_ptr", "S4962")
   );
