@@ -119,7 +119,7 @@ macos_arm64_task:
     - source cirrus-env BUILD-PRIVATE
     - source .cirrus/use-gradle-wrapper.sh
     - ./gradlew build --info --stacktrace
-  build_artifacts:
+  plugin_artifacts:
     path: "sonar-rust-plugin/build/libs/**"
 
 e2e_task:
