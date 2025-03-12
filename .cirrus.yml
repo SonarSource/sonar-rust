@@ -35,7 +35,7 @@ cleanup_gradle_cache_script_template: &CLEANUP_GRADLE_CACHE_SCRIPT
     rm -rf "${GRADLE_USER_HOME}"/caches/journal-*
     rm -rf "${GRADLE_USER_HOME}"/workers
     rm -rf "${GRADLE_USER_HOME}"/.tmp
-    /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete
+    /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete || true
 
 orchestrator_cache_preparation_definition: &ORCHESTRATOR_CACHE
   set_orchestrator_home_script: |
@@ -113,7 +113,7 @@ macos_arm64_task:
     - HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
     - HOMEBREW_NO_INSTALL_UPGRADE: 1
     - HOMEBREW_NO_INSTALL_CLEANUP: 1
-  <<: *SETUP_GRADLE_CACHE
+#  <<: *SETUP_GRADLE_CACHE
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - . $HOME/.cargo/env
@@ -128,7 +128,7 @@ macos_arm64_task:
     - ./gradlew build --info --stacktrace
   plugin_artifacts:
     path: "sonar-rust-plugin/build/libs/**"
-  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
+#  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 e2e_task:
   depends_on:
