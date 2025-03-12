@@ -167,7 +167,7 @@ class ClippySensorTest {
     assertThat(context.allIssues()).hasSize(1);
     Issue issue = context.allIssues().stream().findAny().get();
     assertThat(issue.ruleKey()).isEqualTo(RuleKey.of(RustLanguage.KEY, "S2198"));
-    assertThat(issue.primaryLocation().message()).isEqualTo("message");
+    assertThat(issue.primaryLocation().message()).isEqualTo("Remove the unnecessary comparison or correct the logic to use an appropriate check.");
     TextRange textRange = issue.primaryLocation().textRange();
     assertThat(textRange.start().line()).isEqualTo(1);
     assertThat(textRange.start().lineOffset()).isEqualTo(1);
@@ -222,5 +222,6 @@ class ClippySensorTest {
     var issue = context.allIssues().stream().findAny().get();
     assertThat(issue.primaryLocation().inputComponent().key()).isEqualTo("moduleKey:subdir/src/file.rs");
     assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
+    assertThat(issue.primaryLocation().message()).isEqualTo("Remove the unnecessary comparison or correct the logic to use an appropriate check.");
   }
 }

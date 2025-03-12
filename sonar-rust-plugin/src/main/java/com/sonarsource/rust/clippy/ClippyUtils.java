@@ -89,8 +89,7 @@ class ClippyUtils {
 
     location
       .on(inputFile)
-      .at(inputFile.newRange(span.line_start(), span.column_start() - 1, span.line_end(), span.column_end() - 1))
-      .message(diagnostic.message().message());
+      .at(inputFile.newRange(span.line_start(), span.column_start() - 1, span.line_end(), span.column_end() - 1));
 
     return location;
   }
