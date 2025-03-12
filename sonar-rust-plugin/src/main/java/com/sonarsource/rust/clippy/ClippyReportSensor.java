@@ -91,6 +91,9 @@ public class ClippyReportSensor implements Sensor {
     if (location == null) {
       throw new IllegalStateException("Unknown file: " + diagnostic.message().spans().get(0).file_name());
     }
+
+    location.message(diagnostic.message().message());
+
     issue.at(location);
     issue.save();
   }

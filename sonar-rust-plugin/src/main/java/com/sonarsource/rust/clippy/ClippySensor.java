@@ -85,19 +85,31 @@ public class ClippySensor implements Sensor {
 
   private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic, Path workDir) {
     LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
+
     String lintId = diagnostic.lintId();
     String ruleKey = RustRulesDefinition.lintIdToRuleKey(lintId);
     if (ruleKey == null) {
       LOG.debug("No rule key found for Clippy lint: {}", lintId);
       return;
     }
+
     var issue = context.newIssue()
       .forRule(RuleKey.of(RustLanguage.KEY, ruleKey));
+
     var location = diagnosticToLocation(issue.newLocation(), diagnostic, context, workDir);
     if (location == null) {
       LOG.debug("No InputFile found for Clippy diagnostic: {}", diagnostic);
       return;
     }
+
+    var message = RustRulesDefinition.lintIdToMessage(lintId);
+    if (message == null) {
+      LOG.debug("No message found for Clippy lint: {}", lintId);
+      return;
+    }
+
+    location.message(message);
+
     issue.at(location);
     issue.save();
   }
