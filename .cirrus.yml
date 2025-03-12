@@ -140,12 +140,10 @@ e2e_win_task:
     - source .cirrus/use-gradle-wrapper.sh
     - source set_gradle_build_version
     - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
-  cleanup_before_cache_script:
+  cleanup_orchestrator_cache_script:
     - /usr/bin/find ${CIRRUS_WORKING_DIR}/orchestrator -name "sonar-rust-plugin*" -type f -delete
-    - rm -rf ${GRADLE_USER_HOME}/caches/transforms-1
-    - rm -rf ${GRADLE_USER_HOME}/caches/journal-1
-    - rm -rf ${GRADLE_USER_HOME}/caches/jars-3/*/buildSrc.jar
-    - /usr/bin/find ${GRADLE_USER_HOME} \( -name "*.lock" -o -name "*.bin" -o -name "gc.properties" \) -type f -delete
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
+
   always:
     report_artifacts:
       path: "e2e/build/reports/tests/**"
