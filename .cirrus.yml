@@ -109,7 +109,7 @@ macos_arm64_task:
         cpu: 4
         memory: 8G
   install_script:
-    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu
     - brew install filosottile/musl-cross/musl-cross
     - brew install mingw-w64
