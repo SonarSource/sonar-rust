@@ -115,8 +115,9 @@ macos_arm64_task:
     - HOMEBREW_NO_INSTALL_CLEANUP: 1
   gradle_cache:
     folder: ".gradle"
-  read_brew_script:
-    - brew --cache
+  brew_cache:
+    # retrieve this value by running `brew --cache` on a macOS machine
+    folder: "/Users/admin/Library/Caches/Homebrew"
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - . $HOME/.cargo/env
