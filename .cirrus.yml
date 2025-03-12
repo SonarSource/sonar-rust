@@ -113,7 +113,10 @@ macos_arm64_task:
     - HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
     - HOMEBREW_NO_INSTALL_UPGRADE: 1
     - HOMEBREW_NO_INSTALL_CLEANUP: 1
-#  <<: *SETUP_GRADLE_CACHE
+  gradle_cache:
+    folder: ".gradle"
+  read_brew_script:
+    - brew --cache
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - . $HOME/.cargo/env
@@ -125,10 +128,10 @@ macos_arm64_task:
   build_script:
     - echo "org.gradle.daemon=false" >> "gradle.properties"
     - echo "org.gradle.vfs.watch=false" >> "gradle.properties"
+    - . $HOME/.cargo/env
     - ./gradlew build --info --stacktrace
   plugin_artifacts:
     path: "sonar-rust-plugin/build/libs/**"
-#  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 e2e_task:
   depends_on:
