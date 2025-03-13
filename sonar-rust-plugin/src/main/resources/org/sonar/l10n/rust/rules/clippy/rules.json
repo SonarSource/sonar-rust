@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::reversed_empty_ranges",
+    "ruleKey": "S7432",
+    "message": "Invert the start and end values of the range, and reverse it with `.rev()`."
   }
 ]
