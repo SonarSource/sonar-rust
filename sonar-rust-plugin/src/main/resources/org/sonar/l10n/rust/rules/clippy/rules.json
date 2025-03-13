@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::while_immutable_condition",
+    "ruleKey": "S7415",
+    "message": "Ensure that variables within the while condition are mutated in the body of the loop."
   }
 ]
