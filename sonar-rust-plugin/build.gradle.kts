@@ -108,7 +108,8 @@ tasks.register<Copy>("copyRustOutputs") {
   from(compileRustWin.outputs.files) {
     into("win-x64")
   }
-  from("${project(":analyzer").layout.buildDirectory.get()}/aarch64-apple-darwin/release/analyzer") {
+  // we hardcode the path to the binary because on CI binary is downloaded from another task
+  from("analyzer/target/aarch64-apple-darwin/release/analyzer") {
     into("darwin-arm64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
