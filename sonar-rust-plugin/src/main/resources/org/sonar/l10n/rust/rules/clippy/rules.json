@@ -468,5 +468,10 @@
     "lintId": "clippy::uninit_assumed_init",
     "ruleKey": "S7425",
     "message": "Prevent undefined behavior by not using `MaybeUninit::uninit().assume_init()`."
+  },
+  {
+    "lintId": "clippy::transmuting_null",
+    "ruleKey": "S7427",
+    "message": "Use `Option` to represent a nullable reference"
   }
 ]
