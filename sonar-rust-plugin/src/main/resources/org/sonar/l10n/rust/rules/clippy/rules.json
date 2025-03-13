@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::unit_return_expecting_ord",
+    "ruleKey": "S7421",
+    "message": "Ensure the closure properly returns an `Ord` type or remove any extraneous semi-colons."
   }
 ]
