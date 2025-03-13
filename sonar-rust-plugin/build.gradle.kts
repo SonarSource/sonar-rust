@@ -108,7 +108,7 @@ tasks.register<Copy>("copyRustOutputs") {
   from(compileRustWin.outputs.files) {
     into("win-x64")
   }
-  from(compileRustDarwin.outputs.files) {
+  from("${project(":analyzer").layout.buildDirectory}/aarch64-apple-darwin/release/analyzer") {
     into("darwin-arm64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
