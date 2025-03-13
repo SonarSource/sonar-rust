@@ -109,7 +109,7 @@ tasks.register<Copy>("copyRustOutputs") {
     into("win-x64")
   }
   // we hardcode the path to the binary because on CI binary is downloaded from another task
-  from("analyzer/target/aarch64-apple-darwin/release/analyzer") {
+  from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer") {
     into("darwin-arm64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
