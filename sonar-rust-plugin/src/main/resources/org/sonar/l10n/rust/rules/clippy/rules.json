@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::size_of_in_element_count",
+    "ruleKey": "S7431",
+    "message": "Use the actual element count directly instead of `size_of::<T>`."
   }
 ]
