@@ -447,5 +447,10 @@
   {    "lintId": "clippy::unsound_collection_transmute",
     "ruleKey": "S7420",
     "message": "Do not transmute collections of different types; use iteration and mapping instead."
+  },
+  {
+    "lintId": "clippy::unit_return_expecting_ord",
+    "ruleKey": "S7421",
+    "message": "Ensure the closure properly returns an `Ord` type or remove any extraneous semi-colons."
   }
 ]

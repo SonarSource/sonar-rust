@@ -1,0 +1,21 @@
+<h2>Why is this an issue?</h2>
+<p>Returning the unit type from a closure expecting an <code>Ord</code> type is likely a mistake caused by an extra semi-colon. This is because the
+unit type implements <code>Ord</code> but doesn’t serve the intended sorting purpose, making the code misleading and potentially incorrect.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut twins = vec![(1, 1), (2, 2)];
+twins.sort_by_key(|x| { x.1; }); // Noncompliant: Closure returns unit type due to unnecessary semi-colon.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let mut twins = vec![(1, 1), (2, 2)];
+twins.sort_by_key(|x| x.1); // Compliant: Closure correctly returns an `Ord` type.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unit_return_expecting_ord">https://rust-lang.github.io/rust-clippy/master/index.html#unit_return_expecting_ord</a> </li>
+</ul>
+
