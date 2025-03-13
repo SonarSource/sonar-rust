@@ -1,0 +1,23 @@
+{
+  "title": "Null function pointers should not be created through `transmute`",
+  "type": "BUG",
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "5min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "RSPEC-7429",
+  "sqKey": "S7429",
+  "scope": "All",
+  "quickfix": "unknown",
+  "code": {
+    "impacts": {
+      "RELIABILITY": "MEDIUM"
+    },
+    "attribute": "LOGICAL"
+  }
+}

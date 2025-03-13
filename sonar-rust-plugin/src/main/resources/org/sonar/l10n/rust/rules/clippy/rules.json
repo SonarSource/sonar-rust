@@ -473,5 +473,10 @@
     "lintId": "clippy::transmuting_null",
     "ruleKey": "S7427",
     "message": "Use `Option` to represent a nullable reference"
+  },
+  {
+    "lintId": "clippy::transmute_null_to_fn",
+    "ruleKey": "S7429",
+    "message": "Use `Option<fn()>` to safely represent a nullable function pointer."
   }
 ]

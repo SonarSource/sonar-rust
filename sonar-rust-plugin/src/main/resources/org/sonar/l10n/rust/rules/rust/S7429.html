@@ -1,0 +1,19 @@
+<h2>Why is this an issue?</h2>
+<p>Creating a null function pointer using <code>transmute</code> results in undefined behavior, as null function pointers are not valid in Rust.
+Instead, use <code>Option&lt;fn()&gt;</code> to safely represent a nullable function pointer.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let null_fn: fn() = unsafe { std::mem::transmute(std::ptr::null::&lt;()&gt;()) }; // Noncompliant
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let null_fn: Option&lt;fn()&gt; = None; // Compliant
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#transmute_null_to_fn">https://rust-lang.github.io/rust-clippy/master/index.html#transmute_null_to_fn</a> </li>
+</ul>
+
