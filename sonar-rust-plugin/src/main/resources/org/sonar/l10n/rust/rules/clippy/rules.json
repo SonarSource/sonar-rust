@@ -418,5 +418,10 @@
     "lintId": "clippy::else_if_without_else",
     "ruleKey": "S126",
     "message": "Add an `else` block to this `if`-`else if` chain."
+  },
+  {
+    "lintId": "clippy::zst_offset",
+    "ruleKey": "S7412",
+    "message": "Remove the use of `offset` or `wrapping_add`/`wrapping_sub` on pointers to zero-sized types."
   }
 ]
