@@ -478,5 +478,10 @@
     "lintId": "clippy::transmute_null_to_fn",
     "ruleKey": "S7429",
     "message": "Use `Option<fn()>` to safely represent a nullable function pointer."
+  },
+  {
+    "lintId": "clippy::suspicious_splitn",
+    "ruleKey": "S7430",
+    "message": "Use `splitn` with at least two splits."
   }
 ]
