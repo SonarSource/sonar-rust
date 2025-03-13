@@ -113,11 +113,6 @@ macos_arm64_task:
         image: ghcr.io/cirruslabs/macos-sonoma-xcode:latest
         cpu: 4
         memory: 8G
-  env:
-    - HOMEBREW_NO_AUTO_UPDATE: 1
-    - HOMEBREW_NO_INSTALLED_DEPENDENTS_CHECK: 1
-    - HOMEBREW_NO_INSTALL_UPGRADE: 1
-    - HOMEBREW_NO_INSTALL_CLEANUP: 1
   gradle_cache:
     folder: ".gradle"
   install_script:
@@ -132,8 +127,7 @@ macos_arm64_task:
     - ./gradlew :analyzer:compileRustDarwin --info --stacktrace
   upload_script:
     - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/analyzer
-  plugin_artifacts:
-    path: "sonar-rust-plugin/build/libs/**"
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 e2e_task:
   depends_on:

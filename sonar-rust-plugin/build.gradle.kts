@@ -108,10 +108,8 @@ tasks.register<Copy>("copyRustOutputs") {
   from(compileRustWin.outputs.files) {
     into("win-x64")
   }
-  if (OperatingSystem.current().isMacOsX) {
-    from(compileRustDarwin.outputs.files) {
-      into("darwin-arm64")
-    }
+  from(compileRustDarwin.outputs.files) {
+    into("darwin-arm64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
 }
