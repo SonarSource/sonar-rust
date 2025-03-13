@@ -70,6 +70,8 @@ win_ssd_and_clone: &WIN_SSD_AND_CLONE
     fi
 
 build_task:
+  depends_on:
+    - macos_arm64
   eks_container:
     <<: *CONTAINER_DEFINITION
     cpu: 4
@@ -90,6 +92,9 @@ build_task:
     ARTIFACTORY_DEPLOY_USERNAME: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer username]
     ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
     DEPLOY_PULL_REQUEST: "true"
+  download_script:
+    - mkdir -p "analyzer/target/aarch64-apple-darwin/release"
+    - curl -o "analyzer/target/aarch64-apple-darwin/release/analyzer" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/analyzer
   build_script:
     - source cirrus-env BUILD-PRIVATE
     - source .cirrus/use-gradle-wrapper.sh
@@ -115,22 +120,16 @@ macos_arm64_task:
     - HOMEBREW_NO_INSTALL_CLEANUP: 1
   gradle_cache:
     folder: ".gradle"
-  brew_cache:
-    # retrieve this value by running `brew --cache` on a macOS machine
-    folder: "/Users/admin/Library/Caches/Homebrew"
   install_script:
     - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     - . $HOME/.cargo/env
-    - brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu
-    - brew install filosottile/musl-cross/musl-cross
-    - brew install mingw-w64
-    - rustup target add x86_64-pc-windows-gnu x86_64-unknown-linux-musl x86_64-unknown-linux-gnu x86_64-apple-darwin
+    - rustup target add x86_64-apple-darwin
     - rustup component add clippy
   build_script:
     - echo "org.gradle.daemon=false" >> "gradle.properties"
     - echo "org.gradle.vfs.watch=false" >> "gradle.properties"
     - . $HOME/.cargo/env
-    - ./gradlew build --info --stacktrace
+    - ./gradlew :analyzer:compileRustDarwin --info --stacktrace
   upload_script:
     - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/analyzer
   plugin_artifacts:
