@@ -1,0 +1,36 @@
+<h2>Why is this an issue?</h2>
+<p>The unit type <code>()</code> is always equal to itself and using it in comparisons is either redundant or a mistake, often caused by accidental
+semicolon placement.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+fn foo() {}
+fn bar() {}
+fn baz() {}
+
+if {
+    foo();
+} == {
+    bar();
+} {
+    baz();
+} // Noncompliant: Comparing unit values.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+fn foo() {}
+fn bar() {}
+fn baz() {}
+
+foo();
+bar();
+baz(); // Compliant: No unit comparison.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unit_cmp">https://rust-lang.github.io/rust-clippy/master/index.html#unit_cmp</a>
+  </li>
+</ul>
+
