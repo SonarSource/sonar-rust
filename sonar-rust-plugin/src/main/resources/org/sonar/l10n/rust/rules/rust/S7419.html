@@ -1,0 +1,38 @@
+<h2>Why is this an issue?</h2>
+<p><code>io::Write::write(_vectored)</code> and <code>io::Read::read(_vectored)</code> do not guarantee processing the entire buffer, which might lead
+to only partial writes/reads. This can result in bugs if not handled appropriately. Instead, use <code>write_all</code> or <code>read_exact</code>
+methods that ensure the whole buffer is processed, providing more reliable code especially in asynchronous contexts.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::io;
+fn foo&lt;W: io::Write&gt;(w: &amp;mut W) -&gt; io::Result&lt;()&gt; {
+    w.write(b"foo")?; // Noncompliant: This might not write the entire buffer.
+    Ok(())
+}
+
+fn bar&lt;R: io::Read&gt;(r: &amp;mut R, buffer: &amp;mut [u8]) -&gt; io::Result&lt;()&gt; {
+    r.read(buffer)?; // Noncompliant: This might not read the entire buffer.
+    Ok(())
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::io;
+fn foo&lt;W: io::Write&gt;(w: &amp;mut W) -&gt; io::Result&lt;()&gt; {
+    w.write_all(b"foo")?; // Compliant: This writes the entire buffer.
+    Ok(())
+}
+
+fn bar&lt;R: io::Read&gt;(r: &amp;mut R, buffer: &amp;mut [u8]) -&gt; io::Result&lt;()&gt; {
+    r.read_exact(buffer)?; // Compliant: This reads the entire buffer.
+    Ok(())
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unused_io_amount">https://rust-lang.github.io/rust-clippy/master/index.html#unused_io_amount</a> </li>
+</ul>
+

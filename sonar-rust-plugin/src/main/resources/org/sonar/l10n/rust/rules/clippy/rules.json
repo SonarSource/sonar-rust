@@ -438,5 +438,10 @@
     "lintId": "clippy::useless_attribute",
     "ruleKey": "S7418",
     "message": "Remove this useless lint attribute, or place it on the imported items themselves."
+  },
+  {
+    "lintId": "clippy::unused_io_amount",
+    "ruleKey": "S7419",
+    "message": "Process the entire buffer with `write_all(&buffer)` or `read_exact(&buffer)`."
   }
 ]
