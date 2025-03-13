@@ -443,5 +443,9 @@
     "lintId": "clippy::unused_io_amount",
     "ruleKey": "S7419",
     "message": "Process the entire buffer with `write_all(&buffer)` or `read_exact(&buffer)`."
+  },
+  {    "lintId": "clippy::unsound_collection_transmute",
+    "ruleKey": "S7420",
+    "message": "Do not transmute collections of different types; use iteration and mapping instead."
   }
 ]

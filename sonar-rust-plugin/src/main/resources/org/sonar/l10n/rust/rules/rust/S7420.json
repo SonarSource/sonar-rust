@@ -1,0 +1,23 @@
+{
+  "title": "Collections should not be transmuted to different types",
+  "type": "BUG",
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "5min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "RSPEC-7420",
+  "sqKey": "S7420",
+  "scope": "All",
+  "quickfix": "unknown",
+  "code": {
+    "impacts": {
+      "RELIABILITY": "HIGH"
+    },
+    "attribute": "LOGICAL"
+  }
+}
