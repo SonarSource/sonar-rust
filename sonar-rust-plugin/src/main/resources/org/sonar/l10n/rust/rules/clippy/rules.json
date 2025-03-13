@@ -428,5 +428,10 @@
     "lintId": "clippy::wrong_transmute",
     "ruleKey": "S7414",
     "message": "Remove or correct this transmute operation."
+  },
+  {
+    "lintId": "clippy::while_immutable_condition",
+    "ruleKey": "S7415",
+    "message": "Ensure that variables within the while condition are mutated in the body of the loop."
   }
 ]
