@@ -488,5 +488,10 @@
     "lintId": "clippy::size_of_in_element_count",
     "ruleKey": "S7431",
     "message": "Use the actual element count directly instead of `size_of::<T>`."
+  },
+  {
+    "lintId": "clippy::reversed_empty_ranges",
+    "ruleKey": "S7432",
+    "message": "Invert the start and end values of the range, and reverse it with `.rev()`."
   }
 ]

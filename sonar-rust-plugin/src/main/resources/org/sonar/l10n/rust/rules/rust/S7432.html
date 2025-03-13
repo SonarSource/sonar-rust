@@ -1,0 +1,27 @@
+<h2>Why is this an issue?</h2>
+<p>Empty ranges result in no iterations, making any loop a no-op. Trying to index slices using reversed ranges will result in runtime panics. Both
+scenarios lead to bugs or logical errors in the code.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+fn main() {
+    (10..=0).for_each(|x| println!("{}", x)); // Noncompliant: Empty range
+    let arr = [1, 2, 3, 4, 5];
+    let sub = &amp;arr[3..1]; // Noncompliant: Reversed slice indexing
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+fn main() {
+    (0..=10).rev().for_each(|x| println!("{}", x)); // Compliant: Properly reversed range for iteration
+    let arr = [1, 2, 3, 4, 5];
+    let sub = &amp;arr[1..3]; // Compliant: Valid slice indexing
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#reversed_empty_ranges">https://rust-lang.github.io/rust-clippy/master/index.html#reversed_empty_ranges</a> </li>
+</ul>
+
