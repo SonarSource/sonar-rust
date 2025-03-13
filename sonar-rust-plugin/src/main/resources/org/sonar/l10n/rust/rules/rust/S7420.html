@@ -1,0 +1,23 @@
+<h2>Why is this an issue?</h2>
+<p>Transmuting between collections of different types can lead to undefined behavior due to differences in ABI, size, or alignment. This can result in
+serious issues like out-of-bounds memory access.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let vec = vec![2_u16];
+unsafe {
+    std::mem::transmute::&lt;_, Vec&lt;u32&gt;&gt;(vec); // Noncompliant: Different size, likely out-of-bounds memory access.
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let vec = vec![2_u16];
+let vec_u32: Vec&lt;u32&gt; = vec.into_iter().map(u32::from).collect(); // Compliant: Iterates, maps, and collects the values safely.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unsound_collection_transmute">https://rust-lang.github.io/rust-clippy/master/index.html#unsound_collection_transmute</a> </li>
+</ul>
+

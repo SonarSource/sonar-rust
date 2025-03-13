@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::unsound_collection_transmute",
+    "ruleKey": "S7420",
+    "message": "Do not transmute collections of different types; use iteration and mapping instead."
   }
 ]
