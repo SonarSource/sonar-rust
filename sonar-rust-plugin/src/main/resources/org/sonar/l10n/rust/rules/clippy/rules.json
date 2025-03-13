@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::wrong_transmute",
+    "ruleKey": "S7414",
+    "message": "Remove or correct this transmute operation."
   }
 ]
