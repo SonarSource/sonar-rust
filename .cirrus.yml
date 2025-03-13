@@ -131,6 +131,8 @@ macos_arm64_task:
     - echo "org.gradle.vfs.watch=false" >> "gradle.properties"
     - . $HOME/.cargo/env
     - ./gradlew build --info --stacktrace
+  upload_script:
+    - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/analyzer
   plugin_artifacts:
     path: "sonar-rust-plugin/build/libs/**"
 
