@@ -125,7 +125,7 @@ macos_arm64_task:
     - echo "org.gradle.daemon=false" >> "gradle.properties"
     - echo "org.gradle.vfs.watch=false" >> "gradle.properties"
     - . $HOME/.cargo/env
-    - ./gradlew :analyzer:compileRustDarwin --info --stacktrace
+    - ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
   upload_script:
     - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
     - curl -X POST --data-binary @analyzer/target/x86_64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
