@@ -444,7 +444,8 @@
     "ruleKey": "S7419",
     "message": "Process the entire buffer with `write_all(&buffer)` or `read_exact(&buffer)`."
   },
-  {    "lintId": "clippy::unsound_collection_transmute",
+  {
+    "lintId": "clippy::unsound_collection_transmute",
     "ruleKey": "S7420",
     "message": "Do not transmute collections of different types; use iteration and mapping instead."
   },
@@ -452,5 +453,10 @@
     "lintId": "clippy::unit_return_expecting_ord",
     "ruleKey": "S7421",
     "message": "Ensure the closure properly returns an `Ord` type or remove any extraneous semi-colons."
+  },
+  {
+    "lintId": "clippy::unit_hash",
+    "ruleKey": "S7422",
+    "message": "Replace `().hash(_)` with `0_u8.hash(_)` to yield a meaningful hash value."
   }
 ]
