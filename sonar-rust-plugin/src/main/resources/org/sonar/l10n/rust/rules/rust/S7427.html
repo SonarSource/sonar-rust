@@ -1,0 +1,18 @@
+<h2>Why is this an issue?</h2>
+<p>Transmuting a null pointer is undefined behavior and can lead to unpredictable program crashes and security vulnerabilities.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let null_ref: &amp;u64 = unsafe { std::mem::transmute(0 as *const u64) }; // Noncompliant: Transmuting a null pointer.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let null_ref: Option&lt;&amp;u64&gt; = None; // Compliant: Use Option to represent nullable references.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#transmuting_null">https://rust-lang.github.io/rust-clippy/master/index.html#transmuting_null</a> </li>
+</ul>
+
