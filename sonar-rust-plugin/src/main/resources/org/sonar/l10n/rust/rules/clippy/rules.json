@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::uninit_assumed_init",
+    "ruleKey": "S7425",
+    "message": "Prevent undefined behavior by not using `MaybeUninit::uninit().assume_init()`."
   }
 ]
