@@ -463,5 +463,10 @@
     "lintId": "clippy::unit_cmp",
     "ruleKey": "S7423",
     "message": "Remove comparisons and asserts involving the unit type `()`."
+  },
+  {
+    "lintId": "clippy::uninit_assumed_init",
+    "ruleKey": "S7425",
+    "message": "Prevent undefined behavior by not using `MaybeUninit::uninit().assume_init()`."
   }
 ]
