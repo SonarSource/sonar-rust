@@ -1,0 +1,28 @@
+<h2>Why is this an issue?</h2>
+<p>Using <code>size_of::&lt;T&gt;</code> or <code>size_of_val::&lt;T&gt;</code> as a count of elements is misleading because these functions are meant
+to return the size in bytes, not the count of elements. This can lead to logical errors in the code.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+# use std::ptr::copy_nonoverlapping;
+# use std::mem::size_of;
+const SIZE: usize = 128;
+let x = [2u8; SIZE];
+let mut y = [2u8; SIZE];
+unsafe { copy_nonoverlapping(x.as_ptr(), y.as_mut_ptr(), size_of::&lt;u8&gt;() * SIZE) }; // Noncompliant: uses size_of::&lt;u8&gt;() to determine element count.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+# use std::ptr::copy_nonoverlapping;
+const SIZE: usize = 128;
+let x = [2u8; SIZE];
+let mut y = [2u8; SIZE];
+unsafe { copy_nonoverlapping(x.as_ptr(), y.as_mut_ptr(), SIZE) }; // Compliant: uses the actual element count.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#size_of_in_element_count">https://rust-lang.github.io/rust-clippy/master/index.html#size_of_in_element_count</a> </li>
+</ul>
+

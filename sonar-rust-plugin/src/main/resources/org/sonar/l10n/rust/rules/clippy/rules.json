@@ -483,5 +483,10 @@
     "lintId": "clippy::suspicious_splitn",
     "ruleKey": "S7430",
     "message": "Use `splitn` with at least two splits."
+  },
+  {
+    "lintId": "clippy::size_of_in_element_count",
+    "ruleKey": "S7431",
+    "message": "Use the actual element count directly instead of `size_of::<T>`."
   }
 ]
