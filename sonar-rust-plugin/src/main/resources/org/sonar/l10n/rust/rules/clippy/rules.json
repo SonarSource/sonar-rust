@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::unit_hash",
+    "ruleKey": "S7422",
+    "message": "Replace `().hash(_)` with `0_u8.hash(_)` to yield a meaningful hash value."
   }
 ]
