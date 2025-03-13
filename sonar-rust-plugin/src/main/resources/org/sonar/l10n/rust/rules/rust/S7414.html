@@ -1,0 +1,19 @@
+<h2>Why is this an issue?</h2>
+<p>Using <code>core::intrinsics::transmute</code> in a way that is not valid on any architecture leads to undefined behavior. This can result in
+unpredictable program behavior or crashes.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let ptr: *const T = core::intrinsics::transmute('x'); // Noncompliant: Invalid transmute operation.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let value: T = 'x' as T; // Compliant: Use a safe conversion method.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#wrong_transmute">https://rust-lang.github.io/rust-clippy/master/index.html#wrong_transmute</a> </li>
+</ul>
+

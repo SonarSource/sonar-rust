@@ -423,5 +423,10 @@
     "lintId": "clippy::zst_offset",
     "ruleKey": "S7412",
     "message": "Remove the use of `offset` or `wrapping_add`/`wrapping_sub` on pointers to zero-sized types."
+  },
+  {
+    "lintId": "clippy::wrong_transmute",
+    "ruleKey": "S7414",
+    "message": "Remove or correct this transmute operation."
   }
 ]
