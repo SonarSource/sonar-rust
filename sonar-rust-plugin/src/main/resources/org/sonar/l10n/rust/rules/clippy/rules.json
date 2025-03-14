@@ -498,5 +498,10 @@
     "lintId": "clippy::redundant_comparisons",
     "ruleKey": "S7436",
     "message": "Remove this redundant comparison, or correct the intended comparison logic."
+  },
+  {
+    "lintId": "clippy::recursive_format_impl",
+    "ruleKey": "S7440",
+    "message": "Refactor this formatting implementation to avoid infinite recursion."
   }
 ]
