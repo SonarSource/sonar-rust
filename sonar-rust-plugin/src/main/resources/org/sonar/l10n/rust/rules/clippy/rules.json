@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::panicking_unwrap",
+    "ruleKey": "S7442",
+    "message": "Check first if the value is present before unwrapping it."
   }
 ]
