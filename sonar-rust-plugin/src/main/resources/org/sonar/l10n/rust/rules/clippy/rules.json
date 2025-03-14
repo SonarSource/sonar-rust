@@ -513,5 +513,10 @@
     "lintId": "clippy::panicking_unwrap",
     "ruleKey": "S7442",
     "message": "Check first if the value is present before unwrapping it."
+  },
+  {
+    "lintId": "clippy::panicking_overflow_checks",
+    "ruleKey": "S7444",
+    "message": "Use `checked_add` or `overflowing_add` instead."
   }
 ]
