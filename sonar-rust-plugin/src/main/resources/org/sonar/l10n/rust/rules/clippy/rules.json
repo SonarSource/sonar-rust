@@ -271,7 +271,7 @@
   },
   {
     "lintId": "clippy::async_yields_async",
-    "ruleKey": null,
+    "ruleKey": "S7413",
     "message": "Add `.await` to the returned future within the async context."
   },
   {
