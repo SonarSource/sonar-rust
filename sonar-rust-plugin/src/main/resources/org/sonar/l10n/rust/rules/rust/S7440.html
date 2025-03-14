@@ -1,0 +1,32 @@
+<h2>Why is this an issue?</h2>
+<p>Recursive calls in formatting trait implementations (e.g., <code>Display</code>) will lead to infinite recursion and a stack overflow.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::fmt;
+
+struct Structure(i32);
+impl fmt::Display for Structure {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        write!(f, "{}", self.to_string()) // Noncompliant
+    }
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::fmt;
+
+struct Structure(i32);
+impl fmt::Display for Structure {
+    fn fmt(&amp;self, f: &amp;mut fmt::Formatter) -&gt; fmt::Result {
+        write!(f, "{}", self.0) // Compliant
+    }
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#recursive_format_impl">https://rust-lang.github.io/rust-clippy/master/index.html#recursive_format_impl</a> </li>
+</ul>
+
