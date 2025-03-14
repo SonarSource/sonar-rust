@@ -321,7 +321,7 @@
   },
   {
     "lintId": "clippy::derived_hash_with_manual_eq",
-    "ruleKey": null,
+    "ruleKey": "S7424",
     "message": "Do not manually implement `PartialEq` for types that derive `Hash`. Use the derived implementations."
   },
   {

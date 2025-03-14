@@ -1,0 +1,29 @@
+<h2>Why is this an issue?</h2>
+<p>Having a manual <code>PartialEq</code> implementation for types with a derived <code>Hash</code> can lead to inconsistencies. The contract <code>k1
+== k2 ⇒ hash(k1) == hash(k2)</code> must always hold. Inconsistencies can cause undefined behaviors, especially when these types are used in
+collections such as <code>HashMap</code>.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+#[derive(Hash)]
+struct Foo;
+
+impl PartialEq for Foo {
+    fn eq(&amp;self, other: &amp;Self) -&gt; bool {
+        // Some custom equality logic
+        true // Noncompliant
+    }
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+#[derive(Hash, PartialEq)]
+struct Foo;
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#derived_hash_with_manual_eq">https://rust-lang.github.io/rust-clippy/master/index.html#derived_hash_with_manual_eq</a> </li>
+</ul>
+
