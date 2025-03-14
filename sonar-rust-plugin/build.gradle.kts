@@ -92,6 +92,7 @@ tasks.register<Copy>("copyRustOutputs") {
   group = "Build"
   val compileRustLinux = project(":analyzer").tasks.named("compileRustLinux").get()
   val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
+  val compileRustLinuxArm = project(":analyzer").tasks.named("compileRustLinuxArm").get()
   val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
   val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
   val compileRustDarwinX86 = project(":analyzer").tasks.named("compileRustDarwinX86").get()
@@ -106,12 +107,15 @@ tasks.register<Copy>("copyRustOutputs") {
   from(compileRustLinuxMusl.outputs.files) {
     into("linux-x64-musl")
   }
+  from(compileRustLinuxArm.outputs.files) {
+    into("linux-aarch64-musl")
+  }
   from(compileRustWin.outputs.files) {
     into("win-x64")
   }
   // we hardcode the path to the binary because on CI binary is downloaded from another task
   from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer") {
-    into("darwin-arm64")
+    into("darwin-aarch64")
   }
   from("${project(":analyzer").layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer") {
     into("darwin-x86_64")

@@ -16,7 +16,8 @@ eks_container_definition: &CONTAINER_DEFINITION
   namespace: default
   builder_role: cirrus-builder
   builder_image: docker-builder-v*
-  builder_instance_type: t2.small
+  builder_instance_type: c6i.xlarge
+  builder_timeout: 120m
   dockerfile: .cirrus/rust.Dockerfile
   docker_arguments:
     CIRRUS_AWS_ACCOUNT: ${CIRRUS_AWS_ACCOUNT}
@@ -181,7 +182,45 @@ e2e_win_task:
   cleanup_orchestrator_cache_script:
     - /usr/bin/find ${CIRRUS_WORKING_DIR}/orchestrator -name "sonar-rust-plugin*" -type f -delete
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
+  always:
+    report_artifacts:
+      path: "e2e/build/reports/tests/**"
 
+e2e_linux_arm64_task:
+  depends_on:
+    - build
+  eks_container:
+    cluster_name: ${CIRRUS_CLUSTER_NAME}
+    region: eu-central-1
+    namespace: default
+    cpu: 4
+    memory: 8G
+    nodeSelectorTerms:
+      - matchExpressions:
+          - key: kubernetes.io/arch
+            operator: In
+            values:
+              - arm64
+    architecture: arm64
+    builder_role: cirrus-builder
+    builder_image: docker-builder-arm64-v*
+    builder_instance_type: t4g.xlarge
+    dockerfile: .cirrus/arm64.Dockerfile
+    docker_arguments:
+      CIRRUS_AWS_ACCOUNT: ${CIRRUS_AWS_ACCOUNT}
+  gradle_cache:
+    folder: "${GRADLE_USER_HOME}/caches"
+  <<: *ORCHESTRATOR_CACHE
+  e2e_script:
+    - echo "org.gradle.daemon=false" >> "gradle.properties"
+    - export PATH=$PATH:$HOME/.cargo/bin
+    - source cirrus-env QA
+    - source .cirrus/use-gradle-wrapper.sh
+    - source .cirrus/custom_set_gradle_build_version.sh
+    - ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+  cleanup_orchestrator_cache_script:
+    - /usr/bin/find ${CIRRUS_WORKING_DIR}/orchestrator -name "sonar-rust-plugin*" -type f -delete
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
   always:
     report_artifacts:
       path: "e2e/build/reports/tests/**"
@@ -192,6 +231,7 @@ promote_task:
     - build
     - e2e
     - e2e_win
+    - e2e_linux_arm64
   eks_container:
     <<: *CONTAINER_DEFINITION
     cpu: 1
