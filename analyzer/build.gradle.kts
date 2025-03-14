@@ -39,6 +39,7 @@ val compileRustLinuxMusl = createCompileRustTask(
 )
 val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
 val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin", "Darwin")
+val compileRustDarwinX86 = createCompileRustTask("x86_64-apple-darwin", "DarwinX86")
 
 
 task<Exec>("testRust") {

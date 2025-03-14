@@ -14,6 +14,7 @@ enum Platform {
   LINUX_X64,
   LINUX_X64_MUSL,
   DARWIN_ARM64,
+  DARWIN_X86_64,
   UNSUPPORTED;
 
 
@@ -28,8 +29,8 @@ enum Platform {
       return WIN_X64;
     } else if (lowerCaseOsName.contains("linux") && isX64()) {
       return isAlpine() ? LINUX_X64_MUSL : LINUX_X64;
-    } else if (lowerCaseOsName.contains("mac os") && isARM64()) {
-      return DARWIN_ARM64;
+    } else if (lowerCaseOsName.contains("mac os")) {
+      return isARM64() ? DARWIN_ARM64 : DARWIN_X86_64;
     }
     return UNSUPPORTED;
   }

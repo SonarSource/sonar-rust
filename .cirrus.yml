@@ -35,7 +35,7 @@ cleanup_gradle_cache_script_template: &CLEANUP_GRADLE_CACHE_SCRIPT
     rm -rf "${GRADLE_USER_HOME}"/caches/journal-*
     rm -rf "${GRADLE_USER_HOME}"/workers
     rm -rf "${GRADLE_USER_HOME}"/.tmp
-    /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete
+    /usr/bin/find "${GRADLE_USER_HOME}"/caches/ -name "*.lock" -type f -delete || true
 
 orchestrator_cache_preparation_definition: &ORCHESTRATOR_CACHE
   set_orchestrator_home_script: |
@@ -70,6 +70,8 @@ win_ssd_and_clone: &WIN_SSD_AND_CLONE
     fi
 
 build_task:
+  depends_on:
+    - macos_arm64
   eks_container:
     <<: *CONTAINER_DEFINITION
     cpu: 4
@@ -90,10 +92,46 @@ build_task:
     ARTIFACTORY_DEPLOY_USERNAME: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer username]
     ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
     DEPLOY_PULL_REQUEST: "true"
+  download_script:
+    - >
+      if [[ $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ ^branch-.* ]]; then
+        mkdir -p "analyzer/target/aarch64-apple-darwin/release"
+        curl -o "analyzer/target/aarch64-apple-darwin/release/analyzer" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
+        mkdir -p "analyzer/target/x86_64-apple-darwin/release"
+        curl -o "analyzer/target/x86_64-apple-darwin/release/analyzer" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
+      fi
   build_script:
     - source cirrus-env BUILD-PRIVATE
     - source .cirrus/use-gradle-wrapper.sh
     - source regular_gradle_build_deploy_analyze --info --stacktrace
+  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
+
+macos_arm64_task:
+  skip: $CIRRUS_BRANCH != "master" && $CIRRUS_BRANCH != "dogfood-on-peach" && $CIRRUS_BRANCH !=~ "branch-.*"
+  persistent_worker:
+    resources:
+      tart-vms: 1
+    labels:
+      envname: prod
+    isolation:
+      tart:
+        image: ghcr.io/cirruslabs/macos-sonoma-xcode:latest
+        cpu: 4
+        memory: 8G
+  gradle_cache:
+    folder: ".gradle"
+  install_script:
+    - curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+    - . $HOME/.cargo/env
+    - rustup target add x86_64-apple-darwin
+  build_script:
+    - echo "org.gradle.daemon=false" >> "gradle.properties"
+    - echo "org.gradle.vfs.watch=false" >> "gradle.properties"
+    - . $HOME/.cargo/env
+    - ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
+  upload_script:
+    - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
+    - curl -X POST --data-binary @analyzer/target/x86_64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 e2e_task:

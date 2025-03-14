@@ -55,6 +55,7 @@ public class AnalyzerFactory {
       case LINUX_X64 -> "/analyzer/linux-x64/analyzer";
       case LINUX_X64_MUSL -> "/analyzer/linux-x64-musl/analyzer";
       case DARWIN_ARM64 -> "/analyzer/darwin-arm64/analyzer";
+      case DARWIN_X86_64 -> "/analyzer/darwin-x86_64/analyzer";
       default -> throw new IllegalStateException("Unsupported platform");
     };
   }
