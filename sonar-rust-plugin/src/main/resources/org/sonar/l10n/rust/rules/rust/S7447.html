@@ -1,0 +1,24 @@
+<h2>Why is this an issue?</h2>
+<p>Using contradictory or nonsensical combinations of file open options, such as <code>read(true)</code> with <code>truncate(true)</code>, can lead to
+code that is confusing and harder to read. In some cases, it can result in runtime errors or undefined behavior, potentially causing data corruption
+or loss.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::fs::OpenOptions;
+
+OpenOptions::new().read(true).truncate(true); // Noncompliant: Invalid combination of file open options.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::fs::OpenOptions;
+
+OpenOptions::new().write(true).truncate(true); // Compliant: Valid combination of file open options.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#nonsensical_open_options">https://rust-lang.github.io/rust-clippy/master/index.html#nonsensical_open_options</a> </li>
+</ul>
+
