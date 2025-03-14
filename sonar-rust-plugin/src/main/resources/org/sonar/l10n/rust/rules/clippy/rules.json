@@ -533,5 +533,10 @@
     "lintId": "clippy::nonsensical_open_options",
     "ruleKey": "S7447",
     "message": "Ensure that these file open options are consistent and do not conflict with each other."
+  },
+  {
+    "lintId": "clippy::non_octal_unix_permissions",
+    "ruleKey": "S7448",
+    "message": "Use octal values to set Unix file permissions."
   }
 ]
