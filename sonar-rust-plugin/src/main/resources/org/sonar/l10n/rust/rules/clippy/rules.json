@@ -523,5 +523,10 @@
     "lintId": "clippy::option_env_unwrap",
     "ruleKey": "S7445",
     "message": "Use `env!(...)` to ensure compile-time checking of the environment variable."
+  },
+  {
+    "lintId": "clippy::not_unsafe_ptr_arg_deref",
+    "ruleKey": "S7446",
+    "message": "Mark this function as `unsafe` to indicate that it dereferences raw pointer arguments."
   }
 ]
