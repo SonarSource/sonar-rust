@@ -1,0 +1,23 @@
+<h2>Why is this an issue?</h2>
+<p>Unwrapping the result of <code>option_env!</code> will panic at runtime if the environment variable doesn’t exist, whereas <code>env!</code>
+catches it at compile-time, ensuring safer code execution.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+---_
+let _ = option_env!("HOME").unwrap(); // Noncompliant: Can panic at runtime.
+---_
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+---_
+let _ = env!("HOME"); // Compliant: Ensures compile-time checking.
+---_
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#option_env_unwrap">https://rust-lang.github.io/rust-clippy/master/index.html#option_env_unwrap</a> </li>
+</ul>
+
