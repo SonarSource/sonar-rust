@@ -528,5 +528,10 @@
     "lintId": "clippy::not_unsafe_ptr_arg_deref",
     "ruleKey": "S7446",
     "message": "Mark this function as `unsafe` to indicate that it dereferences raw pointer arguments."
+  },
+  {
+    "lintId": "clippy::nonsensical_open_options",
+    "ruleKey": "S7447",
+    "message": "Ensure that these file open options are consistent and do not conflict with each other."
   }
 ]
