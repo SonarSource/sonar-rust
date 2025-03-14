@@ -348,5 +348,10 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::read_line_without_trim",
+    "ruleKey": "S7441",
+    "message": "Trim this line read from the standard input."
   }
 ]

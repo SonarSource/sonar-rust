@@ -1,0 +1,23 @@
+<h2>Why is this an issue?</h2>
+<p>Using <code>Stdin::read_line</code> without trimming the newline character can cause runtime issues, especially when parsing the input into another
+type (e.g., <code>i32</code>). The operation will fail if the string contains a trailing newline character, making the code unreliable.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut input = String::new();
+std::io::stdin().read_line(&amp;mut input).expect("Failed to read a line");
+let num: i32 = input.parse().expect("Not a number!"); // Noncompliant: The input string may contain a newline character.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let mut input = String::new();
+std::io::stdin().read_line(&amp;mut input).expect("Failed to read a line");
+let num: i32 = input.trim_end().parse().expect("Not a number!"); // Compliant: Trims the trailing newline character.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#read_line_without_trim">https://rust-lang.github.io/rust-clippy/master/index.html#read_line_without_trim</a> </li>
+</ul>
+
