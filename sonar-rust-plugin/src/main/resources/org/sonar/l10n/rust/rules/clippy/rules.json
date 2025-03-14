@@ -493,5 +493,10 @@
     "lintId": "clippy::reversed_empty_ranges",
     "ruleKey": "S7432",
     "message": "Invert the start and end values of the range, and reverse it with `.rev()`."
+  },
+  {
+    "lintId": "clippy::redundant_comparisons",
+    "ruleKey": "S7436",
+    "message": "Remove this redundant comparison, or correct the intended comparison logic."
   }
 ]
