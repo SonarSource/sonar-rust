@@ -508,5 +508,10 @@
     "lintId": "clippy::read_line_without_trim",
     "ruleKey": "S7441",
     "message": "Trim this line read from the standard input."
+  },
+  {
+    "lintId": "clippy::panicking_unwrap",
+    "ruleKey": "S7442",
+    "message": "Check first if the value is present before unwrapping it."
   }
 ]
