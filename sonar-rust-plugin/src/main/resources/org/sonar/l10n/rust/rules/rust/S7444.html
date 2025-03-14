@@ -1,0 +1,29 @@
+<h2>Why is this an issue?</h2>
+<p>C-style underflow/overflow checks will panic in debug builds. Using safe methods like <code>checked_add</code> or <code>overflowing_add</code>
+ensures that overflow conditions are explicitly handled, preventing unexpected panics.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let a = 1i32;
+let b = 2i32;
+if a + b &lt; a {
+// Noncompliant: This will panic in debug builds
+// handle overflow
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let a = 1i32;
+let b = 2i32;
+if a.checked_add(b).is_none() {
+// Compliant: Explicitly handle overflow
+// handle overflow
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#panicking_overflow_checks">https://rust-lang.github.io/rust-clippy/master/index.html#panicking_overflow_checks</a> </li>
+</ul>
+
