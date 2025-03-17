@@ -1,0 +1,52 @@
+<h2>Why is this an issue?</h2>
+<p>Importing every public name from a module using a wildcard (<code>use _::*</code>) is a bad idea because:</p>
+<ul>
+  <li> It could lead to conflicts between names defined locally and the ones imported. </li>
+  <li> It reduces code readability as developers will have a hard time knowing where names come from. </li>
+  <li> It clutters the local namespace, which makes debugging more difficult. </li>
+</ul>
+<p>Remember that imported names can change when you update your dependencies. A wildcard import that works today might be broken tomorrow.</p>
+<h3>Exceptions</h3>
+<p>No issue will be raised for modules that their name contains <code>prelude </code>. Many crates, including the standard library, provide modules
+named <code>prelude </code> that are specifically designed for wildcard import.</p>
+<p>No issue will be raised in test modules. This is defined as any module with <code>test</code> in the name.</p>
+<h2>How to fix it</h2>
+<p>There are two ways to avoid a wildcard import:</p>
+<ul>
+  <li> Replace it with <code>use mymodule;</code> and access module members as <code>mymodule::myfunction</code>. If the module name is too long,
+  alias it to a shorter name. Example: <code>use std::collections as col;</code> </li>
+  <li> List every imported name. If necessary, import statements can be split on multiple lines using parentheses (preferred solution) or backslashes.
+  </li>
+</ul>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre>
+use std::collections::*; // Noncompliant
+fn main() {
+    let mut map = HashMap::new();
+    map.insert(1, 2);
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre>
+use std::collections::HashMap;
+fn main() {
+    let mut map = HashMap::new();
+    map.insert(1, 2);
+}
+</pre>
+<p>Or</p>
+<pre>
+use std::collections::HashMap as HM;
+fn main() {
+    let mut map = HM::new();
+    map.insert(1, 2);
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_imports">https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_imports</a> </li>
+</ul>
+

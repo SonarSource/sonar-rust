@@ -1,10 +1,5 @@
 [
   {
-    "lintId": "clippy::while_immutable_condition",
-    "ruleKey": null,
-    "message": "Ensure that variables within the while condition are mutated in the body of the loop."
-  },
-  {
     "lintId": "clippy::never_loop",
     "ruleKey": null,
     "message": "Refactor the loop to perform useful iterations or remove it entirely."
@@ -13,31 +8,6 @@
     "lintId": "clippy::iter_next_loop",
     "ruleKey": null,
     "message": "Replace the loop on `x.next()` with a more explicit and clear iteration."
-  },
-  {
-    "lintId": "clippy::not_unsafe_ptr_arg_deref",
-    "ruleKey": null,
-    "message": "Public functions that dereference raw pointer arguments but are not marked as `unsafe` should be marked as such. This is because dereferencing raw pointers can lead to unsafe behavior if the pointer is invalid, and it must be explicitly indicated to ensure the caller handles it within an `unsafe` block."
-  },
-  {
-    "lintId": "clippy::transmute_null_to_fn",
-    "ruleKey": null,
-    "message": "Replace `transmute` with `Option` to handle null function pointers."
-  },
-  {
-    "lintId": "clippy::transmuting_null",
-    "ruleKey": null,
-    "message": "Do not use `std::mem::transmute` with null pointers."
-  },
-  {
-    "lintId": "clippy::unsound_collection_transmute",
-    "ruleKey": null,
-    "message": "Do not transmute collections of different types; use iteration and mapping instead."
-  },
-  {
-    "lintId": "clippy::wrong_transmute",
-    "ruleKey": null,
-    "message": "Remove or correct the transmute operation, as it is guaranteed to cause undefined behavior."
   },
   {
     "lintId": "clippy::match_str_case_mismatch",
@@ -55,18 +25,13 @@
     "message": "Use `priority` field in the `[lints]` table in `Cargo.toml` to override a group of lints. The priority field ensures the correct order of linting."
   },
   {
-    "lintId": "clippy::unit_cmp",
-    "ruleKey": null,
-    "message": "Remove comparisons and asserts involving the unit type `()`."
-  },
-  {
     "lintId": "clippy::self_assignment",
     "ruleKey": "S1656",
     "message": "Remove or correct this useless self-assignment."
   },
   {
     "lintId": "clippy::modulo_one",
-    "ruleKey": null,
+    "ruleKey": "S7451",
     "message": "Refactor the code to remove the `% 1` or `% -1` operation."
   },
   {
@@ -78,11 +43,6 @@
     "lintId": "clippy::eq_op",
     "ruleKey": "S1764",
     "message": "Correct expressions where identical variables are used on both sides of a binary operator."
-  },
-  {
-    "lintId": "clippy::redundant_comparisons",
-    "ruleKey": null,
-    "message": "Simplify by removing redundant comparisons, or correct the intended comparison logic."
   },
   {
     "lintId": "clippy::impossible_comparisons",
@@ -110,19 +70,9 @@
     "message": "Use a valid semantic version for the 'since' field, or \"TBD\" for future deprecation."
   },
   {
-    "lintId": "clippy::useless_attribute",
-    "ruleKey": null,
-    "message": "Remove lint attributes on `extern crate` and `use` items, as they have no effect on these imports. For `use` items, if needed, place attributes on the imported items themselves or modify existing lint attributes appropriately."
-  },
-  {
     "lintId": "clippy::iter_skip_zero",
     "ruleKey": null,
     "message": "Remove `.skip(0)` from the iterator or change it to `.skip(1)` if the intention is to skip the first element."
-  },
-  {
-    "lintId": "clippy::read_line_without_trim",
-    "ruleKey": null,
-    "message": "Always trim the trailing newline when using `Stdin::read_line`."
   },
   {
     "lintId": "clippy::vec_resize_to_zero",
@@ -130,39 +80,9 @@
     "message": "Replace `Vec::resize(0, value)` with `Vec::clear()`, or swap the `Vec::resize` arguments."
   },
   {
-    "lintId": "clippy::unit_hash",
-    "ruleKey": null,
-    "message": "Replace `().hash(_)` with `0_u8.hash(_)` to yield a meaningful hash value."
-  },
-  {
-    "lintId": "clippy::nonsensical_open_options",
-    "ruleKey": null,
-    "message": "Remove or correct nonsensical combinations like `read(true)` and `truncate(true)` in file open options."
-  },
-  {
-    "lintId": "clippy::suspicious_splitn",
-    "ruleKey": null,
-    "message": "Use `splitn` with at least two splits."
-  },
-  {
-    "lintId": "clippy::zst_offset",
-    "ruleKey": null,
-    "message": "Remove the use of `offset` or `wrapping_add`/`wrapping_sub` on pointers to zero-sized types."
-  },
-  {
-    "lintId": "clippy::uninit_assumed_init",
-    "ruleKey": null,
-    "message": "Prevent undefined behavior by not using `MaybeUninit::uninit().assume_init()`."
-  },
-  {
     "lintId": "clippy::iterator_step_by_zero",
     "ruleKey": null,
     "message": "Replace `.step_by(0)` with `panic!()` if you intend to panic; otherwise, correct the step value."
-  },
-  {
-    "lintId": "clippy::reversed_empty_ranges",
-    "ruleKey": null,
-    "message": "Revise range expressions where the start is greater than the end or equal when used in conditions for loops, ensuring logic yields values. Avoid reversed slice indexing which may cause runtime panics."
   },
   {
     "lintId": "clippy::mistyped_literal_suffixes",
@@ -175,11 +95,6 @@
     "message": "Replace approximate floating-point literals with their corresponding predefined constants from the standard library."
   },
   {
-    "lintId": "clippy::unit_return_expecting_ord",
-    "ruleKey": null,
-    "message": "Ensure the closure properly returns an `Ord` type or remove any extraneous semi-colons causing unit return."
-  },
-  {
     "lintId": "clippy::min_max",
     "ruleKey": "S6913",
     "message": "Correct the order of min and max functions to avoid unintended constant results."
@@ -188,11 +103,6 @@
     "lintId": "clippy::serde_api_misuse",
     "ruleKey": null,
     "message": "Implement all required `Visitor` methods to avoid API misuse."
-  },
-  {
-    "lintId": "clippy::unused_io_amount",
-    "ruleKey": null,
-    "message": "Replace `io::Write::write(&buffer)` or `io::Read::read(&buffer)` with `write_all(&buffer)` or `read_exact(&buffer)` to handle the entire buffer properly, especially in asynchronous code."
   },
   {
     "lintId": "clippy::let_underscore_lock",
@@ -213,11 +123,6 @@
     "lintId": "clippy::infinite_iter",
     "ruleKey": null,
     "message": "Ensure that iterations are finite or account for infinite iteration in the intended logic."
-  },
-  {
-    "lintId": "clippy::recursive_format_impl",
-    "ruleKey": null,
-    "message": "Remove recursive calls in formatting trait implementations to prevent infinite recursion."
   },
   {
     "lintId": "clippy::invalid_null_ptr_usage",
@@ -243,26 +148,6 @@
     "lintId": "clippy::out_of_bounds_indexing",
     "ruleKey": "S6466",
     "message": "Accessing an array with an out-of-bounds index will cause a runtime panic."
-  },
-  {
-    "lintId": "clippy::size_of_in_element_count",
-    "ruleKey": null,
-    "message": "Use element count directly instead of `size_of::<T>`."
-  },
-  {
-    "lintId": "clippy::panicking_overflow_checks",
-    "ruleKey": null,
-    "message": "Use safe methods like `checked_add` or `overflowing_add` instead of C-style overflow checks."
-  },
-  {
-    "lintId": "clippy::non_octal_unix_permissions",
-    "ruleKey": null,
-    "message": "Replace non-octal Unix file permission values with octal values (e.g., 644 to 0o644)."
-  },
-  {
-    "lintId": "clippy::option_env_unwrap",
-    "ruleKey": null,
-    "message": "Replace `option_env!(...).unwrap()` with `env!(...)` to ensure compile-time checking of the environment variable."
   },
   {
     "lintId": "clippy::invisible_characters",
@@ -325,11 +210,6 @@
     "message": "Do not manually implement `PartialEq` for types that derive `Hash`. Use the derived implementations."
   },
   {
-    "lintId": "clippy::panicking_unwrap",
-    "ruleKey": null,
-    "message": "Avoid using `unwrap()` in conditions that will always cause a panic. Use explicit `panic!()` if panicking is intended."
-  },
-  {
     "lintId": "clippy::no_effect",
     "ruleKey": "S905",
     "message": "Remove or correct this statement, as it has no effect."
@@ -348,5 +228,195 @@
     "lintId": "clippy::redundant_closure_for_method_calls",
     "ruleKey": "S1612",
     "message": "Replace this closure with a method reference."
+  },
+  {
+    "lintId": "clippy::string_to_string",
+    "ruleKey": "S1858",
+    "message": "Remove the redundant `to_string()` call, or clone the string."
+  },
+  {
+    "lintId": "clippy::unnecessary_cast",
+    "ruleKey": "S4325",
+    "message": "Remove this unnecessary cast."
+  },
+  {
+    "lintId": "clippy::redundant_field_names",
+    "ruleKey": "S3498",
+    "message": "Use the field init shorthand syntax."
+  },
+  {
+    "lintId": "clippy::unnecessary_semicolon",
+    "ruleKey": "S1116",
+    "message": "Remove this semicolon."
+  },
+  {
+    "lintId": "clippy::let_and_return",
+    "ruleKey": "S1488",
+    "message": "Remove the `let` statement and return the expression directly."
+  },
+  {
+    "lintId": "clippy::match_bool",
+    "ruleKey": "S920",
+    "message": "Replace this `match` expression with an `if-else` expression."
+  },
+  {
+    "lintId": "clippy::misnamed_getter",
+    "ruleKey": "S4275",
+    "message": "Access the expected field of the getter."
+  },
+  {
+    "lintId": "clippy::print_stdout",
+    "ruleKey": "S106",
+    "message": "Use a logging framework to log this message to the console."
+  },
+  {
+    "lintId": "clippy::while_float",
+    "ruleKey": "S2193",
+    "message": "Avoid using floating-point numbers as loop counters."
+  },
+  {
+    "lintId": "clippy::vec_init_then_push",
+    "ruleKey": "S7089",
+    "message": "Use a vector literal to initialize the vector."
+  },
+  {
+    "lintId": "clippy::unreadable_literal",
+    "ruleKey": "S2148",
+    "message": "Use underscore delimiters to make the literal easier to read."
+  },
+  {
+    "lintId": "clippy::wildcard_imports",
+    "ruleKey": "S2208",
+    "message": "Replace this wildcard import with specific imports."
+  },
+  {
+    "lintId": "clippy::branches_sharing_code",
+    "ruleKey": "S7411",
+    "message": "Refactor the code to avoid duplicating logic in multiple branches."
+  },
+  {
+    "lintId": "clippy::else_if_without_else",
+    "ruleKey": "S126",
+    "message": "Add an `else` block to this `if`-`else if` chain."
+  },
+  {
+    "lintId": "clippy::zst_offset",
+    "ruleKey": "S7412",
+    "message": "Remove the use of `offset` or `wrapping_add`/`wrapping_sub` on pointers to zero-sized types."
+  },
+  {
+    "lintId": "clippy::wrong_transmute",
+    "ruleKey": "S7414",
+    "message": "Remove or correct this transmute operation."
+  },
+  {
+    "lintId": "clippy::while_immutable_condition",
+    "ruleKey": "S7415",
+    "message": "Ensure that variables within the while condition are mutated in the body of the loop."
+  },
+  {
+    "lintId": "clippy::useless_attribute",
+    "ruleKey": "S7418",
+    "message": "Remove this useless lint attribute, or place it on the imported items themselves."
+  },
+  {
+    "lintId": "clippy::unused_io_amount",
+    "ruleKey": "S7419",
+    "message": "Process the entire buffer with `write_all(&buffer)` or `read_exact(&buffer)`."
+  },
+  {
+    "lintId": "clippy::unsound_collection_transmute",
+    "ruleKey": "S7420",
+    "message": "Do not transmute collections of different types; use iteration and mapping instead."
+  },
+  {
+    "lintId": "clippy::unit_return_expecting_ord",
+    "ruleKey": "S7421",
+    "message": "Ensure the closure properly returns an `Ord` type or remove any extraneous semi-colons."
+  },
+  {
+    "lintId": "clippy::unit_hash",
+    "ruleKey": "S7422",
+    "message": "Replace `().hash(_)` with `0_u8.hash(_)` to yield a meaningful hash value."
+  },
+  {
+    "lintId": "clippy::unit_cmp",
+    "ruleKey": "S7423",
+    "message": "Remove comparisons and asserts involving the unit type `()`."
+  },
+  {
+    "lintId": "clippy::uninit_assumed_init",
+    "ruleKey": "S7425",
+    "message": "Prevent undefined behavior by not using `MaybeUninit::uninit().assume_init()`."
+  },
+  {
+    "lintId": "clippy::transmuting_null",
+    "ruleKey": "S7427",
+    "message": "Use `Option` to represent a nullable reference"
+  },
+  {
+    "lintId": "clippy::transmute_null_to_fn",
+    "ruleKey": "S7429",
+    "message": "Use `Option<fn()>` to safely represent a nullable function pointer."
+  },
+  {
+    "lintId": "clippy::suspicious_splitn",
+    "ruleKey": "S7430",
+    "message": "Use `splitn` with at least two splits."
+  },
+  {
+    "lintId": "clippy::size_of_in_element_count",
+    "ruleKey": "S7431",
+    "message": "Use the element count directly instead of `size_of::<T>`."
+  },
+  {
+    "lintId": "clippy::reversed_empty_ranges",
+    "ruleKey": "S7432",
+    "message": "Invert the start and end values of the range, and reverse it with `.rev()`."
+  },
+  {
+    "lintId": "clippy::redundant_comparisons",
+    "ruleKey": "S7436",
+    "message": "Remove this redundant comparison, or correct the intended comparison logic."
+  },
+  {
+    "lintId": "clippy::recursive_format_impl",
+    "ruleKey": "S7440",
+    "message": "Refactor this formatting implementation to avoid infinite recursion."
+  },
+  {
+    "lintId": "clippy::read_line_without_trim",
+    "ruleKey": "S7441",
+    "message": "Always trim the trailing newline when using `Stdin::read_line`."
+  },
+  {
+    "lintId": "clippy::panicking_unwrap",
+    "ruleKey": "S7442",
+    "message": "Avoid using `unwrap()` in conditions that will always cause a panic. Use explicit `panic!()` if panicking is intended."
+  },
+  {
+    "lintId": "clippy::panicking_overflow_checks",
+    "ruleKey": "S7444",
+    "message": "Use safe methods like `checked_add` or `overflowing_add` instead of C-style overflow checks."
+  },
+  {
+    "lintId": "clippy::option_env_unwrap",
+    "ruleKey": "S7445",
+    "message": "Use `env!(...)` to ensure compile-time checking of the environment variable."
+  },
+  {
+    "lintId": "clippy::not_unsafe_ptr_arg_deref",
+    "ruleKey": "S7446",
+    "message": "Mark this function as `unsafe` to indicate that it dereferences raw pointer arguments."
+  },
+  {
+    "lintId": "clippy::nonsensical_open_options",
+    "ruleKey": "S7447",
+    "message": "Ensure that these file open options are consistent and do not conflict with each other."
+  },
+  {
+    "lintId": "clippy::non_octal_unix_permissions",
+    "ruleKey": "S7448",
+    "message": "Use octal values to set Unix file permissions."
   }
 ]

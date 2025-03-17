@@ -1,0 +1,23 @@
+{
+  "title": "Match expression conditions should not have boolean type",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "LOW"
+    },
+    "attribute": "CLEAR"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "10min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Minor",
+  "ruleSpecification": "RSPEC-920",
+  "sqKey": "S920",
+  "scope": "Main",
+  "quickfix": "unknown"
+}

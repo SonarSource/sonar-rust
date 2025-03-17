@@ -1,0 +1,24 @@
+{
+  "title": "Local variables should not be declared and then immediately returned",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "LOW"
+    },
+    "attribute": "CLEAR"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "2min"
+  },
+  "tags": [
+    "clumsy",
+    "clippy"
+  ],
+  "defaultSeverity": "Minor",
+  "ruleSpecification": "RSPEC-1488",
+  "sqKey": "S1488",
+  "scope": "All",
+  "quickfix": "unknown"
+}

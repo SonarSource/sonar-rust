@@ -22,7 +22,7 @@ class RustRulesDefinitionTest {
   void testClippyRules() {
     var rules = RustRulesDefinition.CLIPPY_RULES;
     assertThat(rules.keySet()).hasSize(new HashSet<>(rules.values()).size());
-    assertThat(rules.keySet()).hasSize(15);
+    assertThat(rules.keySet()).hasSize(54);
     assertThat(rules.keySet()).allSatisfy(ruleKey -> assertThat(ruleKey).startsWith("clippy::"));
   }
 

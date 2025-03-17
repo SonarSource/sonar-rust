@@ -1,0 +1,32 @@
+<h2>Why is this an issue?</h2>
+<p>Having shared code in all branches of an if-statement leads to redundancy, making the code harder to maintain and increasing the risk of errors. It
+also reduces readability by cluttering the distinct logic of each branch. Extracting shared code into a single location improves maintainability.</p>
+<h2>How to fix it</h2>
+<p>To fix this issue, move the shared code outside of the if-statement branches so that it is executed regardless of the condition.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let result = if condition {
+    println!("Hello World");
+    42
+} else {
+    println!("Hello World");
+    24
+};
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+println!("Hello World");
+let result = if condition {
+    42
+} else {
+    24
+};
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#branches_sharing_code">https://rust-lang.github.io/rust-clippy/master/index.html#branches_sharing_code</a> </li>
+</ul>
+

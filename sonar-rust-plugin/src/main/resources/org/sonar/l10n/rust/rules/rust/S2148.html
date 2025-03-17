@@ -1,0 +1,27 @@
+<h2>Why is this an issue?</h2>
+<p>Long numbers, whether integral or floating-point, can be difficult to read and understand at a glance. This can lead to mistakes when reading,
+writing, or maintaining code. For example, it’s easy to miscount the number of zeros in a large number or misplace a decimal point. These mistakes can
+introduce subtle bugs that are hard to detect and debug.</p>
+<p>To improve readability, Rust allows the use of underscores as visual separators in numeric literals. By grouping digits into more manageable
+chunks, numbers become easier to read and understand.</p>
+<p>This practice reduces the likelihood of errors and makes the code more maintainable.</p>
+<h2>How to fix it</h2>
+<p>To fix this issue, use underscores to make numeric literals more explicit and easier to read.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let large_number = 1000000000;
+let precise_float = 1234567.890123;
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let large_number = 1_000_000_000;
+let precise_float = 1_234_567.890_123;
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#unreadable_literal">https://rust-lang.github.io/rust-clippy/master/index.html#unreadable_literal</a> </li>
+</ul>
+

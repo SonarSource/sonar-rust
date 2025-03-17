@@ -1,0 +1,24 @@
+{
+  "title": "Wildcard imports should not be used",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "HIGH"
+    },
+    "attribute": "CLEAR"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "5min"
+  },
+  "tags": [
+    "pitfall",
+    "clippy"
+  ],
+  "defaultSeverity": "Critical",
+  "ruleSpecification": "RSPEC-2208",
+  "sqKey": "S2208",
+  "scope": "All",
+  "quickfix": "unknown"
+}

@@ -1,0 +1,27 @@
+<h2>Why is this an issue?</h2>
+<p>Using non-octal values to set Unix file permissions is problematic because they are converted to octal internally, which can lead to unexpected
+file permissions and potential security issues.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::fs::OpenOptions;
+use std::os::unix::fs::OpenOptionsExt;
+
+let mut options = OpenOptions::new();
+options.mode(644); // Noncompliant: Non-octal value used.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::fs::OpenOptions;
+use std::os::unix::fs::OpenOptionsExt;
+
+let mut options = OpenOptions::new();
+options.mode(0o644); // Compliant: Octal value used.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#non_octal_unix_permissions">https://rust-lang.github.io/rust-clippy/master/index.html#non_octal_unix_permissions</a> </li>
+</ul>
+

@@ -1,0 +1,24 @@
+<h2>Why is this an issue?</h2>
+<p>Getting the remainder of an integer division by one always results in zero, making the operation redundant. Using minus one as the divisor can
+cause panic or overflow issues.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let x = 1;
+let a = x % 1; // Noncompliant: Remainder of division by one.
+let b = x % -1; // Noncompliant: Remainder of division by minus one.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let x = 1;
+let a = 0; // Compliant: Directly assigning zero instead of using `% 1`.
+let b = 0; // Compliant: Directly assigning zero instead of using `% -1`.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#modulo_one">https://rust-lang.github.io/rust-clippy/master/index.html#modulo_one</a>
+  </li>
+</ul>
+

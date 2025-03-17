@@ -1,0 +1,28 @@
+<h2>Why is this an issue?</h2>
+<p>Lint attributes on crate imports and <code>use</code> statements have no effect and may indicate a misunderstanding or mistake in the code. This
+can lead to confusion or unintended behavior.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+#[deny(dead_code)]
+extern crate foo;
+
+#[forbid(dead_code)]
+use foo::bar; // Noncompliant: Lint attributes are ineffective on imports.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+#[allow(unused_imports)]
+use foo::baz;
+
+#[allow(unused_imports)]
+#[macro_use]
+extern crate baz; // Compliant: Example with appropriate usage.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#useless_attribute">https://rust-lang.github.io/rust-clippy/master/index.html#useless_attribute</a> </li>
+</ul>
+

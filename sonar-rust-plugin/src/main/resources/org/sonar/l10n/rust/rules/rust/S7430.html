@@ -1,0 +1,25 @@
+<h2>Why is this an issue?</h2>
+<p>When using <code>splitn</code> with zero or one splits, the function does not actually split the value, which is likely not the intended
+behavior.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let s = "";
+for x in s.splitn(1, ":") { // Noncompliant
+    // ..
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let s = "";
+for x in s.splitn(2, ":") { // Compliant
+    // ..
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_splitn">https://rust-lang.github.io/rust-clippy/master/index.html#suspicious_splitn</a> </li>
+</ul>
+

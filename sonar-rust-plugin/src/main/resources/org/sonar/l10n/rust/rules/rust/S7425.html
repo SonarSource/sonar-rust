@@ -1,0 +1,23 @@
+<h2>Why is this an issue?</h2>
+<p>Using <code>MaybeUninit::uninit().assume_init()</code> results in undefined behavior for most types, since it bypasses initialization and assumes
+the data is valid. This can lead to unpredictable results and hard-to-diagnose bugs.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::mem::MaybeUninit;
+
+let _: usize = unsafe { MaybeUninit::uninit().assume_init() }; // Noncompliant: Unsafe code resulting in undefined behavior.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::mem::MaybeUninit;
+
+let _: [MaybeUninit&lt;bool&gt;; 5] = unsafe { MaybeUninit::uninit().assume_init() }; // Compliant: Allowed for tuples/arrays of MaybeUninit.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#uninit_assumed_init">https://rust-lang.github.io/rust-clippy/master/index.html#uninit_assumed_init</a> </li>
+</ul>
+

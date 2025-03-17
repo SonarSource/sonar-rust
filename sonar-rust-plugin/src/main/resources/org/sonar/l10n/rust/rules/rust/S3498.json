@@ -1,0 +1,23 @@
+{
+  "title": "Field init shorthand should be used",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "LOW"
+    },
+    "attribute": "CONVENTIONAL"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "1min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Minor",
+  "ruleSpecification": "RSPEC-3498",
+  "sqKey": "S3498",
+  "scope": "Main",
+  "quickfix": "covered"
+}
