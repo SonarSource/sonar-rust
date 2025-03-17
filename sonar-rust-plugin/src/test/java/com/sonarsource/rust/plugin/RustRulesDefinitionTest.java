@@ -5,8 +5,6 @@
  */
 package com.sonarsource.rust.plugin;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import org.sonar.api.SonarEdition;
@@ -16,13 +14,15 @@ import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.utils.Version;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 class RustRulesDefinitionTest {
 
   @Test
   void testClippyRules() {
     var rules = RustRulesDefinition.CLIPPY_RULES;
     assertThat(rules.keySet()).hasSize(new HashSet<>(rules.values()).size());
-    assertThat(rules.keySet()).hasSize(54);
+    assertThat(rules.keySet()).hasSize(66);
     assertThat(rules.keySet()).allSatisfy(ruleKey -> assertThat(ruleKey).startsWith("clippy::"));
   }
 
