@@ -136,7 +136,7 @@
   },
   {
     "lintId": "clippy::inline_fn_without_body",
-    "ruleKey": null,
+    "ruleKey": "S7449",
     "message": "Remove the `#[inline]` attribute from this trait method; it has no effect."
   },
   {
