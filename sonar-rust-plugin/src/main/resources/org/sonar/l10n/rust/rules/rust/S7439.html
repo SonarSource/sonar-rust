@@ -1,0 +1,16 @@
+<h2>Why is this an issue?</h2>
+<p>Comparisons involving overlapping ranges that can never be true are likely a programming mistake and can result in unreachable code.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre>
+if status_code &lt;= 400 &amp;&amp; status_code &gt; 500 {  // Noncompliant: The condition can never be true.
+  // ...
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#impossible_comparisons">https://rust-lang.github.io/rust-clippy/master/index.html#impossible_comparisons</a> </li>
+</ul>
+

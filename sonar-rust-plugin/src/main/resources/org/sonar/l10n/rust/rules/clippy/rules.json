@@ -46,8 +46,8 @@
   },
   {
     "lintId": "clippy::impossible_comparisons",
-    "ruleKey": null,
-    "message": "Refactor to remove comparisons that always evaluate to false."
+    "ruleKey": "S7439",
+    "message": "Refactor or remove this comparison that always evaluates to false."
   },
   {
     "lintId": "clippy::ineffective_bit_mask",
