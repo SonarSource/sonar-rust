@@ -106,8 +106,8 @@
   },
   {
     "lintId": "clippy::let_underscore_lock",
-    "ruleKey": null,
-    "message": "To extend the lock's lifetime within the scope, use an underscore-prefixed name instead (i.e., `_lock`). If you need to drop the lock immediately, use `std::mem::drop` to make your intention clear."
+    "ruleKey": "S7450",
+    "message": "Refactor this code to not drop the lock guard immediately after acquiring it."
   },
   {
     "lintId": "clippy::redundant_locals",
