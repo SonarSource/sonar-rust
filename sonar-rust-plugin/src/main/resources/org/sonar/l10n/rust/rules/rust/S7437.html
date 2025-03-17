@@ -1,0 +1,24 @@
+<h2>Why is this an issue?</h2>
+<p>The sequence <code>foo = bar; bar = foo</code> looks like a failed attempt to swap the values of two variables. This code mistakenly reassigns both
+variables, leading to incorrect and unintended behavior. Using <code>std::mem::swap</code> ensures a correct and intended swap.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut foo = 1;
+let mut bar = 2;
+foo = bar; // Noncompliant
+bar = foo; // Noncompliant
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let mut foo = 1;
+let mut bar = 2;
+std::mem::swap(&amp;mut foo, &amp;mut bar); // Compliant
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#almost_swapped">https://rust-lang.github.io/rust-clippy/master/index.html#almost_swapped</a> </li>
+</ul>
+

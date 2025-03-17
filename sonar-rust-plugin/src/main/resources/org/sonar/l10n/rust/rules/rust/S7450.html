@@ -1,0 +1,26 @@
+<h2>Why is this an issue?</h2>
+<p>Immediately dropping a synchronization lock (e.g., <code>mutex</code>, <code>rwlock</code>) after acquiring it using <code>let _ = sync_lock</code>
+is often unintentional and can lead to subtle bugs. By extending the lock lifetime to the end of the scope using a named variable, the code becomes
+safer and intentions are clearer. If immediate drop is intended, using <code>std::mem::drop</code> conveys the intention more clearly and reduces
+error-prone behavior.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let _ = Mutex::new(1).lock(); // Noncompliant: Immediately drops the lock.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+// Extend lock lifetime to end of scope
+let _lock = Mutex::new(1).lock(); // Compliant: Lock remains till scope ends.
+</pre>
+<p>You can also explicitly drop the lock to convey intention:</p>
+<pre data-diff-id="1" data-diff-type="compliant">
+std::mem::drop(Mutex::new(1).lock()); // Compliant: Clearly drops the lock.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#let_underscore_lock">https://rust-lang.github.io/rust-clippy/master/index.html#let_underscore_lock</a> </li>
+</ul>
+

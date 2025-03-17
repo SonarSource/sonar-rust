@@ -11,13 +11,13 @@
   },
   {
     "lintId": "clippy::match_str_case_mismatch",
-    "ruleKey": null,
-    "message": "Ensure all `match` arms compare strings in consistent casing."
+    "ruleKey": "S7428",
+    "message": "Refactor this `match` so that all arms compare strings in consistent casing."
   },
   {
     "lintId": "clippy::cast_slice_different_sizes",
-    "ruleKey": null,
-    "message": "The produced raw pointer to a slice does not update its length metadata correctly. This can lead to either creating a slice with less data or causing Undefined Behavior by creating a slice with more data than intended. Use `ptr::slice_from_raw_parts` for a proper transformation."
+    "ruleKey": "S7433",
+    "message": "Replace this potentially incorrect cast with a safe alternative."
   },
   {
     "lintId": "clippy::lint_groups_priority",
@@ -46,8 +46,8 @@
   },
   {
     "lintId": "clippy::impossible_comparisons",
-    "ruleKey": null,
-    "message": "Refactor to remove comparisons that always evaluate to false."
+    "ruleKey": "S7439",
+    "message": "Refactor or remove this comparison that always evaluates to false."
   },
   {
     "lintId": "clippy::ineffective_bit_mask",
@@ -56,8 +56,8 @@
   },
   {
     "lintId": "clippy::bad_bit_mask",
-    "ruleKey": null,
-    "message": "Replace `vec.resize(0, value)` with `vec.clear()`, or swap the `vec.resize` arguments."
+    "ruleKey": "S7438",
+    "message": "Correct this bit mask to ensure the comparison does not always yield the same result."
   },
   {
     "lintId": "clippy::absurd_extreme_comparisons",
@@ -106,8 +106,8 @@
   },
   {
     "lintId": "clippy::let_underscore_lock",
-    "ruleKey": null,
-    "message": "To extend the lock's lifetime within the scope, use an underscore-prefixed name instead (i.e., `_lock`). If you need to drop the lock immediately, use `std::mem::drop` to make your intention clear."
+    "ruleKey": "S7450",
+    "message": "Refactor this code to not drop the lock guard immediately after acquiring it."
   },
   {
     "lintId": "clippy::redundant_locals",
@@ -136,7 +136,7 @@
   },
   {
     "lintId": "clippy::inline_fn_without_body",
-    "ruleKey": null,
+    "ruleKey": "S7449",
     "message": "Remove the `#[inline]` attribute from this trait method; it has no effect."
   },
   {
@@ -156,7 +156,7 @@
   },
   {
     "lintId": "clippy::async_yields_async",
-    "ruleKey": null,
+    "ruleKey": "S7413",
     "message": "Add `.await` to the returned future within the async context."
   },
   {
@@ -171,8 +171,8 @@
   },
   {
     "lintId": "clippy::enum_clike_unportable_variant",
-    "ruleKey": null,
-    "message": "Do not use `repr(isize/usize)` on C-like enumerations if the values exceed the `i32` limit."
+    "ruleKey": "S7426",
+    "message": "Replace this `repr(isize/usize)` with a portable type."
   },
   {
     "lintId": "clippy::inverted_saturating_sub",
@@ -181,7 +181,7 @@
   },
   {
     "lintId": "clippy::almost_swapped",
-    "ruleKey": null,
+    "ruleKey": "S7437",
     "message": "Use `std::mem::swap(&mut var1, &mut var2)` instead of `var1 = var2; var2 = var1;`."
   },
   {
@@ -200,14 +200,19 @@
     "message": "Eliminate `to_string(&self) -> String` as it will shadow the `Display` trait implementation."
   },
   {
+    "lintId": "clippy::eager_transmute",
+    "ruleKey": "S7443",
+    "message": "Make sure that this call to `std::mem::transmute` is lazily evaluated."
+  },
+  {
     "lintId": "clippy::derive_ord_xor_partial_ord",
-    "ruleKey": null,
+    "ruleKey": "S7417",
     "message": "Replace manual `PartialOrd` and `Ord` implementations with either entirely derived or entirely manual implementations."
   },
   {
     "lintId": "clippy::derived_hash_with_manual_eq",
-    "ruleKey": null,
-    "message": "Do not manually implement `PartialEq` for types that derive `Hash`. Use the derived implementations."
+    "ruleKey": "S7424",
+    "message": "Replace this manually implemented `PartialEq` with the derived implementation."
   },
   {
     "lintId": "clippy::no_effect",

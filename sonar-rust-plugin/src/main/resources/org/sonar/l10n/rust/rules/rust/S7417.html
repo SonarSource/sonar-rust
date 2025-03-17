@@ -1,0 +1,50 @@
+<h2>Why is this an issue?</h2>
+<p>Manually implementing <code>PartialOrd</code> for a type that derives <code>Ord</code> can lead to inconsistencies, as the implementations of these
+traits must agree for sorting and other comparisons. According to the trait contract, the following must hold for any type implementing
+<code>Ord</code>:</p>
+<pre>
+k1.cmp(&amp;k2) == k1.partial_cmp(&amp;k2).unwrap()
+</pre>
+<p>Using a default-generated <code>Ord</code> implementation with an explicitly defined <code>PartialOrd</code> is a risky practice that may cause
+unexpected behavior.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+#[derive(Ord, PartialEq, Eq)]
+struct Foo;
+
+impl PartialOrd for Foo {
+    fn partial_cmp(&amp;self, other: &amp;Self) -&gt; Option&lt;Ordering&gt; {
+        None  // Noncompliant: Manually implemented PartialOrd when Ord is derived.
+    }
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+#[derive(PartialEq, Eq)]
+struct Foo;
+
+impl PartialOrd for Foo {
+    fn partial_cmp(&amp;self, other: &amp;Foo) -&gt; Option&lt;Ordering&gt; {
+        Some(self.cmp(other)) // Compliant: Manual implementation is consistent with Ord.
+    }
+}
+
+impl Ord for Foo {
+    fn cmp(&amp;self, other: &amp;Foo) -&gt; Ordering {
+        // Implementation here
+    }
+}
+</pre>
+<p>Or, if a custom ordering is not needed:</p>
+<pre data-diff-id="1" data-diff-type="compliant">
+#[derive(Ord, PartialOrd, PartialEq, Eq)]
+struct Foo; // Compliant: Both Ord and PartialOrd are derived.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#derive_ord_xor_partial_ord">https://rust-lang.github.io/rust-clippy/master/index.html#derive_ord_xor_partial_ord</a> </li>
+</ul>
+
