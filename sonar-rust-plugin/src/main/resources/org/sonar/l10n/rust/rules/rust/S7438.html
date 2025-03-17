@@ -3,10 +3,19 @@
 mask, compared value, and operators). This results in dead code, potential security vulnerabilities, confusion for developers, and wasted processing
 time on redundant checks.</p>
 <h2>How to fix it</h2>
-<p>Ensuring valid bitwise operations in comparisons requires: - For <code>&amp;</code> (AND) operations: - <code>x &amp; mask == value</code> is valid
-if all bits set in <code>value</code> are also set in <code>mask</code> - <code>x &amp; mask &lt; value</code> is valid if <code>mask &lt;
-value</code> - <code>x &amp; mask &gt; value</code> is valid if <code>mask &gt; value</code> - For <code>|</code> (OR) operations: - <code>x | mask ==
-value</code> is valid if all bits set in <code>mask</code> are also set in <code>value</code></p>
+<p>Ensuring valid bitwise operations in comparisons requires:</p>
+<ul>
+  <li> For <code>&amp;</code> (AND) operations:
+    <ul>
+      <li> <code>x &amp; mask == value</code> is valid if all bits set in <code>value</code> are also set in <code>mask</code> </li>
+      <li> <code>x &amp; mask &lt; value</code> is valid if <code>mask &lt; value</code> </li>
+      <li> <code>x &amp; mask &gt; value</code> is valid if <code>mask &gt; value</code> </li>
+    </ul>  </li>
+  <li> For <code>|</code> (OR) operations:
+    <ul>
+      <li> <code>x | mask == value</code> is valid if all bits set in <code>mask</code> are also set in <code>value</code> </li>
+    </ul>  </li>
+</ul>
 <p>Correct the bit mask or comparison value to create a valid logical expression that can be both true and false depending on input. This ensures the
 bitwise operations in the comparisons result in meaningful code execution.</p>
 <h3>Code examples</h3>
