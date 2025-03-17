@@ -6,7 +6,9 @@
     "func": "Constant\/Issue",
     "constantCost": "5min"
   },
-  "tags": [],
+  "tags": [
+    "clippy"
+  ],
   "defaultSeverity": "Critical",
   "ruleSpecification": "RSPEC-7426",
   "sqKey": "S7426",
@@ -14,9 +16,7 @@
   "quickfix": "unknown",
   "code": {
     "impacts": {
-      "MAINTAINABILITY": "HIGH",
-      "RELIABILITY": "HIGH",
-      "SECURITY": "LOW"
+      "RELIABILITY": "HIGH"
     },
     "attribute": "LOGICAL"
   }
