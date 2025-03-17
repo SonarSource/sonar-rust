@@ -16,8 +16,8 @@
   },
   {
     "lintId": "clippy::cast_slice_different_sizes",
-    "ruleKey": null,
-    "message": "The produced raw pointer to a slice does not update its length metadata correctly. This can lead to either creating a slice with less data or causing Undefined Behavior by creating a slice with more data than intended. Use `ptr::slice_from_raw_parts` for a proper transformation."
+    "ruleKey": "S7433",
+    "message": "Replace this potentially incorrect cast with a safe alternative."
   },
   {
     "lintId": "clippy::lint_groups_priority",
