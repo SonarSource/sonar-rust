@@ -1,0 +1,33 @@
+<h2>Why is this an issue?</h2>
+<p>When an async block or function returns a value that is itself awaitable (like a <code>Future</code>), it often indicates that the developer forgot
+to await that value. This creates a nested future that must be awaited twice to get the actual result, which is rarely the intended behavior. Missing
+an await can lead to unexpected behavior where async operations never actually execute, nested futures that require multiple awaits to resolve,
+hard-to-debug problems, potential deadlocks, or blocking in async contexts.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+async fn foo() {}
+
+fn bar() {
+    let x = async {
+        foo() // Noncompliant: returns a future that needs to be awaited
+    };
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+async fn foo() {}
+
+fn bar() {
+    let x = async {
+        foo().await // Properly awaits the inner future
+    };
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#async_yields_async">https://rust-lang.github.io/rust-clippy/master/index.html#async_yields_async</a> </li>
+</ul>
+
