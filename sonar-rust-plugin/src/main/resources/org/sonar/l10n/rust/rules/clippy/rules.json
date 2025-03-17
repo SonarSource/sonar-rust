@@ -181,7 +181,7 @@
   },
   {
     "lintId": "clippy::almost_swapped",
-    "ruleKey": null,
+    "ruleKey": "S7437",
     "message": "Use `std::mem::swap(&mut var1, &mut var2)` instead of `var1 = var2; var2 = var1;`."
   },
   {
