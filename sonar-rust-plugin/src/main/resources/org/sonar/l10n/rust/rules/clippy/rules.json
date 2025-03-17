@@ -200,6 +200,11 @@
     "message": "Eliminate `to_string(&self) -> String` as it will shadow the `Display` trait implementation."
   },
   {
+    "lintId": "clippy::eager_transmute",
+    "ruleKey": "S7443",
+    "message": "Make sure that this call to `std::mem::transmute` is lazily evaluated."
+  },
+  {
     "lintId": "clippy::derive_ord_xor_partial_ord",
     "ruleKey": "S7417",
     "message": "Replace manual `PartialOrd` and `Ord` implementations with either entirely derived or entirely manual implementations."

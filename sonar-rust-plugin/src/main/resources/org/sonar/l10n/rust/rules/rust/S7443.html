@@ -1,0 +1,42 @@
+<h2>Why is this an issue?</h2>
+<p>When a transmute is placed within an expression that uses eager evaluation (like <code>bool::then_some</code>), it will execute even if a preceding
+validity check fails. This can result in creating invalid values, potentially leading to undefined behavior.</p>
+<h2>How to fix it</h2>
+<p>Use lazy evaluation (for example by replacing <code>then_some</code> with <code>then</code>) and providing a closure that contains the transmute.
+This ensures the transmute only occurs if the validity check passes.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+#[repr(u8)]
+enum Opcode {
+    Add = 0,
+    Sub = 1,
+    Mul = 2,
+    Div = 3
+}
+
+fn int_to_opcode(op: u8) -&gt; Option&lt;Opcode&gt; {
+    (op &lt; 4).then_some(unsafe { std::mem::transmute(op) })
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+#[repr(u8)]
+enum Opcode {
+    Add = 0,
+    Sub = 1,
+    Mul = 2,
+    Div = 3
+}
+
+fn int_to_opcode(op: u8) -&gt; Option&lt;Opcode&gt; {
+    (op &lt; 4).then(|| unsafe { std::mem::transmute(op) })
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#eager_transmute">https://rust-lang.github.io/rust-clippy/master/index.html#eager_transmute</a> </li>
+</ul>
+
