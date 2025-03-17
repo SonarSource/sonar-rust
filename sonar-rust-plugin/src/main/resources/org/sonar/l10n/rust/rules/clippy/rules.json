@@ -201,7 +201,7 @@
   },
   {
     "lintId": "clippy::derive_ord_xor_partial_ord",
-    "ruleKey": null,
+    "ruleKey": "S7417",
     "message": "Replace manual `PartialOrd` and `Ord` implementations with either entirely derived or entirely manual implementations."
   },
   {
