@@ -31,7 +31,7 @@
   },
   {
     "lintId": "clippy::modulo_one",
-    "ruleKey": null,
+    "ruleKey": "S7451",
     "message": "Refactor the code to remove the `% 1` or `% -1` operation."
   },
   {
