@@ -11,8 +11,8 @@
   },
   {
     "lintId": "clippy::match_str_case_mismatch",
-    "ruleKey": null,
-    "message": "Ensure all `match` arms compare strings in consistent casing."
+    "ruleKey": "S7428",
+    "message": "Refactor this `match` so that all arms compare strings in consistent casing."
   },
   {
     "lintId": "clippy::cast_slice_different_sizes",

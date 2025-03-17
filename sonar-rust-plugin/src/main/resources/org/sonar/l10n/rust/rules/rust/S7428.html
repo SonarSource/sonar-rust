@@ -1,0 +1,26 @@
+<h2>Why is this an issue?</h2>
+<p>Case mismatches in pattern arms make some arms unreachable, likely leading to logic errors that can be difficult to debug.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+match &amp;*text.to_ascii_lowercase() {
+    "foo" =&gt; {},
+    "Bar" =&gt; {}, // Noncompliant: This arm is unreachable.
+    _ =&gt; {},
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+match &amp;*text.to_ascii_lowercase() {
+    "foo" =&gt; {},
+    "bar" =&gt; {},
+    _ =&gt; {},
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#match_str_case_mismatch">https://rust-lang.github.io/rust-clippy/master/index.html#match_str_case_mismatch</a> </li>
+</ul>
+
