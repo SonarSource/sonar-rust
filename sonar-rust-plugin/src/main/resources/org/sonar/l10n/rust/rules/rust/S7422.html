@@ -4,12 +4,12 @@ confusion or misleading code, as it implies some hashing operation is actually t
 <h3>Code examples</h3>
 <h4>Noncompliant code example</h4>
 <pre data-diff-id="1" data-diff-type="noncompliant">
-# use std::hash::Hash;
-# use std::collections::hash_map::DefaultHasher;
-# enum Foo { Empty, WithValue(u8) }
-# use Foo::*;
-# let mut state = DefaultHasher::new();
-# let my_enum = Foo::Empty;
+enum Foo { Empty, WithValue(u8) }
+use Foo::*;
+
+let mut state = DefaultHasher::new();
+let my_enum = Foo::Empty;
+
 match my_enum {
     Empty =&gt; ().hash(&amp;mut state), // Noncompliant
     WithValue(x) =&gt; x.hash(&amp;mut state),
@@ -17,12 +17,12 @@ match my_enum {
 </pre>
 <h4>Compliant solution</h4>
 <pre data-diff-id="1" data-diff-type="compliant">
-# use std::hash::Hash;
-# use std::collections::hash_map::DefaultHasher;
-# enum Foo { Empty, WithValue(u8) }
-# use Foo::*;
-# let mut state = DefaultHasher::new();
-# let my_enum = Foo::Empty;
+enum Foo { Empty, WithValue(u8) }
+use Foo::*;
+
+let mut state = DefaultHasher::new();
+let my_enum = Foo::Empty;
+
 match my_enum {
     Empty =&gt; 0_u8.hash(&amp;mut state), // Compliant
     WithValue(x) =&gt; x.hash(&amp;mut state),
