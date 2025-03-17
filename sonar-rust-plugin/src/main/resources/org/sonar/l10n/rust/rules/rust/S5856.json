@@ -13,7 +13,8 @@
     "constantCost": "15min"
   },
   "tags": [
-    "regex"
+    "regex",
+    "clippy"
   ],
   "defaultSeverity": "Critical",
   "ruleSpecification": "RSPEC-5856",
