@@ -56,8 +56,8 @@
   },
   {
     "lintId": "clippy::bad_bit_mask",
-    "ruleKey": null,
-    "message": "Replace `vec.resize(0, value)` with `vec.clear()`, or swap the `vec.resize` arguments."
+    "ruleKey": "S7438",
+    "message": "Correct this bit mask to ensure the comparison does not always yield the same result."
   },
   {
     "lintId": "clippy::absurd_extreme_comparisons",
