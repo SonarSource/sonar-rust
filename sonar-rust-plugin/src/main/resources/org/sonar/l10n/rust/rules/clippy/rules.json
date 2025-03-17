@@ -171,8 +171,8 @@
   },
   {
     "lintId": "clippy::enum_clike_unportable_variant",
-    "ruleKey": null,
-    "message": "Do not use `repr(isize/usize)` on C-like enumerations if the values exceed the `i32` limit."
+    "ruleKey": "S7426",
+    "message": "Replace this `repr(isize/usize)` with a portable type."
   },
   {
     "lintId": "clippy::inverted_saturating_sub",
