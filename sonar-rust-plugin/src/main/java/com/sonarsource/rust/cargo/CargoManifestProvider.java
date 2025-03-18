@@ -37,7 +37,7 @@ public class CargoManifestProvider {
 
       var manifestPatterns = context.config().getStringArray(CARGO_MANIFEST_PATHS);
       if (manifestPatterns.length == 0) {
-        LOG.warn("No Cargo manifest paths were provided");
+        LOG.debug("No Cargo manifest paths were provided");
         return List.of();
       }
 
