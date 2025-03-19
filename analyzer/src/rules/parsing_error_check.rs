@@ -82,10 +82,10 @@ impl NodeVisitor for RuleVisitor<'_> {
             let error = sexp[1..sexp.len() - 1].to_string().to_lowercase();
             let message = format!("A syntax error occurred during parsing: {}.", error);
 
-            // The location of the missing node is the location of the token that should have been there, which means that it might not
-            // even exist in the original source code.
-            // In order to avoid reporting on non-existant locations, we use the location of the parent node.
-            let parent = match node.parent() {
+            // The location of the missing node is the location of the token that should have been there, which means that the location might not
+            // even exist in the original source code. In order to avoid reporting on non-existant locations, we use the location of either the closest
+            // sibling (if it exists) or the parent node.
+            let parent = match get_sibling_or_parent(node) {
                 Some(parent) => parent,
                 None => {
                     self.error = Some(AnalyzerError::FileError(
@@ -100,6 +100,15 @@ impl NodeVisitor for RuleVisitor<'_> {
 
             self.new_issue(message, location);
         }
+    }
+}
+
+fn get_sibling_or_parent(node: Node<'_>) -> Option<Node<'_>> {
+    match node.prev_sibling() {
+        Some(prev_sibling) if !prev_sibling.is_error() && !prev_sibling.is_missing() => {
+            Some(prev_sibling)
+        }
+        _ => node.parent(),
     }
 }
 
@@ -143,7 +152,7 @@ fn
                 message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                 location: SonarLocation {
                     start_line: 3,
-                    start_column: 4,
+                    start_column: 12,
                     end_line: 3,
                     end_column: 14,
                 },
