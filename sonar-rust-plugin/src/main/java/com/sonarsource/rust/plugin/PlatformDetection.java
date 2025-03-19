@@ -68,7 +68,7 @@ class PlatformDetection {
     return system.getOsArch().contains("aarch64");
   }
 
-  boolean isAlpine() {
+  private boolean isAlpine() {
     return system.fileExists(Path.of("/etc/alpine-release"));
   }
 
