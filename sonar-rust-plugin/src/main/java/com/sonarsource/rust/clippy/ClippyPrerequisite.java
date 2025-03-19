@@ -30,7 +30,7 @@ public class ClippyPrerequisite {
 
   public void check(Path workDir) {
     checkVersion(List.of("cargo", "--version"), "Cargo", workDir);
-    checkVersion(List.of("cargo", "clippy", "--version2"), "Clippy", workDir);
+    checkVersion(List.of("cargo", "clippy", "--version"), "Clippy", workDir);
   }
 
   private void checkVersion(List<String> command, String prerequisite, Path workDir) {
