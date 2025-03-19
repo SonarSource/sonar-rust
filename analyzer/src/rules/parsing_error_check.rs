@@ -7,7 +7,7 @@
 use crate::{
     issue::Issue,
     rules::rule::Rule,
-    tree::{walk_tree, NodeVisitor, SonarLocation, TreeSitterLocation},
+    tree::{walk_tree, AnalyzerError, NodeVisitor, SonarLocation, TreeSitterLocation},
 };
 use tree_sitter::{Node, Tree};
 
@@ -22,16 +22,21 @@ impl ParsingErrorCheck {
 }
 
 impl Rule for ParsingErrorCheck {
-    fn check(&self, tree: &Tree, source_code: &str) -> Vec<Issue> {
+    fn check(&self, tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
         let mut visitor = RuleVisitor::new(source_code);
         walk_tree(tree.root_node(), &mut visitor);
-        visitor.issues
+
+        match visitor.error {
+            Some(error) => Err(error),
+            None => Ok(visitor.issues),
+        }
     }
 }
 
 struct RuleVisitor<'a> {
     source_code: &'a str,
     issues: Vec<Issue>,
+    error: Option<AnalyzerError>,
 }
 
 impl<'a> RuleVisitor<'a> {
@@ -39,6 +44,7 @@ impl<'a> RuleVisitor<'a> {
         Self {
             source_code,
             issues: Vec::new(),
+            error: None,
         }
     }
 
@@ -79,7 +85,15 @@ impl NodeVisitor for RuleVisitor<'_> {
             // The location of the missing node is the location of the token that should have been there, which means that it might not
             // even exist in the original source code.
             // In order to avoid reporting on non-existant locations, we use the location of the closest non-error ancestor node.
-            let parent = non_error_parent(node).expect("a missing node must have a parent");
+            let parent = match non_error_parent(node) {
+                Some(parent) => parent,
+                None => {
+                    self.error = Some(AnalyzerError::FileError(
+                        "a missing node must have a valid parent".to_string(),
+                    ));
+                    return;
+                }
+            };
 
             let location = TreeSitterLocation::from_tree_sitter_node(parent)
                 .to_sonar_location(self.source_code);
@@ -115,7 +129,7 @@ fn main() {
         let rule = ParsingErrorCheck::new();
         let tree = parse_rust_code(source_code).unwrap();
 
-        let actual = rule.check(&tree, source_code);
+        let actual = rule.check(&tree, source_code).unwrap();
         let expected = vec![];
 
         assert_eq!(actual, expected);
@@ -133,7 +147,7 @@ fn
         let rule = ParsingErrorCheck::new();
         let tree = parse_rust_code(source_code).unwrap();
 
-        let actual = rule.check(&tree, source_code);
+        let actual = rule.check(&tree, source_code).unwrap();
         let expected = vec![
             Issue {
                 rule_key: RULE_KEY.to_string(),
