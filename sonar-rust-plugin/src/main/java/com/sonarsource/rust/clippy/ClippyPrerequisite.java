@@ -36,7 +36,7 @@ public class ClippyPrerequisite {
   private void checkVersion(List<String> command, String prerequisite, Path workDir) {
     LOG.debug("Checking {} version", prerequisite);
     try {
-      processWrapper.start(command, workDir, LOG::debug, LOG::warn);
+      processWrapper.start(command, workDir, null, LOG::warn);
       try (var reader = new BufferedReader(new InputStreamReader(processWrapper.getInputStream()))) {
         var version = reader.readLine();
         LOG.debug("{} version: {}", prerequisite, version);
