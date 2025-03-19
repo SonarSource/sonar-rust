@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,7 +55,8 @@ public class AnalyzerFactory {
       case WIN_X64 -> "/analyzer/win-x64/analyzer.exe";
       case LINUX_X64 -> "/analyzer/linux-x64/analyzer";
       case LINUX_X64_MUSL -> "/analyzer/linux-x64-musl/analyzer";
-      case DARWIN_ARM64 -> "/analyzer/darwin-arm64/analyzer";
+      case LINUX_AARCH64 -> "/analyzer/linux-aarch64-musl/analyzer";
+      case DARWIN_AARCH64 -> "/analyzer/darwin-aarch64/analyzer";
       case DARWIN_X86_64 -> "/analyzer/darwin-x86_64/analyzer";
       default -> throw new IllegalStateException("Unsupported platform");
     };

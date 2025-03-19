@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.BeforeEach;
