@@ -40,12 +40,15 @@ brew install mingw-w64
 apt-get -y install rustup gcc-mingw-w64 musl-tools musl-dev build-essential autoconf libtool pkg-config
 ```
 
+#### Rust Toolchains
+
 You also need to install the Rust toolchains for the target platforms:
 
 ```shell
 rustup target add x86_64-pc-windows-gnu
 rustup target add x86_64-unknown-linux-musl
 rustup target add x86_64-unknown-linux-gnu
+rustup target add aarch64-unknown-linux-musl
 rustup target add x86_64-apple-darwin
 ```
 
@@ -54,7 +57,6 @@ To verify installed toolchains, you can run the following command:
 ```shell
 rustup target list
 ```
-
 
 ## Running End-to-End Tests
 
