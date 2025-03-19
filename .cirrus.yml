@@ -95,7 +95,7 @@ build_task:
     DEPLOY_PULL_REQUEST: "true"
   download_script:
     - >
-      if [[ true ]]; then
+      if [[ $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ ^branch-.* ]]; then
         mkdir -p "analyzer/target/aarch64-apple-darwin/release"
         curl -o "analyzer/target/aarch64-apple-darwin/release/analyzer.xz" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
         mkdir -p "analyzer/target/x86_64-apple-darwin/release"
@@ -108,7 +108,7 @@ build_task:
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 macos_arm64_task:
-#  skip: $CIRRUS_BRANCH != "master" && $CIRRUS_BRANCH != "dogfood-on-peach" && $CIRRUS_BRANCH !=~ "branch-.*"
+  skip: $CIRRUS_BRANCH != "master" && $CIRRUS_BRANCH != "dogfood-on-peach" && $CIRRUS_BRANCH !=~ "branch-.*"
   persistent_worker:
     resources:
       tart-vms: 1
