@@ -7,7 +7,7 @@
 use crate::{
     issue::Issue,
     rules::rule::Rule,
-    tree::{walk_tree, NodeVisitor, SonarLocation, TreeSitterLocation},
+    tree::{walk_tree, AnalyzerError, NodeVisitor, SonarLocation, TreeSitterLocation},
 };
 use tree_sitter::{Node, Tree};
 
@@ -22,16 +22,21 @@ impl ParsingErrorCheck {
 }
 
 impl Rule for ParsingErrorCheck {
-    fn check(&self, tree: &Tree, source_code: &str) -> Vec<Issue> {
+    fn check(&self, tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
         let mut visitor = RuleVisitor::new(source_code);
         walk_tree(tree.root_node(), &mut visitor);
-        visitor.issues
+
+        match visitor.error {
+            Some(error) => Err(error),
+            None => Ok(visitor.issues),
+        }
     }
 }
 
 struct RuleVisitor<'a> {
     source_code: &'a str,
     issues: Vec<Issue>,
+    error: Option<AnalyzerError>,
 }
 
 impl<'a> RuleVisitor<'a> {
@@ -39,6 +44,7 @@ impl<'a> RuleVisitor<'a> {
         Self {
             source_code,
             issues: Vec::new(),
+            error: None,
         }
     }
 
@@ -76,22 +82,33 @@ impl NodeVisitor for RuleVisitor<'_> {
             let error = sexp[1..sexp.len() - 1].to_string().to_lowercase();
             let message = format!("A syntax error occurred during parsing: {}.", error);
 
-            // The Sonar location API expects the end column to be greater than the start column.
-            // However, the end column of a missing node seems to be the same as the start column.
-            // By precaution, we increment the end column by one to avoid potential failures.
-            let location =
-                TreeSitterLocation::from_tree_sitter_node(node).to_sonar_location(self.source_code);
-            let sonar_location = SonarLocation {
-                end_column: if location.start_column == location.end_column {
-                    location.start_column + 1
-                } else {
-                    location.end_column
-                },
-                ..location
+            // The location of the missing node is the location of the token that should have been there, which means that the location might not
+            // even exist in the original source code. In order to avoid reporting on non-existant locations, we use the location of either the closest
+            // sibling (if it exists) or the parent node.
+            let parent = match get_sibling_or_parent(node) {
+                Some(parent) => parent,
+                None => {
+                    self.error = Some(AnalyzerError::FileError(
+                        "a missing node must have a valid parent".to_string(),
+                    ));
+                    return;
+                }
             };
 
-            self.new_issue(message, sonar_location);
+            let location = TreeSitterLocation::from_tree_sitter_node(parent)
+                .to_sonar_location(self.source_code);
+
+            self.new_issue(message, location);
         }
+    }
+}
+
+fn get_sibling_or_parent(node: Node<'_>) -> Option<Node<'_>> {
+    match node.prev_sibling() {
+        Some(prev_sibling) if !prev_sibling.is_error() && !prev_sibling.is_missing() => {
+            Some(prev_sibling)
+        }
+        _ => node.parent(),
     }
 }
 
@@ -110,7 +127,7 @@ fn main() {
         let rule = ParsingErrorCheck::new();
         let tree = parse_rust_code(source_code).unwrap();
 
-        let actual = rule.check(&tree, source_code);
+        let actual = rule.check(&tree, source_code).unwrap();
         let expected = vec![];
 
         assert_eq!(actual, expected);
@@ -128,16 +145,16 @@ fn
         let rule = ParsingErrorCheck::new();
         let tree = parse_rust_code(source_code).unwrap();
 
-        let actual = rule.check(&tree, source_code);
+        let actual = rule.check(&tree, source_code).unwrap();
         let expected = vec![
             Issue {
                 rule_key: RULE_KEY.to_string(),
                 message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                 location: SonarLocation {
                     start_line: 3,
-                    start_column: 14,
+                    start_column: 12,
                     end_line: 3,
-                    end_column: 15,
+                    end_column: 14,
                 },
             },
             Issue {
