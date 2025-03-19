@@ -100,7 +100,7 @@ class AnalyzerTest {
         """);
 
       assertThat(result.issues()).containsExactly(
-        new Analyzer.Issue("S2260", "A syntax error occurred during parsing: missing \";\".", 2, 12, 2, 13));
+        new Analyzer.Issue("S2260", "A syntax error occurred during parsing: missing \";\".", 2, 2, 2, 12));
     }
   }
 }

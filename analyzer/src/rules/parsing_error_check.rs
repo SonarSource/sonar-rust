@@ -76,23 +76,28 @@ impl NodeVisitor for RuleVisitor<'_> {
             let error = sexp[1..sexp.len() - 1].to_string().to_lowercase();
             let message = format!("A syntax error occurred during parsing: {}.", error);
 
-            // The Sonar location API expects the end column to be greater than the start column.
-            // However, the end column of a missing node seems to be the same as the start column.
-            // By precaution, we increment the end column by one to avoid potential failures.
-            let location =
-                TreeSitterLocation::from_tree_sitter_node(node).to_sonar_location(self.source_code);
-            let sonar_location = SonarLocation {
-                end_column: if location.start_column == location.end_column {
-                    location.start_column + 1
-                } else {
-                    location.end_column
-                },
-                ..location
-            };
+            // The location of the missing node is the location of the token that should have been there, which means that it might not
+            // even exist in the original source code.
+            // In order to avoid reporting on non-existant locations, we use the location of the closest non-error ancestor node.
+            let parent = non_error_parent(node).expect("a missing node must have a parent");
 
-            self.new_issue(message, sonar_location);
+            let location = TreeSitterLocation::from_tree_sitter_node(parent)
+                .to_sonar_location(self.source_code);
+
+            self.new_issue(message, location);
         }
     }
+}
+
+fn non_error_parent(node: Node<'_>) -> Option<Node<'_>> {
+    let mut parent = node.parent();
+    while let Some(p) = parent {
+        if !p.is_error() && !p.is_missing() {
+            return Some(p);
+        }
+        parent = p.parent();
+    }
+    None
 }
 
 #[cfg(test)]
@@ -135,9 +140,9 @@ fn
                 message: "A syntax error occurred during parsing: missing \";\".".to_string(),
                 location: SonarLocation {
                     start_line: 3,
-                    start_column: 14,
+                    start_column: 4,
                     end_line: 3,
-                    end_column: 15,
+                    end_column: 14,
                 },
             },
             Issue {
