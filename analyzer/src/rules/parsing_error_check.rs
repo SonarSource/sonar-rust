@@ -84,8 +84,8 @@ impl NodeVisitor for RuleVisitor<'_> {
 
             // The location of the missing node is the location of the token that should have been there, which means that it might not
             // even exist in the original source code.
-            // In order to avoid reporting on non-existant locations, we use the location of the closest non-error ancestor node.
-            let parent = match non_error_parent(node) {
+            // In order to avoid reporting on non-existant locations, we use the location of the parent node.
+            let parent = match node.parent() {
                 Some(parent) => parent,
                 None => {
                     self.error = Some(AnalyzerError::FileError(
@@ -101,17 +101,6 @@ impl NodeVisitor for RuleVisitor<'_> {
             self.new_issue(message, location);
         }
     }
-}
-
-fn non_error_parent(node: Node<'_>) -> Option<Node<'_>> {
-    let mut parent = node.parent();
-    while let Some(p) = parent {
-        if !p.is_error() && !p.is_missing() {
-            return Some(p);
-        }
-        parent = p.parent();
-    }
-    None
 }
 
 #[cfg(test)]
