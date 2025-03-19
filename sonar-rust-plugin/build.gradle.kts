@@ -34,6 +34,7 @@ dependencies {
   implementation("com.google.code.gson:gson:2.11.0")
   implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:$analyzerCommonsVersion")
   implementation("org.sonarsource.analyzer-commons:sonar-xml-parsing:$analyzerCommonsVersion")
+  implementation("org.tukaani:xz:1.10")
   compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
@@ -114,10 +115,10 @@ tasks.register<Copy>("copyRustOutputs") {
     into("win-x64")
   }
   // we hardcode the path to the binary because on CI binary is downloaded from another task
-  from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer") {
+  from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
     into("darwin-aarch64")
   }
-  from("${project(":analyzer").layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer") {
+  from("${project(":analyzer").layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
     into("darwin-x86_64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")

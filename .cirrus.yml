@@ -95,11 +95,11 @@ build_task:
     DEPLOY_PULL_REQUEST: "true"
   download_script:
     - >
-      if [[ $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ ^branch-.* ]]; then
+      if [[ true ]]; then
         mkdir -p "analyzer/target/aarch64-apple-darwin/release"
-        curl -o "analyzer/target/aarch64-apple-darwin/release/analyzer" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
+        curl -o "analyzer/target/aarch64-apple-darwin/release/analyzer.xz" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
         mkdir -p "analyzer/target/x86_64-apple-darwin/release"
-        curl -o "analyzer/target/x86_64-apple-darwin/release/analyzer" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
+        curl -o "analyzer/target/x86_64-apple-darwin/release/analyzer.xz" http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
       fi
   build_script:
     - source cirrus-env BUILD-PRIVATE
@@ -108,7 +108,7 @@ build_task:
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 macos_arm64_task:
-  skip: $CIRRUS_BRANCH != "master" && $CIRRUS_BRANCH != "dogfood-on-peach" && $CIRRUS_BRANCH !=~ "branch-.*"
+#  skip: $CIRRUS_BRANCH != "master" && $CIRRUS_BRANCH != "dogfood-on-peach" && $CIRRUS_BRANCH !=~ "branch-.*"
   persistent_worker:
     resources:
       tart-vms: 1
@@ -131,8 +131,8 @@ macos_arm64_task:
     - . $HOME/.cargo/env
     - ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
   upload_script:
-    - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
-    - curl -X POST --data-binary @analyzer/target/x86_64-apple-darwin/release/analyzer http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
+    - curl -X POST --data-binary @analyzer/target/aarch64-apple-darwin/release/analyzer.xz http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/aarch64-apple-darwin
+    - curl -X POST --data-binary @analyzer/target/x86_64-apple-darwin/release/analyzer.xz http://${CIRRUS_HTTP_CACHE_HOST}/build/${CIRRUS_BUILD_ID}/x86_64-apple-darwin
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 e2e_task:
