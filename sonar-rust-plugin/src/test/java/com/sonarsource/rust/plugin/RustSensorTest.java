@@ -94,6 +94,24 @@ class RustSensorTest {
     assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
   }
 
+  @Test
+  void analyze_syntax_errors_location_at_end_of_line() {
+    var sensor = sensor();
+    context.fileSystem().add(inputFile("main.rs", """
+fn main() {
+  let x = 42
+}"""));
+
+    sensor.execute(context);
+
+    assertThat(context.allIssues()).hasSize(1);
+
+    var issue = context.allIssues().iterator().next();
+    assertThat(issue.ruleKey().rule()).isEqualTo("S2260");
+    assertThat(issue.primaryLocation().message()).isEqualTo("A syntax error occurred during parsing: missing \";\".");
+    assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(2);
+  }
+
   private InputFile inputFile(String relativePath, String content) {
     return new TestInputFileBuilder(PROJECT_KEY, relativePath)
       .setModuleBaseDir(baseDir.toPath())

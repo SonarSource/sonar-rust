@@ -4,7 +4,7 @@
  * mailto:info AT sonarsource DOT com
  */
 use crate::rules::rule::all_rules;
-use crate::tree::SonarLocation;
+use crate::tree::{AnalyzerError, SonarLocation};
 use tree_sitter::Tree;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -14,10 +14,10 @@ pub struct Issue {
     pub location: SonarLocation,
 }
 
-pub fn find_issues(tree: &Tree, source_code: &str) -> Vec<Issue> {
+pub fn find_issues(tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
     let mut issues = Vec::new();
     for rule in all_rules() {
-        issues.extend(rule.check(tree, source_code));
+        issues.extend(rule.check(tree, source_code)?);
     }
-    issues
+    Ok(issues)
 }
