@@ -78,7 +78,7 @@ public class RustPlugin implements Plugin {
     // Clippy report paths
     context.addExtension(
       PropertyDefinition
-        .builder(ClippySensor.CLIPPY_SENSOR_ENABLED)
+        .builder(ClippySensor.CLIPPY_ANALYSIS_ENABLED)
         .category("Rust")
         .subCategory("Clippy")
         .name("Execute Clippy analysis")

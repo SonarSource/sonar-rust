@@ -23,7 +23,6 @@ public class ClippyReportSensor implements Sensor {
 
   public static final String CLIPPY_REPORT_PATHS = "sonar.rust.clippyReport.reportPaths";
 
-
   @Override
   public void describe(SensorDescriptor descriptor) {
     descriptor
@@ -53,7 +52,7 @@ public class ClippyReportSensor implements Sensor {
         diagnostics.addAll(reportDiagnostics);
         LOG.debug("Successfully parsed Clippy report");
       } catch (Exception e) {
-        LOG.warn("Failed to parse Clippy report", e);
+        LOG.error("Failed to parse Clippy report", e);
       }
     }
 
@@ -65,7 +64,7 @@ public class ClippyReportSensor implements Sensor {
         saveIssue(context, diagnostic, baseDir);
         LOG.debug("Successfully saved Clippy diagnostic");
       } catch (Exception e) {
-        LOG.warn("Failed to save Clippy diagnostic. {}", e.getMessage());
+        LOG.error("Failed to save Clippy diagnostic. {}", e.getMessage());
       }
     }
 

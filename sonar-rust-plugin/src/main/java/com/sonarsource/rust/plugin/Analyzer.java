@@ -30,7 +30,7 @@ public class Analyzer implements AutoCloseable {
       this.outputStream = new DataOutputStream(process.getOutputStream());
       this.inputStream = new DataInputStream(process.getInputStream());
     } catch (IOException ex) {
-      throw new IllegalStateException("Failed to start analyzer process", ex);
+      throw new IllegalStateException("Failed to start the analyzer process", ex);
     }
   }
 

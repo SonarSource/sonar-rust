@@ -49,7 +49,7 @@ class ClippyUtils {
         if (line.startsWith("{")) {
           return true;
         } else {
-          LOG.debug("Skipped output: {}", line);
+          LOG.debug("Ignoring line: {}", line);
           return false;
         }
       })

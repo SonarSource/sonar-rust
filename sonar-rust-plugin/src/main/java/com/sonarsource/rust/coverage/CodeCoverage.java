@@ -45,7 +45,7 @@ public class CodeCoverage {
 
   private void validateLineNumber(int line) {
     if (line < 1 || line > inputFile.lines()) {
-      throw new IllegalStateException("Line number outside file range: " + line);
+      throw new IllegalStateException("Line number outside of file range: " + line);
     }
   }
 }

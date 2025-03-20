@@ -23,7 +23,7 @@ public class ClippySensor implements Sensor {
 
   private static final Logger LOG = LoggerFactory.getLogger(ClippySensor.class);
 
-  public static final String CLIPPY_SENSOR_ENABLED = "sonar.rust.clippy.enabled";
+  public static final String CLIPPY_ANALYSIS_ENABLED = "sonar.rust.clippy.enabled";
 
   private final ClippyPrerequisite clippyPrerequisite;
   private final ClippyRunner clippy;
@@ -41,20 +41,20 @@ public class ClippySensor implements Sensor {
   public void describe(SensorDescriptor descriptor) {
     descriptor
       .name("Clippy")
-      .onlyWhenConfiguration(config -> config.getBoolean(CLIPPY_SENSOR_ENABLED).orElse(true))
+      .onlyWhenConfiguration(config -> config.getBoolean(CLIPPY_ANALYSIS_ENABLED).orElse(true))
       .onlyOnLanguage(RustLanguage.KEY);
   }
 
   @Override
   public void execute(SensorContext context) {
-    if (!context.config().getBoolean(CLIPPY_SENSOR_ENABLED).orElse(true)) {
-      LOG.debug("Clippy sensor is disabled");
+    if (!context.config().getBoolean(CLIPPY_ANALYSIS_ENABLED).orElse(true)) {
+      LOG.debug("Clippy analysis is disabled");
       return;
     }
 
     var manifests = CargoManifestProvider.getManifests(context);
     if (manifests.isEmpty()) {
-      LOG.debug("No Cargo manifest found, skipping Clippy analysis");
+      LOG.warn("No Cargo manifest found, skipping Clippy analysis");
       return;
     }
 

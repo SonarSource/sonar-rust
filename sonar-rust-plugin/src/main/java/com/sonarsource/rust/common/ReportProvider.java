@@ -28,7 +28,7 @@ public class ReportProvider {
   public List<File> getReportFiles(SensorContext context) {
     var reportPaths = context.config().getStringArray(property);
     if (reportPaths.length == 0) {
-      LOG.warn("No {} report paths were provided", kind);
+      LOG.debug("No {} report paths were provided", kind);
       return List.of();
     }
 
@@ -60,7 +60,7 @@ public class ReportProvider {
       var provider = new FileProvider(baseDir, reportPath);
       var matchingFiles = provider.getMatchingFiles();
       if (matchingFiles.isEmpty()) {
-        LOG.warn("No {} report files matched the pattern: {}", kind, reportPath);
+        LOG.debug("No {} report files matched the pattern: {}", kind, reportPath);
         continue;
       } else {
         LOG.debug("Found {} report files: {}", kind, matchingFiles);
