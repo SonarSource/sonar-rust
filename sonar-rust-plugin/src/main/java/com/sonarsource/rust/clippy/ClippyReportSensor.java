@@ -64,7 +64,7 @@ public class ClippyReportSensor implements Sensor {
         saveIssue(context, diagnostic, baseDir);
         LOG.debug("Successfully saved Clippy diagnostic");
       } catch (Exception e) {
-        LOG.error("Failed to save Clippy diagnostic. {}", e.getMessage());
+        LOG.warn("Failed to save Clippy diagnostic. {}", e.getMessage());
       }
     }
 
