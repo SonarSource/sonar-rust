@@ -10,6 +10,7 @@ const Parser = require('tree-sitter');
 const Rust = require('tree-sitter-rust');
 
 const CLIPPY_RULE_URL = 'https://rust-lang.github.io/rust-clippy/master/index.html';
+const CATEGORY_OFFSET = 3;
 
 /**
  * Parse command line arguments
@@ -120,16 +121,16 @@ function collectLints(node, lints) {
  * '}'`
  */
 function parseLint(macro) {
-  const token_tree = macro.child(2);
-  if (token_tree.type !== 'token_tree') {
-    console.log(`Error: Unexpected token tree type: ${token_tree.type}`);
-    return;
+  const tokenTree = macro.child(2);
+  if (tokenTree.type !== 'token_tree') {
+    console.log(`Error: Unexpected token tree type: ${tokenTree.type}`);
+    return null;
   }
 
   let pubTokenIdx = -1;
   let tokenIdx = 0;
-  while (tokenIdx < token_tree.childCount) {
-    const token = token_tree.children[tokenIdx];
+  while (tokenIdx < tokenTree.childCount) {
+    const token = tokenTree.children[tokenIdx];
     if (token.text === 'pub') {
       pubTokenIdx = tokenIdx;
       break;
@@ -139,15 +140,15 @@ function parseLint(macro) {
 
   if (pubTokenIdx === -1) {
     console.log('Error: Could not find `pub` token in Clippy lint declaration');
-    return;
+    return null;
   }
 
-  const category = token_tree.children[pubTokenIdx + 3].text;
+  const category = tokenTree.children[pubTokenIdx + CATEGORY_OFFSET].text;
   if (category === 'internal') {
     return null;
   }
 
-  const key = token_tree.children[pubTokenIdx + 1].text.toLowerCase();
+  const key = tokenTree.children[pubTokenIdx + 1].text.toLowerCase();
   const url = `${CLIPPY_RULE_URL}#${key}`;
   const description = `Clippy lint <code>${key}</code>.`;
 
