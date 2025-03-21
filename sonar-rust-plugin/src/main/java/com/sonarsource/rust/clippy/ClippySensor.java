@@ -5,19 +5,20 @@
  */
 package com.sonarsource.rust.clippy;
 
-import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
-
 import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
 import com.sonarsource.rust.plugin.RustRulesDefinition;
+import com.sonarsource.rust.plugin.Telemetry;
+import java.nio.file.Path;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
 import org.sonar.api.rule.RuleKey;
-import java.nio.file.Path;
-import java.util.Objects;
+
+import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
 
 public class ClippySensor implements Sensor {
 
@@ -60,8 +61,11 @@ public class ClippySensor implements Sensor {
 
     var baseDir = context.fileSystem().baseDir().toPath();
 
+    Telemetry.reportAnalyzerClippyUsage(context);
+
     try {
-      clippyPrerequisite.check(baseDir);
+      var versions = clippyPrerequisite.check(baseDir);
+      Telemetry.reportClippyVersion(context, versions.clippyVersion());
     } catch (Exception e) {
       LOG.error("Failed to check Clippy prerequisites", e);
       return;
@@ -75,7 +79,10 @@ public class ClippySensor implements Sensor {
 
     try {
       for (var manifest : manifests) {
-        var workDir = manifest.toPath().getParent();
+        Path manifestPath = manifest.toPath();
+        Telemetry.reportManifestInfo(context, manifestPath);
+
+        var workDir = manifestPath.getParent();
         clippy.run(workDir, lints, diagnostic -> saveIssue(context, diagnostic, workDir));
       }
     } catch (Exception e) {

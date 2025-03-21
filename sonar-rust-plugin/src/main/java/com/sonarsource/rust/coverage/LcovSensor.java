@@ -8,6 +8,7 @@ package com.sonarsource.rust.coverage;
 import com.sonarsource.rust.common.FileLocator;
 import com.sonarsource.rust.common.ReportProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
+import com.sonarsource.rust.plugin.Telemetry;
 import java.util.ArrayList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,8 @@ public class LcovSensor implements Sensor {
   @Override
   public void execute(SensorContext context) {
     LOG.debug("Processing LCOV coverage reports");
+
+    Telemetry.reportCoverageFormat(context, "LCOV");
 
     var reportProvider = new ReportProvider("LCOV", COVERAGE_REPORT_PATHS);
     var reportFiles = reportProvider.getReportFiles(context);

@@ -5,10 +5,9 @@
  */
 package com.sonarsource.rust.clippy;
 
-import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
-
 import com.sonarsource.rust.common.ReportProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
+import com.sonarsource.rust.plugin.Telemetry;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import org.slf4j.Logger;
@@ -16,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
+
+import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
 
 public class ClippyReportSensor implements Sensor {
 
@@ -34,6 +35,8 @@ public class ClippyReportSensor implements Sensor {
   @Override
   public void execute(SensorContext context) {
     LOG.debug("Processing Clippy reports");
+
+    Telemetry.reportExternalClippyUsage(context);
 
     var reportProvider = new ReportProvider("Clippy", CLIPPY_REPORT_PATHS);
     var reportFiles = reportProvider.getReportFiles(context);

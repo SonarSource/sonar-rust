@@ -8,6 +8,7 @@ package com.sonarsource.rust.coverage;
 import com.sonarsource.rust.common.FileLocator;
 import com.sonarsource.rust.common.ReportProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
+import com.sonarsource.rust.plugin.Telemetry;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import org.slf4j.Logger;
@@ -34,6 +35,8 @@ public class CoberturaSensor implements Sensor {
   @Override
   public void execute(SensorContext context) {
     LOG.debug("Processing Cobertura coverage reports");
+
+    Telemetry.reportCoverageFormat(context, "Cobertura");
 
     var reportFiles = new ReportProvider("Cobertura", COBERTURA_REPORT_PATHS).getReportFiles(context);
     if (reportFiles.isEmpty()) {
