@@ -94,7 +94,7 @@ class TelemetryTest {
         name = "analyzer"
         version = "0.1.0"
         edition = "2021"
-        
+
         [dependencies]
         tree-sitter = "0.25.1"
         tree-sitter-rust = "0.23.2"
