@@ -82,12 +82,12 @@ class CodeCoverageTest {
 
     assertThatThrownBy(() -> coverage.addLineHits(0, 1))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessage("Line number outside file range: 0");
+      .hasMessage("Line number outside of file range: 0");
     assertThatThrownBy(() -> coverage.addLineHits(5, 1))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessage("Line number outside file range: 5");
+      .hasMessage("Line number outside of file range: 5");
       assertThatThrownBy(() -> coverage.addBranchHits(0, "T", 1))
       .isInstanceOf(IllegalStateException.class)
-      .hasMessage("Line number outside file range: 0");
+      .hasMessage("Line number outside of file range: 0");
   }
 }

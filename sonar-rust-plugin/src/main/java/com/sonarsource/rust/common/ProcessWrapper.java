@@ -55,7 +55,7 @@ public class ProcessWrapper {
       consumer.await();
     } catch (InterruptedException e) {
       Thread.currentThread().interrupt();
-      throw new IllegalStateException("Interrupted while waiting for process to finish", e);
+      throw new IllegalStateException("Interrupted while waiting for the process to finish", e);
     }
   }
 

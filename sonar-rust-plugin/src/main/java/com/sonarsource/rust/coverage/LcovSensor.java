@@ -64,7 +64,7 @@ public class LcovSensor implements Sensor {
         }
         coverages.addAll(parsingResult.coverages());
       } catch (Exception e) {
-        LOG.warn("Failed to parse LCOV report", e);
+        LOG.error("Failed to parse LCOV report", e);
       }
     }
 
@@ -74,12 +74,10 @@ public class LcovSensor implements Sensor {
         CoverageUtils.saveCoverage(context, coverage);
         LOG.debug("Successfully saved coverage");
       } catch (Exception e) {
-        LOG.warn("Failed to save coverage", e);
+        LOG.error("Failed to save coverage", e);
       }
     }
 
     LOG.debug("Processed LCOV coverage reports");
   }
-
-
 }
