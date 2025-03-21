@@ -10,13 +10,13 @@ essential to ensure that the logs are:</p>
 <p>Those requirements are not met if a program directly writes to the standard outputs (e.g., print!, println!). That is why defining and using a
 dedicated logger is highly recommended.</p>
 <h3>Code examples</h3>
-<p>The following noncompliant code:</p>
+<h4>Noncompliant code example</h4>
 <pre data-diff-id="1" data-diff-type="noncompliant">
 fn do_something() {
     println!("my message");  // Noncompliant, output directly to stdout without a logger
 }
 </pre>
-<p>Could be replaced by:</p>
+<h4>Compliant solution</h4>
 <pre data-diff-id="1" data-diff-type="compliant">
 use log::{info, LevelFilter};
 use simple_logger::SimpleLogger;
@@ -33,5 +33,9 @@ fn do_something() {
 <ul>
   <li> Clippy Lints - <a
   href="https://rust-lang.github.io/rust-clippy/master/index.html#print_stdout">https://rust-lang.github.io/rust-clippy/master/index.html#print_stdout</a> </li>
+  <li> OWASP - <a href="https://owasp.org/Top10/A09_2021-Security_Logging_and_Monitoring_Failures/">Top 10 2021 Category A9 - Security Logging and
+  Monitoring Failures</a> </li>
+  <li> OWASP - <a href="https://owasp.org/www-project-top-ten/2017/A3_2017-Sensitive_Data_Exposure">Top 10 2017 Category A3 - Sensitive Data
+  Exposure</a> </li>
 </ul>
 
