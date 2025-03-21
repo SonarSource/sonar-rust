@@ -69,3 +69,13 @@ To run the end-to-end tests, use the following command:
 ```
 
 It executes the end-to-end tests, ensuring that the entire system works as expected.
+
+# License
+
+Copyright 2025 SonarSource.
+
+SonarQube analyzers released after November 29, 2024, including patch fixes for prior versions,
+are published under the [Sonar Source-Available License Version 1 (SSALv1)](LICENSE).
+
+See individual files for details that specify the license applicable to each file.
+Files subject to the SSALv1 will be noted in their headers.

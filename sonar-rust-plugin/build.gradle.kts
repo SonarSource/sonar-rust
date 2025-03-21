@@ -1,7 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
-
 plugins {
   id("java")
   id("jacoco")
@@ -69,6 +68,7 @@ tasks.named<Test>("test") {
 tasks.named("check") {
   dependsOn(":analyzer:testRust")
   dependsOn(":analyzer:checkRustFormat")
+  dependsOn(":analyzer:checkRustLicense")
 }
 
 tasks.jar {
@@ -136,16 +136,10 @@ tasks.shadowJar {
 }
 
 spotless {
+  val licenseHeaderFile = rootProject.file("license-header.txt")
+  val licenseHeader = licenseHeaderFile.readText().trim()
   java {
-    licenseHeader(
-      """
-            /*
-             * Copyright (C) 2025 SonarSource SA
-             * All rights reserved
-             * mailto:info AT sonarsource DOT com
-             */
-            """.trimIndent()
-    )
+    licenseHeader(licenseHeader)
     trimTrailingWhitespace()
   }
 }
@@ -189,7 +183,9 @@ publishing {
         }
         licenses {
           license {
-            name.set("SonarSource")
+            name.set("SSALv1")
+            url.set("https://sonarsource.com/license/ssal/")
+            distribution.set("repo")
           }
         }
         scm {
