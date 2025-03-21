@@ -58,14 +58,14 @@ class ClippySensorTest {
   @Test
   void executeSkipsIfDisabled() {
     var context = SensorContextTester.create(baseDir);
-    context.settings().setProperty(ClippySensor.CLIPPY_SENSOR_ENABLED, "false");
+    context.settings().setProperty(ClippySensor.CLIPPY_ANALYSIS_ENABLED, "false");
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
     var clippyRunner = mock(ClippyRunner.class);
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
     sensor.execute(context);
 
-    assertThat(logTester.logs()).contains("Clippy sensor is disabled");
+    assertThat(logTester.logs()).contains("Clippy analysis is disabled");
   }
 
   @Test

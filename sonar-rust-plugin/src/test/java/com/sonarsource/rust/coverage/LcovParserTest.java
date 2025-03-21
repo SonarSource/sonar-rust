@@ -407,7 +407,7 @@ class LcovParserTest {
     assertThat(problems).hasSize(1);
 
     var problem = problems.get(0);
-    assertThat(problem).isEqualTo(String.format("%s:%d: Invalid BRDA. Line number outside file range: 42", lcovFile, 2));
+    assertThat(problem).isEqualTo(String.format("%s:%d: Invalid BRDA. Line number outside of file range: 42", lcovFile, 2));
 
     Files.delete(lcovFile);
   }

@@ -64,7 +64,7 @@ public class CargoManifestProvider {
         var provider = new FileProvider(baseDir, manifestPattern);
         var matchingFiles = provider.getMatchingFiles();
         if (matchingFiles.isEmpty()) {
-          LOG.warn("No Cargo manifest matched the pattern: {}", manifestPattern);
+          LOG.debug("No Cargo manifest matched the pattern: {}", manifestPattern);
           continue;
         } else {
           LOG.debug("Found Cargo manifests: {}", matchingFiles);
