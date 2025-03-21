@@ -37,6 +37,11 @@ val compileRustLinuxMusl = createCompileRustTask(
     "AR_x86_64_unknown_linux_musl" to muslAr
   )
 )
+val compileRustLinuxArm = createCompileRustTask("aarch64-unknown-linux-musl", "LinuxArm",
+  mapOf(
+    "TARGET_CC" to "aarch64-linux-musl-gcc",
+    "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER" to "aarch64-linux-musl-gcc",
+  ))
 val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
 val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin", "Darwin")
 val compileRustDarwinX86 = createCompileRustTask("x86_64-apple-darwin", "DarwinX86")

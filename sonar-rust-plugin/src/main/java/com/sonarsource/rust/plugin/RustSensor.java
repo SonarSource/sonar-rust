@@ -5,6 +5,7 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.StreamSupport;
@@ -28,9 +29,11 @@ public class RustSensor implements Sensor {
   private static final Logger LOG = LoggerFactory.getLogger(RustSensor.class);
 
   private final AnalyzerFactory analyzerFactory;
+  private final PlatformDetection platformDetection;
 
   public RustSensor(AnalyzerFactory analyzerFactory) {
     this.analyzerFactory = analyzerFactory;
+    this.platformDetection = new PlatformDetection();
   }
 
   @Override
@@ -43,9 +46,9 @@ public class RustSensor implements Sensor {
   @Override
   public void execute(SensorContext sensorContext) {
     List<InputFile> inputFiles = inputFiles(sensorContext);
-    var platform = Platform.detect();
+    var platform = platformDetection.detect();
     if (platform == Platform.UNSUPPORTED) {
-      LOG.error("Unsupported platform: {}", Platform.detect());
+      LOG.error("Unsupported platform: {}", platformDetection.debug());
       return;
     }
     LOG.info("Detected platform: {}", platform);
