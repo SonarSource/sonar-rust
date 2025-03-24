@@ -1,4 +1,3 @@
-use crate::tree::AnalyzerError;
 /*
  * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
@@ -15,7 +14,7 @@ use crate::tree::AnalyzerError;
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-use crate::tree::{walk_tree, NodeVisitor, SonarLocation, TreeSitterLocation};
+use crate::tree::{walk_tree, AnalyzerError, NodeVisitor, SonarLocation, TreeSitterLocation};
 use tree_sitter::Node;
 use tree_sitter::Tree;
 
