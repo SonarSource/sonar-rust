@@ -43,8 +43,6 @@ fn main() {
     }
     let parameters = read_map();
 
-    eprintln!("read parameters {:?}", &parameters);
-
     loop {
         let command = read_string();
         if command != "analyze" {

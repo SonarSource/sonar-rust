@@ -161,8 +161,20 @@ public class RustSensor implements Sensor {
           .message(issue.message());
         newIssue
           .forRule(RuleKey.of(RustLanguage.KEY, issue.ruleKey()))
-          .at(location)
-          .save();
+          .at(location);
+
+        for (var secondaryLocation : issue.secondaryLocations()) {
+          newIssue.addLocation(newIssue.newLocation()
+            .on(inputFile)
+            .at(inputFile.newRange(
+              secondaryLocation.location().startLine(),
+              secondaryLocation.location().startColumn(),
+              secondaryLocation.location().endLine(),
+              secondaryLocation.location().endColumn()))
+            .message(secondaryLocation.message()));
+        }
+
+        newIssue.save();
       } catch (IllegalArgumentException e) {
         LOG.error("Invalid issue: {}. Reason: {}", issue, e.getMessage());
       }
