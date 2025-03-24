@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 /*
  * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
@@ -18,6 +16,7 @@ use std::collections::HashMap;
  */
 use crate::rules::rule::all_rules;
 use crate::tree::{AnalyzerError, SonarLocation};
+use std::collections::HashMap;
 use tree_sitter::Tree;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -34,7 +33,11 @@ pub struct SecondaryLocation {
     pub location: SonarLocation,
 }
 
-pub fn find_issues(tree: &Tree, source_code: &str, parameters: &HashMap<String, String>) -> Result<Vec<Issue>, AnalyzerError> {
+pub fn find_issues(
+    tree: &Tree,
+    source_code: &str,
+    parameters: &HashMap<String, String>,
+) -> Result<Vec<Issue>, AnalyzerError> {
     let mut issues = Vec::new();
     for rule in all_rules(&parameters)? {
         issues.extend(rule.check(tree, source_code)?);

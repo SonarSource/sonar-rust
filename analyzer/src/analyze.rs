@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 /*
  * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
@@ -25,6 +23,7 @@ use crate::{
         metrics::{calculate_metrics, Metrics},
     },
 };
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Output {
@@ -153,7 +152,9 @@ fn main() {
     fn test_unicode() {
         // 4 byte value
         assert_eq!(
-            analyze("//𠱓", &test_parameters()).unwrap().highlight_tokens,
+            analyze("//𠱓", &test_parameters())
+                .unwrap()
+                .highlight_tokens,
             vec![HighlightToken {
                 token_type: HighlightTokenType::Comment,
                 location: SonarLocation {
@@ -251,8 +252,6 @@ fn main() {
     }
 
     fn test_parameters() -> HashMap<String, String> {
-        HashMap::from([
-            ("S3776:threshold".to_string(), "15".to_string())
-        ])
+        HashMap::from([("S3776:threshold".to_string(), "15".to_string())])
     }
 }
