@@ -15,7 +15,7 @@
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 
-use crate::{issue::Issue, rules::parsing_error_check::ParsingErrorCheck, tree::AnalyzerError};
+use crate::{issue::Issue, rules::{cognitive_complexity_check::CognitiveComplexityCheck, parsing_error_check::ParsingErrorCheck}, tree::AnalyzerError};
 use tree_sitter::Tree;
 
 pub trait Rule {
@@ -24,6 +24,7 @@ pub trait Rule {
 
 pub fn all_rules() -> Vec<Box<dyn Rule>> {
     vec![
+        Box::new(CognitiveComplexityCheck::new(15)),
         Box::new(ParsingErrorCheck::new()),
         // Add other rules here
     ]

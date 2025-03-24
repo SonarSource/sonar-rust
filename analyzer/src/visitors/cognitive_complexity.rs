@@ -19,22 +19,22 @@ use std::collections::HashSet;
 use tree_sitter::{Node, Tree};
 
 #[allow(dead_code)] // Location is currently only used in tests, so we allow dead code
-pub(crate) struct Increment {
-    location: TreeSitterLocation,
-    nesting: i32,
+pub struct Increment {
+    pub location: TreeSitterLocation,
+    pub nesting: i32,
 }
 
-pub(crate) fn calculate_total_cognitive_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
-    Ok(calculate_cognitive_complexity(tree)?
+pub fn calculate_total_cognitive_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
+    Ok(calculate_cognitive_complexity(tree.root_node())?
         .iter()
         .map(|inc| inc.nesting + 1)
         .sum())
 }
 
-fn calculate_cognitive_complexity(tree: &Tree) -> Result<Vec<Increment>, AnalyzerError> {
+pub fn calculate_cognitive_complexity(node: Node<'_>) -> Result<Vec<Increment>, AnalyzerError> {
     let mut visitor = ComplexityVisitor::default();
 
-    walk_tree(tree.root_node(), &mut visitor);
+    walk_tree(node, &mut visitor);
 
     if let Some(error) = visitor.error {
         return Err(error);
@@ -53,16 +53,16 @@ struct ComplexityVisitor {
 }
 
 impl ComplexityVisitor {
-    fn increment_with_nesting(&mut self, node: Node<'_>, nesting_level: i32) {
+    fn increment_with_nesting(&mut self, location: Node<'_>, nesting_level: i32) {
         self.current_increments.push(Increment {
-            location: TreeSitterLocation::from_tree_sitter_node(node),
+            location: TreeSitterLocation::from_tree_sitter_node(location),
             nesting: nesting_level,
         });
     }
 
-    fn increment_without_nesting(&mut self, node: Node<'_>) {
+    fn increment_without_nesting(&mut self, location: Node<'_>) {
         self.current_increments.push(Increment {
-            location: TreeSitterLocation::from_tree_sitter_node(node),
+            location: TreeSitterLocation::from_tree_sitter_node(location),
             nesting: 0,
         });
     }
@@ -81,15 +81,15 @@ impl NodeVisitor for ComplexityVisitor {
             }
             "if_expression" => {
                 if !is_else_if(node) {
-                    self.increment_with_nesting(node, self.current_nesting);
+                    self.increment_with_nesting(node.child(0).unwrap(), self.current_nesting);
                     self.current_nesting += 1;
                 }
                 if let Some(alternative) = node.child_by_field_name("alternative") {
-                    self.increment_without_nesting(alternative);
+                    self.increment_without_nesting(alternative.child(0).unwrap());
                 }
             }
             "while_expression" | "loop_expression" | "for_expression" | "match_expression" => {
-                self.increment_with_nesting(node, self.current_nesting);
+                self.increment_with_nesting(node.child(0).unwrap(), self.current_nesting);
                 self.current_nesting += 1;
             }
             "label" => {
@@ -488,7 +488,7 @@ match x { // +1
     fn check_complexity(source_code: &str) {
         let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
 
-        let increments = calculate_cognitive_complexity(&tree).unwrap();
+        let increments = calculate_cognitive_complexity(tree.root_node()).unwrap();
         let mut expected_increments_by_line = collect_complexity_increments(source_code);
 
         let actual_total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();

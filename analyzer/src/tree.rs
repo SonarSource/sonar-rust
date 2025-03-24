@@ -14,7 +14,7 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-use tree_sitter::{Node, Parser, Point, Tree};
+use tree_sitter::{Node, Parser, Point, Tree, TreeCursor};
 
 /// Source location as defined by Tree-sitter.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -142,4 +142,63 @@ pub(crate) fn parse_rust_code(source_code: &str) -> Result<Tree, AnalyzerError> 
         ))?;
 
     Ok(tree)
+}
+
+/// Iterator for iterating over nodes of a tree filtered by a predicate.
+///
+/// For example, you can use this iterator to iterate over all function nodes in a tree:
+/// ```rust
+/// let iter = NodeIterator::new(tree.root_node(), |node| node.kind() == "function_item");
+/// while let Some(function) = iter.next() {
+///     // Handle function...
+/// }
+/// ```
+///
+/// The iterator visits all nodes, except for the children "extra" nodes (e.g. comments).
+pub struct NodeIterator<'a> {
+    predicate: Box<dyn Fn(Node<'a>) -> bool>,
+    cursor: TreeCursor<'a>,
+    visited_children: bool,
+}
+
+impl<'a> NodeIterator<'a> {
+    pub fn new<F>(tree: Node<'a>, predicate: F) -> Self
+        where F: Fn(Node<'a>) -> bool + 'static
+    {
+        Self {
+            predicate: Box::new(predicate),
+            cursor: tree.walk(),
+            visited_children: false
+        }
+    }
+}
+
+impl<'a> Iterator for NodeIterator<'a> {
+    type Item = Node<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {    
+        loop {
+            let node = self.cursor.node();
+
+            if node.is_extra() {
+                self.visited_children = true;
+            }
+
+            if !self.visited_children {
+                if !self.cursor.goto_first_child() {
+                    self.visited_children = true;
+                }
+            } else {
+                if self.cursor.goto_next_sibling() {
+                    self.visited_children = false;
+                } else if !self.cursor.goto_parent() {
+                    return None;
+                }
+
+                if (self.predicate)(node) {
+                    return Some(node);
+                }
+            }
+        }
+    }
 }

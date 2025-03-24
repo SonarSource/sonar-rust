@@ -17,8 +17,9 @@
 mod analyze;
 mod issue;
 mod rules {
-    pub mod parsing_error_check;
     pub mod rule;
+    pub mod parsing_error_check;
+    pub mod cognitive_complexity_check;
 }
 mod tree;
 mod visitors {

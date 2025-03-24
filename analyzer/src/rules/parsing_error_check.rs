@@ -64,6 +64,7 @@ impl<'a> RuleVisitor<'a> {
             rule_key: RULE_KEY.to_string(),
             message,
             location,
+            secondary_locations: vec![]
         });
     }
 }
@@ -167,6 +168,7 @@ fn
                     end_line: 3,
                     end_column: 14,
                 },
+                secondary_locations: vec![]
             },
             Issue {
                 rule_key: RULE_KEY.to_string(),
@@ -177,6 +179,7 @@ fn
                     end_line: 6,
                     end_column: 2,
                 },
+                secondary_locations: vec![]
             },
         ];
 

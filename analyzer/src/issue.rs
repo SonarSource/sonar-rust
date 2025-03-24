@@ -23,6 +23,13 @@ pub struct Issue {
     pub rule_key: String,
     pub message: String,
     pub location: SonarLocation,
+    pub secondary_locations: Vec<SecondaryLocation>
+}
+
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub struct SecondaryLocation {
+    pub message: String,
+    pub location: SonarLocation
 }
 
 pub fn find_issues(tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
