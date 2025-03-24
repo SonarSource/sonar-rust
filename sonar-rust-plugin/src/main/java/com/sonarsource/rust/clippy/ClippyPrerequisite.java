@@ -39,21 +39,27 @@ public class ClippyPrerequisite {
     this.processWrapper = processWrapper;
   }
 
-  public void check(Path workDir) {
-    checkVersion(List.of("cargo", "--version"), "Cargo", workDir);
-    checkVersion(List.of("cargo", "clippy", "--version"), "Clippy", workDir);
+  public ToolVersions check(Path workDir) {
+    String cargoVersion = checkVersion(List.of("cargo", "--version"), "Cargo", workDir);
+    String clippyVersion = checkVersion(List.of("cargo", "clippy", "--version"), "Clippy", workDir);
+
+    return new ToolVersions(cargoVersion, clippyVersion);
   }
 
-  private void checkVersion(List<String> command, String prerequisite, Path workDir) {
+  private String checkVersion(List<String> command, String prerequisite, Path workDir) {
     LOG.debug("Checking {} version", prerequisite);
     try {
       processWrapper.start(command, workDir, null, LOG::warn);
       try (var reader = new BufferedReader(new InputStreamReader(processWrapper.getInputStream()))) {
         var version = reader.readLine();
         LOG.debug("{} version: {}", prerequisite, version);
+        return version;
       }
     } catch (IOException e) {
       throw new IllegalStateException("Failed to check " + prerequisite + " version", e);
     }
+  }
+
+  public record ToolVersions(String cargoVersion, String clippyVersion) {
   }
 }

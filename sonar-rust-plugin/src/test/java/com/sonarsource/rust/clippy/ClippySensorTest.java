@@ -16,15 +16,6 @@
  */
 package com.sonarsource.rust.clippy;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
-
 import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
@@ -47,6 +38,15 @@ import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.sensor.issue.Issue;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class ClippySensorTest {
 
@@ -114,7 +114,7 @@ class ClippySensorTest {
     Files.createFile(manifest);
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
-    doNothing().when(clippyPrerequisite).check(any());
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
     doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
@@ -140,8 +140,7 @@ class ClippySensorTest {
     Files.createFile(manifest);
 
     ClippyPrerequisite clippyPrerequisite = mock(ClippyPrerequisite.class);
-    doNothing().when(clippyPrerequisite).check(any());
-
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     List<ClippyDiagnostic> diagnostics = List.of(
       new ClippyDiagnostic(new ClippyMessage(
@@ -209,7 +208,7 @@ class ClippySensorTest {
     context.fileSystem().add(inputFile);
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
-    doNothing().when(clippyPrerequisite).check(any());
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
     List<ClippyDiagnostic> diagnostics = List.of(
