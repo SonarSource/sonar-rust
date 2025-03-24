@@ -137,7 +137,7 @@ fn main() {
     return new RustSensor(new AnalyzerFactory(null) {
       @Override
       public Analyzer create(Platform platform) {
-        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND);
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
       }
     });
   }

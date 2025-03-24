@@ -40,7 +40,7 @@ class RustRulesDefinitionTest {
   @Test
   void testSonarRules() {
     var rules = RustRulesDefinition.SONAR_RULES;
-    assertThat(rules).hasSize(1);
+    assertThat(rules).hasSize(2);
   }
 
   @Test
