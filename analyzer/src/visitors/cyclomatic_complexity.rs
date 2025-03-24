@@ -15,15 +15,15 @@
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 use crate::{
-    tree::{walk_tree, NodeVisitor},
+    tree::{walk_tree, AnalyzerError, NodeVisitor},
     visitors::cognitive_complexity::is_logical_operator,
 };
 use tree_sitter::{Node, Tree};
 
-pub(crate) fn calculate_cyclomatic_complexity(tree: &Tree) -> i32 {
+pub(crate) fn calculate_cyclomatic_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
     let mut visitor = CyclomaticComplexityVisitor::default();
-    walk_tree(tree.root_node(), &mut visitor);
-    visitor.complexity
+    walk_tree(tree.root_node(), &mut visitor)?;
+    Ok(visitor.complexity)
 }
 
 #[derive(Debug, Default)]
@@ -32,7 +32,7 @@ struct CyclomaticComplexityVisitor {
 }
 
 impl NodeVisitor for CyclomaticComplexityVisitor {
-    fn enter_node(&mut self, node: Node<'_>) {
+    fn enter_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         match node.kind() {
             "if_expression" | "loop_expression" | "while_expression" | "for_expression"
             | "closure_expression" => {
@@ -49,6 +49,8 @@ impl NodeVisitor for CyclomaticComplexityVisitor {
             }
             _ => {}
         }
+
+        return Ok(());
     }
 }
 
@@ -149,6 +151,6 @@ mod tests {
 
     fn complexity(source_code: &str) -> i32 {
         let tree = parse_rust_code(source_code).unwrap();
-        calculate_cyclomatic_complexity(&tree)
+        calculate_cyclomatic_complexity(&tree).unwrap()
     }
 }

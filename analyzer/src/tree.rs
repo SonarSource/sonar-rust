@@ -40,10 +40,14 @@ pub struct SonarLocation {
 
 pub trait NodeVisitor {
     /// Callback invoked the first time a node is visited.
-    fn enter_node(&mut self, _node: Node<'_>) {}
+    fn enter_node(&mut self, _node: Node<'_>) -> Result<(), AnalyzerError> {
+        Ok(())
+    }
 
     /// Callback invoked after all children of a node have been visited.
-    fn exit_node(&mut self, _node: Node<'_>) {}
+    fn exit_node(&mut self, _node: Node<'_>) -> Result<(), AnalyzerError> {
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -95,7 +99,10 @@ impl TreeSitterLocation {
 /// Performs a depth-first traversal of the tree, calling the callbacks defined in the visitor whenever entering and leaving a node.
 /// The visitor visits "extra" nodes (e.g. comments) as well, however, it does not visit their children
 /// (i.e. comments are treated as leaves in the tree).
-pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
+pub(crate) fn walk_tree(
+    tree: Node<'_>,
+    visitor: &mut dyn NodeVisitor,
+) -> Result<(), AnalyzerError> {
     let mut cursor = tree.walk();
     let mut has_next = true;
     let mut visited_children = false;
@@ -109,14 +116,14 @@ pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
         }
 
         if !visited_children {
-            visitor.enter_node(node);
+            visitor.enter_node(node)?;
             if !cursor.goto_first_child() {
                 visited_children = true;
             }
         } else {
             // When this branch is reached, all children of the node have already been processed.
             // Process the information in the node and move on to the next sibling (or backtrack to the parent if there aren't any).
-            visitor.exit_node(node);
+            visitor.exit_node(node)?;
 
             if cursor.goto_next_sibling() {
                 visited_children = false;
@@ -125,6 +132,8 @@ pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
             }
         }
     }
+
+    Ok(())
 }
 
 pub(crate) fn parse_rust_code(source_code: &str) -> Result<Tree, AnalyzerError> {
@@ -163,12 +172,13 @@ pub struct NodeIterator<'a> {
 
 impl<'a> NodeIterator<'a> {
     pub fn new<F>(tree: Node<'a>, predicate: F) -> Self
-        where F: Fn(Node<'a>) -> bool + 'static
+    where
+        F: Fn(Node<'a>) -> bool + 'static,
     {
         Self {
             predicate: Box::new(predicate),
             cursor: tree.walk(),
-            visited_children: false
+            visited_children: false,
         }
     }
 }
@@ -176,7 +186,7 @@ impl<'a> NodeIterator<'a> {
 impl<'a> Iterator for NodeIterator<'a> {
     type Item = Node<'a>;
 
-    fn next(&mut self) -> Option<Self::Item> {    
+    fn next(&mut self) -> Option<Self::Item> {
         loop {
             let node = self.cursor.node();
 

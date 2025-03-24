@@ -33,12 +33,12 @@ pub struct Metrics {
 
 pub fn calculate_metrics(tree: &Tree, source_code: &str) -> Result<Metrics, AnalyzerError> {
     let mut metrics_visitor = MetricsVisitor::new(source_code);
-    walk_tree(tree.root_node(), &mut metrics_visitor);
+    walk_tree(tree.root_node(), &mut metrics_visitor)?;
 
     let mut metrics = Metrics::default();
     metrics_visitor.update_metrics(&mut metrics);
     metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree)?;
-    metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree);
+    metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree)?;
 
     Ok(metrics)
 }
@@ -75,7 +75,7 @@ impl<'a> MetricsVisitor<'a> {
 }
 
 impl NodeVisitor for MetricsVisitor<'_> {
-    fn exit_node(&mut self, node: Node<'_>) {
+    fn exit_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         match node.kind() {
             "line_comment" | "block_comment" => {
                 let mut current_line = node.start_position().row;
@@ -106,6 +106,8 @@ impl NodeVisitor for MetricsVisitor<'_> {
                 self.lines_of_code.insert(line);
             }
         }
+
+        return Ok(());
     }
 }
 

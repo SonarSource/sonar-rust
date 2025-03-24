@@ -1,3 +1,4 @@
+use crate::tree::AnalyzerError;
 /*
  * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
@@ -24,10 +25,13 @@ pub struct CpdToken {
     pub location: SonarLocation,
 }
 
-pub fn calculate_cpd_tokens(tree: &Tree, source_code: &str) -> Vec<CpdToken> {
+pub fn calculate_cpd_tokens(
+    tree: &Tree,
+    source_code: &str,
+) -> Result<Vec<CpdToken>, AnalyzerError> {
     let mut cpd_visitor = CPDVisitor::new(source_code);
-    walk_tree(tree.root_node(), &mut cpd_visitor);
-    cpd_visitor.tokens
+    walk_tree(tree.root_node(), &mut cpd_visitor)?;
+    Ok(cpd_visitor.tokens)
 }
 
 #[derive(Debug)]
@@ -54,30 +58,30 @@ impl<'a> CPDVisitor<'a> {
 }
 
 impl NodeVisitor for CPDVisitor<'_> {
-    fn enter_node(&mut self, node: Node<'_>) {
+    fn enter_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         if node.child_count() == 0 {
             // Ignore source files
             // We wrongly consider them as tokens when they denote empty files
             if node.kind() == "source_file" {
-                return;
+                return Ok(());
             }
 
             // Ignore missing nodes
             // They denote syntax errors and can have identical starting and ending columns
             if node.is_missing() {
-                return;
+                return Ok(());
             }
 
             // Ignore error nodes
             // They denote syntax errors and can be unpredictable
             if node.is_error() {
-                return;
+                return Ok(());
             }
 
             // Number-like tokens
             if node.kind() == "integer_literal" || node.kind() == "float_literal" {
                 self.new_token("NUMBER", node);
-                return;
+                return Ok(());
             }
 
             // String-like tokens
@@ -90,13 +94,15 @@ impl NodeVisitor for CPDVisitor<'_> {
                 } else {
                     self.new_token("STRING", node);
                 }
-                return;
+                return Ok(());
             }
 
             // Default case
             let image = &self.source_code[node.start_byte()..node.end_byte()];
             self.new_token(image, node);
         }
+
+        return Ok(());
     }
 }
 
@@ -138,7 +144,7 @@ bar
 "#;
         let tree = parse_rust_code(source_code).unwrap();
 
-        let actual = calculate_cpd_tokens(&tree, source_code);
+        let actual = calculate_cpd_tokens(&tree, source_code).unwrap();
         let expected = vec![
             token("fn", 2, 0, 2, 2),
             token("main", 2, 3, 2, 7),
@@ -170,7 +176,7 @@ bar
     fn test_empty_source() {
         let source_code = "";
         let tree = parse_rust_code(source_code).unwrap();
-        let actual = calculate_cpd_tokens(&tree, source_code);
+        let actual = calculate_cpd_tokens(&tree, source_code).unwrap();
         assert_eq!(actual, Vec::new());
     }
 
@@ -182,7 +188,7 @@ fn main() {
 }"#;
 
         let tree = parse_rust_code(source_code).unwrap();
-        let actual = calculate_cpd_tokens(&tree, source_code);
+        let actual = calculate_cpd_tokens(&tree, source_code).unwrap();
         let expected = vec![
             token("fn", 2, 0, 2, 2),
             token("main", 2, 3, 2, 7),

@@ -4,14 +4,17 @@
  * mailto:info AT sonarsource DOT com
  */
 use crate::{
-    issue::{Issue, SecondaryLocation}, rules::rule::Rule, tree::{AnalyzerError, NodeIterator, TreeSitterLocation}, visitors::cognitive_complexity::calculate_cognitive_complexity
+    issue::{Issue, SecondaryLocation},
+    rules::rule::Rule,
+    tree::{AnalyzerError, NodeIterator, TreeSitterLocation},
+    visitors::cognitive_complexity::calculate_cognitive_complexity,
 };
 use tree_sitter::{Node, Tree};
 
 const RULE_KEY: &str = "S3776";
 
 pub struct CognitiveComplexityCheck {
-    threshold: i32
+    threshold: i32,
 }
 
 impl CognitiveComplexityCheck {
@@ -21,32 +24,33 @@ impl CognitiveComplexityCheck {
 }
 
 impl Rule for CognitiveComplexityCheck {
-
     fn check(&self, tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
         let iter = NodeIterator::new(tree.root_node(), |node| is_outer_function_node(node));
         let mut issues: Vec<Issue> = vec![];
 
         for function_item in iter {
             let increments = calculate_cognitive_complexity(function_item)?;
-            let total: i32 = increments
-                .iter()
-                .map(|inc| inc.nesting + 1)
-                .sum();
+            let total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();
 
             if total > self.threshold {
-                let secondary_locations: Vec<SecondaryLocation> = increments.iter()
-                    .map(|inc| SecondaryLocation{
+                let secondary_locations: Vec<SecondaryLocation> = increments
+                    .iter()
+                    .map(|inc| SecondaryLocation {
                         location: inc.location.to_sonar_location(source_code),
                         message: if inc.nesting == 0 {
                             format!("+{}", inc.nesting + 1)
                         } else {
                             format!("+{} (incl {} for nesting)", inc.nesting + 1, inc.nesting)
-                        }
+                        },
                     })
                     .collect();
 
-                let location = function_item.child_by_field_name("name")
-                    .ok_or(AnalyzerError::FileError("A function_item node should have a 'name' field".to_string()))?;
+                let location =
+                    function_item
+                        .child_by_field_name("name")
+                        .ok_or(AnalyzerError::FileError(
+                            "A function_item node should have a 'name' field".to_string(),
+                        ))?;
 
                 issues.push(Issue {
                     rule_key: RULE_KEY.to_string(),
@@ -96,7 +100,7 @@ fn main() {
 
         assert_eq!(actual, expected);
     }
-    
+
     #[test]
     fn if_else_complexity() {
         let source_code = r#"
@@ -118,17 +122,63 @@ fn foo(c1: bool, c2: bool) {
 
         assert_eq!(actual.len(), 1);
         assert_eq!(actual[0].rule_key, RULE_KEY);
-        assert_eq!(actual[0].message, "Refactor this function to reduce its Cognitive Complexity from 5 to the 0 allowed.");
-        assert_eq!(actual[0].location, SonarLocation{ start_line: 2, start_column: 3, end_line: 2, end_column: 6 });
+        assert_eq!(
+            actual[0].message,
+            "Refactor this function to reduce its Cognitive Complexity from 5 to the 0 allowed."
+        );
+        assert_eq!(
+            actual[0].location,
+            SonarLocation {
+                start_line: 2,
+                start_column: 3,
+                end_line: 2,
+                end_column: 6
+            }
+        );
 
         assert_eq!(actual[0].secondary_locations.len(), 4);
 
-        assert_eq!(actual[0].secondary_locations, vec![
-            SecondaryLocation{ message: "+1".to_owned(), location: SonarLocation { start_line: 3, start_column: 4, end_line: 3, end_column: 6 } },
-            SecondaryLocation{ message: "+1".to_owned(), location: SonarLocation { start_line: 9, start_column: 6, end_line: 9, end_column: 10 } },
-            SecondaryLocation{ message: "+2 (incl 1 for nesting)".to_owned(), location: SonarLocation { start_line: 4, start_column: 8, end_line: 4, end_column: 10 } },
-            SecondaryLocation{ message: "+1".to_owned(), location: SonarLocation { start_line: 6, start_column: 10, end_line: 6, end_column: 14 } },
-        ]);
+        assert_eq!(
+            actual[0].secondary_locations,
+            vec![
+                SecondaryLocation {
+                    message: "+1".to_owned(),
+                    location: SonarLocation {
+                        start_line: 3,
+                        start_column: 4,
+                        end_line: 3,
+                        end_column: 6
+                    }
+                },
+                SecondaryLocation {
+                    message: "+1".to_owned(),
+                    location: SonarLocation {
+                        start_line: 9,
+                        start_column: 6,
+                        end_line: 9,
+                        end_column: 10
+                    }
+                },
+                SecondaryLocation {
+                    message: "+2 (incl 1 for nesting)".to_owned(),
+                    location: SonarLocation {
+                        start_line: 4,
+                        start_column: 8,
+                        end_line: 4,
+                        end_column: 10
+                    }
+                },
+                SecondaryLocation {
+                    message: "+1".to_owned(),
+                    location: SonarLocation {
+                        start_line: 6,
+                        start_column: 10,
+                        end_line: 6,
+                        end_column: 14
+                    }
+                },
+            ]
+        );
     }
 
     #[test]
@@ -153,15 +203,45 @@ fn foo(c1: bool) {
 
         assert_eq!(actual.len(), 1);
         assert_eq!(actual[0].rule_key, RULE_KEY);
-        assert_eq!(actual[0].message, "Refactor this function to reduce its Cognitive Complexity from 3 to the 0 allowed.");
-        assert_eq!(actual[0].location, SonarLocation{ start_line: 2, start_column: 3, end_line: 2, end_column: 6 });
+        assert_eq!(
+            actual[0].message,
+            "Refactor this function to reduce its Cognitive Complexity from 3 to the 0 allowed."
+        );
+        assert_eq!(
+            actual[0].location,
+            SonarLocation {
+                start_line: 2,
+                start_column: 3,
+                end_line: 2,
+                end_column: 6
+            }
+        );
 
-        assert_eq!(actual[0].secondary_locations, vec![
-            SecondaryLocation{ message: "+2 (incl 1 for nesting)".to_string(), location: SonarLocation { start_line: 4, start_column: 8, end_line: 4, end_column: 10 }},
-            SecondaryLocation{ message: "+1".to_string(), location: SonarLocation { start_line: 9, start_column: 4, end_line: 9, end_column: 6 }},
-        ]);
+        assert_eq!(
+            actual[0].secondary_locations,
+            vec![
+                SecondaryLocation {
+                    message: "+2 (incl 1 for nesting)".to_string(),
+                    location: SonarLocation {
+                        start_line: 4,
+                        start_column: 8,
+                        end_line: 4,
+                        end_column: 10
+                    }
+                },
+                SecondaryLocation {
+                    message: "+1".to_string(),
+                    location: SonarLocation {
+                        start_line: 9,
+                        start_column: 4,
+                        end_line: 9,
+                        end_column: 6
+                    }
+                },
+            ]
+        );
     }
-    
+
     #[test]
     fn test_default_threshold() {
         let source_code = r#"
@@ -184,9 +264,19 @@ fn foo(c1: bool) {
 
         assert_eq!(actual.len(), 1);
         assert_eq!(actual[0].rule_key, RULE_KEY);
-        assert_eq!(actual[0].message, "Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.");
-        assert_eq!(actual[0].location, SonarLocation{ start_line: 2, start_column: 3, end_line: 2, end_column: 6 });
+        assert_eq!(
+            actual[0].message,
+            "Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed."
+        );
+        assert_eq!(
+            actual[0].location,
+            SonarLocation {
+                start_line: 2,
+                start_column: 3,
+                end_line: 2,
+                end_column: 6
+            }
+        );
         assert_eq!(actual[0].secondary_locations.len(), 16);
     }
-
 }

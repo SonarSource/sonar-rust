@@ -38,7 +38,7 @@ pub fn analyze(source_code: &str) -> Result<Output, AnalyzerError> {
     Ok(Output {
         highlight_tokens: highlight(&tree, source_code)?,
         metrics: calculate_metrics(&tree, source_code)?,
-        cpd_tokens: calculate_cpd_tokens(&tree, source_code),
+        cpd_tokens: calculate_cpd_tokens(&tree, source_code)?,
         issues: find_issues(&tree, source_code)?,
     })
 }
