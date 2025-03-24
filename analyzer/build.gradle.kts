@@ -92,6 +92,35 @@ task<Exec>("checkRustFormat") {
   commandLine("cargo", "fmt", "--", "--check")
 }
 
+tasks.register("checkRustLicense") {
+  description = "Checks Rust code license headers."
+  group = "Verification"
+
+  fun checkLicenseHeader(file: File, expectedHeader: String): Boolean {
+    val fileContent = file.readText().trimStart()
+    return fileContent.startsWith(expectedHeader)
+  }
+
+  val rustFiles = fileTree("src/") {
+    include("**/*.rs")
+  }.toList()
+
+  doLast {
+    val licenseHeaderFile = file("${project.rootDir}/license-header.txt")
+    if (!licenseHeaderFile.exists()) {
+      throw GradleException("License header file not found: ${licenseHeaderFile.path}")
+    }
+
+    val expectedHeader = licenseHeaderFile.readText().trim()
+
+    val headerMismatches = rustFiles.filter { !checkLicenseHeader(it, expectedHeader) }
+    if (!headerMismatches.isEmpty()) {
+      headerMismatches.forEach { println("Missing or incorrect license header in: ${it.path}") }
+      throw GradleException("Some Rust files are missing the correct license header.")
+    }
+  }
+}
+
 task<Exec>("coverageRust") {
   inputs.files("src/", "Cargo.toml", "Cargo.lock")
   outputs.files("target/llvm-cov-target/coverage.lcov")
