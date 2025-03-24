@@ -52,7 +52,7 @@ impl<'a> CPDVisitor<'a> {
         self.tokens.push(CpdToken {
             image: image.to_string(),
             location: TreeSitterLocation::from_tree_sitter_node(node)
-                .to_sonar_location(&self.source_code),
+                .to_sonar_location(self.source_code),
         });
     }
 }
@@ -102,7 +102,7 @@ impl NodeVisitor for CPDVisitor<'_> {
             self.new_token(image, node);
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 

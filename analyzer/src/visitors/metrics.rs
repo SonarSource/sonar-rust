@@ -107,7 +107,7 @@ impl NodeVisitor for MetricsVisitor<'_> {
             }
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 

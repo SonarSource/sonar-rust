@@ -50,7 +50,7 @@ impl NodeVisitor for CyclomaticComplexityVisitor {
             _ => {}
         }
 
-        return Ok(());
+        Ok(())
     }
 }
 
