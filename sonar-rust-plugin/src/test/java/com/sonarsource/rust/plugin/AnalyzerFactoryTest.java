@@ -48,7 +48,6 @@ class AnalyzerFactoryTest {
   @Test
   void testPathInJar() {
     assertThat(AnalyzerFactory.pathInJar(Platform.WIN_X64)).isEqualTo("/analyzer/win-x64/analyzer.exe.xz");
-    assertThat(AnalyzerFactory.pathInJar(Platform.LINUX_X64)).isEqualTo("/analyzer/linux-x64/analyzer.xz");
     assertThat(AnalyzerFactory.pathInJar(Platform.LINUX_X64_MUSL)).isEqualTo("/analyzer/linux-x64-musl/analyzer.xz");
     assertThat(AnalyzerFactory.pathInJar(Platform.LINUX_AARCH64)).isEqualTo("/analyzer/linux-aarch64-musl/analyzer.xz");
     assertThat(AnalyzerFactory.pathInJar(Platform.DARWIN_AARCH64)).isEqualTo("/analyzer/darwin-aarch64/analyzer.xz");

@@ -91,19 +91,15 @@ tasks.jar {
 tasks.register<Copy>("copyRustOutputs") {
   description = "Copy native analyzer binary to the build/classes dir for packaging"
   group = "Build"
-  val compileRustLinux = project(":analyzer").tasks.named("compileRustLinux").get()
   val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
   val compileRustLinuxArm = project(":analyzer").tasks.named("compileRustLinuxArm").get()
   val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
   val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
   val compileRustDarwinX86 = project(":analyzer").tasks.named("compileRustDarwinX86").get()
 
-  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin)
+  dependsOn(compileRustLinuxMusl, compileRustWin)
   if (OperatingSystem.current().isMacOsX) {
     dependsOn(compileRustDarwin, compileRustDarwinX86)
-  }
-  from(compileRustLinux.outputs.files) {
-    into("linux-x64")
   }
   from(compileRustLinuxMusl.outputs.files) {
     into("linux-x64-musl")
