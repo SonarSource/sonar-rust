@@ -51,8 +51,8 @@
   },
   {
     "lintId": "clippy::ineffective_bit_mask",
-    "ruleKey": null,
-    "message": "Remove bit masks in comparisons which do not change the outcome."
+    "ruleKey": "S2437",
+    "message": "Remove this unnecessary bit mask operation."
   },
   {
     "lintId": "clippy::bad_bit_mask",

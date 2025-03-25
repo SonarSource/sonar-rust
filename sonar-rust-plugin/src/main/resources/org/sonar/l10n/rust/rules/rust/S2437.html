@@ -1,0 +1,23 @@
+<h2>Why is this an issue?</h2>
+<p>Using redundant bit masks in comparisons can be misleading because the bit mask does not alter the result of the comparison. This makes the code
+harder to read and understand. It may also suggest incorrect logic or purpose, increasing the risk of errors.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let x = 1;
+if (x | 2 &gt; 3) { // Noncompliant: Bitwise OR with 1 is redundant in this context
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+let x = 1;
+if (x &gt; 3) { // Compliant: Simplifies the comparison by removing redundant bit operation
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#ineffective_bit_mask">https://rust-lang.github.io/rust-clippy/master/index.html#ineffective_bit_mask</a> </li>
+</ul>
+
