@@ -21,7 +21,7 @@ import static java.util.Objects.requireNonNull;
 import java.util.List;
 import javax.annotation.Nullable;
 
-public record ClippyDiagnostic(@Nullable ClippyMessage message) {
+public record ClippyDiagnostic(@Nullable String manifest_path, @Nullable ClippyMessage message) {
   public String lintId() {
     requireNonNull(message, "message is null");
     return message.code().code();
