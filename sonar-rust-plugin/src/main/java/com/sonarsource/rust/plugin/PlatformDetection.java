@@ -22,7 +22,6 @@ import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_AARCH
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.UNSUPPORTED;
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.WIN_X64;
 
-import java.nio.file.Path;
 import java.util.Locale;
 
 class PlatformDetection {
@@ -31,7 +30,6 @@ class PlatformDetection {
 
   enum Platform {
     WIN_X64,
-    LINUX_X64,
     LINUX_X64_MUSL,
     LINUX_AARCH64,
     DARWIN_AARCH64,
@@ -53,11 +51,11 @@ class PlatformDetection {
   Platform detect() {
     var osName = system.getOsName();
     var lowerCaseOsName = osName.toLowerCase(Locale.ROOT);
-    if (osName.contains("Windows") && isX64()) {
+    if (lowerCaseOsName.contains("windows") && isX64()) {
       return WIN_X64;
     } else if (lowerCaseOsName.contains("linux")) {
       if (isX64()) {
-        return isAlpine() ? Platform.LINUX_X64_MUSL : Platform.LINUX_X64;
+        return Platform.LINUX_X64_MUSL;
       } else if (isARM64())  {
         return LINUX_AARCH64;
       }
@@ -77,10 +75,6 @@ class PlatformDetection {
 
   private boolean isARM64() {
     return system.getOsArch().contains("aarch64");
-  }
-
-  private boolean isAlpine() {
-    return system.fileExists(Path.of("/etc/alpine-release"));
   }
 
 }

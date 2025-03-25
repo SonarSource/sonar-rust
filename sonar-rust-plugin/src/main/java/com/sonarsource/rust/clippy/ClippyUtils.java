@@ -70,6 +70,7 @@ class ClippyUtils {
 
   private static boolean isClippyDiagnostic(@Nullable ClippyDiagnostic diagnostic) {
     return diagnostic != null
+      && diagnostic.manifest_path() != null
       && diagnostic.message() != null
       && diagnostic.message().code() != null
       && diagnostic.message().code().code() != null

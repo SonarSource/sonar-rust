@@ -17,14 +17,12 @@
 package com.sonarsource.rust.plugin;
 
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_AARCH64;
-import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_X64;
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_X64_MUSL;
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.UNSUPPORTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 class PlatformDetectionTest {
@@ -35,18 +33,11 @@ class PlatformDetectionTest {
     PlatformDetection platformDetection = new PlatformDetection(system);
     when(system.getOsName()).thenReturn("Linux");
     when(system.getOsArch()).thenReturn("amd64");
-    assertThat(platformDetection.detect()).isEqualTo(LINUX_X64);
+    assertThat(platformDetection.detect()).isEqualTo(LINUX_X64_MUSL);
     when(system.getOsArch()).thenReturn("x86");
     assertThat(platformDetection.detect()).isEqualTo(UNSUPPORTED);
     when(system.getOsArch()).thenReturn("aarch64");
     assertThat(platformDetection.detect()).isEqualTo(LINUX_AARCH64);
-
-    when(system.fileExists(Path.of("/etc/alpine-release"))).thenReturn(true);
-    assertThat(platformDetection.detect()).isEqualTo(LINUX_AARCH64);
-    when(system.getOsArch()).thenReturn("x86");
-    assertThat(platformDetection.detect()).isEqualTo(UNSUPPORTED);
-    when(system.getOsArch()).thenReturn("amd64");
-    assertThat(platformDetection.detect()).isEqualTo(LINUX_X64_MUSL);
   }
 
   @Test

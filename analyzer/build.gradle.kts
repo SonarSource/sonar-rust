@@ -44,15 +44,6 @@ fun createCompileRustTask(target: String, name: String, envVars: Map<String, Str
 }
 
 // Create tasks for compiling Rust code for different targets, to get a list of available targets run `rustup target list`
-val linuxCcEnv: String = if (OperatingSystem.current().isMacOsX) {
-  "x86_64-unknown-linux-gnu-gcc"
-} else {
-  "x86_64-linux-gnu-gcc"
-}
-val compileRustLinux = createCompileRustTask(
-  "x86_64-unknown-linux-gnu", "Linux",
-  mapOf("TARGET_CC" to linuxCcEnv, "CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER" to linuxCcEnv)
-)
 val muslAr = if (OperatingSystem.current().isMacOsX) {
   "x86_64-linux-musl-ar"
 } else {

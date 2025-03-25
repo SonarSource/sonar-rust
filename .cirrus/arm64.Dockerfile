@@ -3,10 +3,7 @@ FROM ${CIRRUS_AWS_ACCOUNT}.dkr.ecr.eu-central-1.amazonaws.com/base:java-17
 
 USER root
 
-
 RUN apk add --no-cache autoconf bash build-base musl-dev pkgconfig rustup
-
-RUN apk add --no-cache autoconf build-base musl-dev pkgconfig rustup
 
 USER sonarsource
 

@@ -142,18 +142,19 @@ class ClippySensorTest {
     ClippyPrerequisite clippyPrerequisite = mock(ClippyPrerequisite.class);
     doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
+    var manifestPath = baseDir.toString();
     List<ClippyDiagnostic> diagnostics = List.of(
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "message",
         List.of(new ClippySpan("file.rs", 1, 2, 1, 4)))),
       // This issue should be ignored because "excluded.rs" is not part of FileSystem and thus not part of the analysis
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "message",
         List.of(new ClippySpan("excluded.rs", 1, 2, 1, 4)))),
       // This issue should be ignored because there is no mapping to SonarQube rule
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::no_mapping"),
         "message",
         List.of(new ClippySpan("excluded.rs", 1, 2, 1, 4))))
@@ -211,8 +212,9 @@ class ClippySensorTest {
     doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
+    var manifestPath = subDir.toString();
     List<ClippyDiagnostic> diagnostics = List.of(
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "Unnecessary mathematical comparisons should not be made",
         // Note that the filename is relative to the Cargo.toml directory, not the project base directory

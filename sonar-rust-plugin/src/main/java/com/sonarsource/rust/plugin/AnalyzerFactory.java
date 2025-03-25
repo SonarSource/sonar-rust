@@ -72,7 +72,6 @@ public class AnalyzerFactory {
   static String pathInJar(Platform platform) {
     return switch (platform) {
       case WIN_X64 -> "/analyzer/win-x64/analyzer.exe.xz";
-      case LINUX_X64 -> "/analyzer/linux-x64/analyzer.xz";
       case LINUX_X64_MUSL -> "/analyzer/linux-x64-musl/analyzer.xz";
       case LINUX_AARCH64 -> "/analyzer/linux-aarch64-musl/analyzer.xz";
       case DARWIN_AARCH64 -> "/analyzer/darwin-aarch64/analyzer.xz";

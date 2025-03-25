@@ -29,7 +29,7 @@ class ClippyRunnerTest {
   void test() throws Exception {
     var projectKey = "clippy-runner";
     var projectName = "Clippy";
-    var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/clippy").toURI()).toFile();
+    var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/runner").toURI()).toFile();
 
     var scanner = SonarScanner.create()
       .setProjectKey(projectKey)
@@ -53,7 +53,7 @@ class ClippyRunnerTest {
     assertThat(issues)
       .extracting(Issues.Issue::getLine, Issues.Issue::getComponent, Issues.Issue::getRule)
       .containsExactlyInAnyOrder(
-        tuple(8, "clippy-runner:src/main.rs", "rust:S2198")
+        tuple(2, "clippy-runner:src/main.rs", "rust:S2198")
       );
   }
 }

@@ -11,6 +11,7 @@ import static org.assertj.core.api.Assertions.tuple;
 import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
+import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -30,6 +31,18 @@ class ClippyReportTest {
     var projectKey = "clippy";
     var projectName = "Clippy";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/clippy").toURI()).toFile();
+
+    var clippyReportPath = projectDir.toPath().resolve("report.json");
+    Files.createFile(clippyReportPath);
+
+    ProcessBuilder processBuilder = new ProcessBuilder()
+      .command("cargo", "clippy", "--message-format", "json")
+      .directory(projectDir)
+      .redirectOutput(clippyReportPath.toFile())
+      .redirectError(ProcessBuilder.Redirect.INHERIT);
+
+    Process process = processBuilder.start();
+    process.waitFor();
 
     var scanner = SonarScanner.create()
       .setProjectKey(projectKey)
@@ -56,5 +69,7 @@ class ClippyReportTest {
       .containsExactlyInAnyOrder(
         tuple(2, "clippy:src/main.rs", "external_clippy:double_comparisons"),
         tuple(3, "clippy:src/main.rs", "external_clippy:empty_loop"));
+    
+    Files.deleteIfExists(clippyReportPath);
   }
 }
