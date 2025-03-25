@@ -38,7 +38,7 @@ pub fn calculate_cpd_tokens(
 struct CPDVisitor<'a> {
     source_code: &'a str,
     tokens: Vec<CpdToken>,
-    test_code_node: Option<usize>
+    test_code_node: Option<usize>,
 }
 
 impl<'a> CPDVisitor<'a> {
@@ -46,7 +46,7 @@ impl<'a> CPDVisitor<'a> {
         Self {
             source_code,
             tokens: Vec::new(),
-            test_code_node: None
+            test_code_node: None,
         }
     }
 
@@ -135,7 +135,8 @@ fn is_cfg_test_attribute(node: Node<'_>, source_code: &str) -> bool {
         let identifier = child_of_kind(attribute, "identifier")
             .map(|n| &source_code[n.start_byte()..n.end_byte()]);
 
-        let argument = attribute.child_by_field_name("arguments")
+        let argument = attribute
+            .child_by_field_name("arguments")
             .and_then(|arg| child_of_kind(arg, "identifier"))
             .map(|n| &source_code[n.start_byte()..n.end_byte()]);
 
@@ -261,14 +262,39 @@ mod tests {
 fn bar() {}
 "#;
         let tree = parse_rust_code(source_code).unwrap();
-        let actual: Vec<String> = calculate_cpd_tokens(&tree, source_code).unwrap()
+        let actual: Vec<String> = calculate_cpd_tokens(&tree, source_code)
+            .unwrap()
             .iter()
             .map(|t| t.image.clone())
             .collect();
         let expected: Vec<String> = vec![
-            "fn", "foo", "(", ")", "->", "String", "{", "return", "\"", "STRING", "\"", ".", "to_string", "(", ")", ";", "}",
-            "fn", "bar", "(", ")", "{", "}"
-        ].iter().map(|t| t.to_string()).collect();
+            "fn",
+            "foo",
+            "(",
+            ")",
+            "->",
+            "String",
+            "{",
+            "return",
+            "\"",
+            "STRING",
+            "\"",
+            ".",
+            "to_string",
+            "(",
+            ")",
+            ";",
+            "}",
+            "fn",
+            "bar",
+            "(",
+            ")",
+            "{",
+            "}",
+        ]
+        .iter()
+        .map(|t| t.to_string())
+        .collect();
 
         assert_eq!(actual, expected);
     }
@@ -286,5 +312,4 @@ fn bar() {}
         assert_eq!(check("#[cfg(target=\"Windows\")]"), false);
         assert_eq!(check("#[cfg(not(test))]"), false);
     }
-
 }
