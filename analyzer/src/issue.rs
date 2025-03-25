@@ -39,7 +39,7 @@ pub fn find_issues(
     parameters: &HashMap<String, String>,
 ) -> Result<Vec<Issue>, AnalyzerError> {
     let mut issues = Vec::new();
-    for rule in all_rules(&parameters)? {
+    for rule in all_rules(parameters)? {
         issues.extend(rule.check(tree, source_code)?);
     }
     Ok(issues)
