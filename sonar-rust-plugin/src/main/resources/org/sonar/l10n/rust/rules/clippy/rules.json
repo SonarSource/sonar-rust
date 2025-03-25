@@ -36,7 +36,7 @@
   },
   {
     "lintId": "clippy::erasing_op",
-    "ruleKey": null,
+    "ruleKey": "S2185",
     "message": "Replace `x * 0`, `0 / x`, or `x & 0` with a direct constant value."
   },
   {
