@@ -1,8 +1,8 @@
 [
   {
     "lintId": "clippy::never_loop",
-    "ruleKey": null,
-    "message": "Refactor the loop to perform useful iterations or remove it entirely."
+    "ruleKey": "S1751",
+    "message": "Refactor this loop to perform more than one iteration or remove it."
   },
   {
     "lintId": "clippy::iter_next_loop",
