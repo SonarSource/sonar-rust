@@ -21,7 +21,9 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +39,7 @@ public class AnalyzerFactory {
   private static final Logger LOG = LoggerFactory.getLogger(AnalyzerFactory.class);
 
   private final TempFolder tempFolder;
+  private final Map<String, String> parameters = new HashMap<>();
 
   public AnalyzerFactory(TempFolder tempFolder) {
     this.tempFolder = tempFolder;
@@ -58,8 +61,12 @@ public class AnalyzerFactory {
       if (!Files.isExecutable(path)) {
         Files.setPosixFilePermissions(path, Set.of(OWNER_EXECUTE));
       }
-      return new Analyzer(List.of(path.toString()));
+      return new Analyzer(List.of(path.toString()), parameters);
     }
+  }
+
+  public void addParameters(Map<String, String> parameters) {
+    this.parameters.putAll(parameters);
   }
 
   static String pathInJar(Platform platform) {

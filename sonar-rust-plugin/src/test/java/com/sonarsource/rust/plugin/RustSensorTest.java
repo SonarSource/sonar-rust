@@ -123,6 +123,34 @@ fn main() {
     assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(2);
   }
 
+  @Test
+  void analyze_cognitive_complexity() {
+    // Test to ensure that the sensor correctly reports secondary locations
+    var sensor = sensor();
+    context.fileSystem().add(inputFile("test.rs", """
+fn foo(c1: bool) {
+  if c1 {} else {}
+  if c1 {} else {}
+  if c1 {} else {}
+  if c1 {} else {}
+  if c1 {} else {}
+  if c1 {} else {}
+  if c1 {} else {}
+  if c1 {} else {}
+}
+"""));
+
+    sensor.execute(context);
+
+    assertThat(context.allIssues()).hasSize(1);
+
+    var issue = context.allIssues().iterator().next();
+    assertThat(issue.ruleKey().rule()).isEqualTo("S3776");
+    assertThat(issue.primaryLocation().message()).isEqualTo("Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.");
+    assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
+    assertThat(issue.flows()).hasSize(16);
+  }
+
   private InputFile inputFile(String relativePath, String content) {
     return new TestInputFileBuilder(PROJECT_KEY, relativePath)
       .setModuleBaseDir(baseDir.toPath())
@@ -137,7 +165,7 @@ fn main() {
     return new RustSensor(new AnalyzerFactory(null) {
       @Override
       public Analyzer create(Platform platform) {
-        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND);
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
       }
     });
   }

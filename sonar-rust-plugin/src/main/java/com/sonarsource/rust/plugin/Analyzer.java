@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,12 +35,15 @@ public class Analyzer implements AutoCloseable {
   private final DataOutputStream outputStream;
   private final DataInputStream inputStream;
 
-  public Analyzer(List<String> command) {
+  public Analyzer(List<String> command, Map<String, String> parameters) {
     try {
       process = new ProcessWrapper();
       process.start(command, null, null, LOG::warn);
       this.outputStream = new DataOutputStream(process.getOutputStream());
       this.inputStream = new DataInputStream(process.getInputStream());
+
+      writeString("sonar");
+      writeMap(parameters);
     } catch (IOException ex) {
       throw new IllegalStateException("Failed to start the analyzer process", ex);
     }
@@ -65,11 +69,8 @@ public class Analyzer implements AutoCloseable {
       String messageType = readString();
       if ("highlight".equals(messageType)) {
         String tokenType = readString();
-        int startLine = inputStream.readInt();
-        int startColumn = inputStream.readInt();
-        int endLine = inputStream.readInt();
-        int endColumn = inputStream.readInt();
-        highlightTokens.add(new HighlightTokens(tokenType, startLine, startColumn, endLine, endColumn));
+        Location location = readLocation();
+        highlightTokens.add(new HighlightTokens(tokenType, location));
       } else if ("metrics".equals(messageType)) {
         int ncloc = inputStream.readInt();
         int commentLines = inputStream.readInt();
@@ -82,19 +83,22 @@ public class Analyzer implements AutoCloseable {
         measures = new Measures(ncloc, commentLines, functions, statements, classes, cognitiveComplexity, cyclomaticComplexity);
       } else if ("cpd".equals(messageType)) {
         String image = readString();
-        int startLine = inputStream.readInt();
-        int startColumn = inputStream.readInt();
-        int endLine = inputStream.readInt();
-        int endColumn = inputStream.readInt();
-        cpdTokens.add(new CpdToken(image, startLine, startColumn, endLine, endColumn));
+        Location location = readLocation();
+        cpdTokens.add(new CpdToken(image, location));
       } else if ("issue".endsWith(messageType)) {
         String ruleKey = readString();
         String message = readString();
-        int startLine = inputStream.readInt();
-        int startColumn = inputStream.readInt();
-        int endLine = inputStream.readInt();
-        int endColumn = inputStream.readInt();
-        issues.add(new Issue(ruleKey, message, startLine, startColumn, endLine, endColumn));
+        Location location = readLocation();
+        int numSecondaryLocations = inputStream.readInt();
+
+        List<SecondaryLocation> secondaryLocations = new ArrayList<>();
+        for (int i = 0; i < numSecondaryLocations; i++) {
+          String secondaryMessage = readString();
+          Location secondaryLocation = readLocation();
+          secondaryLocations.add(new SecondaryLocation(secondaryMessage, secondaryLocation));
+        }
+
+        issues.add(new Issue(ruleKey, message, location, secondaryLocations));
       } else {
         break;
       }
@@ -115,6 +119,15 @@ public class Analyzer implements AutoCloseable {
     return new String(bytes, StandardCharsets.UTF_8);
   }
 
+  private Location readLocation() throws IOException {
+    int startLine = inputStream.readInt();
+    int startColumn = inputStream.readInt();
+    int endLine = inputStream.readInt();
+    int endColumn = inputStream.readInt();
+
+    return new Location(startLine, startColumn, endLine, endColumn);
+  }
+
   private void writeInt(int value) throws IOException {
     outputStream.writeInt(value);
     outputStream.flush();
@@ -131,10 +144,18 @@ public class Analyzer implements AutoCloseable {
     outputStream.flush();
   }
 
+  private void writeMap(Map<String, String> map) throws IOException {
+    outputStream.writeInt(map.size());
+    for (Map.Entry<String, String> entry : map.entrySet()) {
+      writeString(entry.getKey());
+      writeString(entry.getValue());
+    }
+  }
+
   public record AnalysisResult(List<HighlightTokens> highlightTokens, Measures measures, List<CpdToken> cpdTokens, List<Issue> issues) {
   }
 
-  public record HighlightTokens(String tokenType, int startLine, int startColumn, int endLine, int endColumn) {
+  public record HighlightTokens(String tokenType, Location location) {
   }
 
   public record Measures(int ncloc, int commentLines, int functions, int statements, int classes, int cognitiveComplexity, int cyclomaticComplexity) {
@@ -143,9 +164,17 @@ public class Analyzer implements AutoCloseable {
     }
   }
 
-  public record CpdToken(String image, int startLine, int startColumn, int endLine, int endColumn) {
+  public record CpdToken(String image, Location location) {
   }
 
-  public record Issue(String ruleKey, String message, int startLine, int startColumn, int endLine, int endColumn) {
+  public record Location(int startLine, int startColumn, int endLine, int endColumn) {
+
+  }
+
+  public record Issue(String ruleKey, String message, Location location, List<SecondaryLocation> secondaryLocations) {
+  }
+
+  public record SecondaryLocation(String message, Location location) {
+
   }
 }

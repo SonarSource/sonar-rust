@@ -40,7 +40,7 @@ class RustRulesDefinitionTest {
   @Test
   void testSonarRules() {
     var rules = RustRulesDefinition.SONAR_RULES;
-    assertThat(rules).hasSize(1);
+    assertThat(rules).hasSize(2);
   }
 
   @Test
@@ -74,5 +74,20 @@ class RustRulesDefinitionTest {
     for (var rule : profile.rules()) {
       assertThat(repository.rule(rule.ruleKey())).isNotNull();
     }
+  }
+
+  @Test
+  void parameters() {
+    // Make sure that parameters are defined only for known Sonar rules
+    var runtime = SonarRuntimeImpl.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
+    var definition = new RustRulesDefinition(runtime);
+    var definitionContext = new RulesDefinition.Context();
+    definition.define(definitionContext);
+
+    var repository = definitionContext.repository(RustLanguage.KEY);
+
+    assertThat(RustRulesDefinition.parameters()).extracting(RustRulesDefinition.RuleParameter::ruleKey)
+      .allSatisfy(ruleKey -> assertThat(RustRulesDefinition.SONAR_RULES).contains(ruleKey))
+      .allSatisfy(ruleKey -> assertThat(repository.rule(ruleKey)).isNotNull());
   }
 }

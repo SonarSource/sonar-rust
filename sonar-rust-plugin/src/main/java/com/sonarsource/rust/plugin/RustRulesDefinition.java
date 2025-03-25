@@ -22,10 +22,12 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import org.sonar.api.SonarRuntime;
+import org.sonar.api.server.rule.RuleParamType;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonarsource.analyzer.commons.RuleMetadataLoader;
 
@@ -55,7 +57,7 @@ public class RustRulesDefinition implements RulesDefinition {
     }
   }
 
-  public static final Set<String> SONAR_RULES = Set.of("S2260");
+  public static final Set<String> SONAR_RULES = Set.of("S2260", "S3776");
 
   private final SonarRuntime sonarRuntime;
 
@@ -70,8 +72,24 @@ public class RustRulesDefinition implements RulesDefinition {
     var ruleKeys = new ArrayList<String>();
     ruleKeys.addAll(CLIPPY_RULES.values().stream().map(ClippyRule::ruleKey).toList());
     ruleKeys.addAll(SONAR_RULES);
+
     loader.addRulesByRuleKey(repository, ruleKeys);
+
+    for (var param : parameters()) {
+      repository.rule(param.ruleKey())
+        .createParam(param.paramKey())
+        .setDefaultValue(param.defaultValue())
+        .setDescription(param.description())
+        .setType(param.type());
+    }
+
     repository.done();
+  }
+
+  public static List<RuleParameter> parameters() {
+    return List.of(
+      new RuleParameter("S3776", "threshold", "15", "The maximum authorized complexity", RuleParamType.INTEGER)
+    );
   }
 
   public static String lintIdToRuleKey(String lintId) {
@@ -84,5 +102,14 @@ public class RustRulesDefinition implements RulesDefinition {
 
   public static String lintIdToMessage(String lintId) {
     return Optional.ofNullable(CLIPPY_RULES.get(lintId)).map(ClippyRule::message).orElse(null);
+  }
+
+
+  public record RuleParameter(
+    String ruleKey,
+    String paramKey,
+    String defaultValue,
+    String description,
+    RuleParamType type) {
   }
 }

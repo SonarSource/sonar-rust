@@ -16,6 +16,7 @@
  */
 use crate::rules::rule::all_rules;
 use crate::tree::{AnalyzerError, SonarLocation};
+use std::collections::HashMap;
 use tree_sitter::Tree;
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -23,11 +24,22 @@ pub struct Issue {
     pub rule_key: String,
     pub message: String,
     pub location: SonarLocation,
+    pub secondary_locations: Vec<SecondaryLocation>,
 }
 
-pub fn find_issues(tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
+#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
+pub struct SecondaryLocation {
+    pub message: String,
+    pub location: SonarLocation,
+}
+
+pub fn find_issues(
+    tree: &Tree,
+    source_code: &str,
+    parameters: &HashMap<String, String>,
+) -> Result<Vec<Issue>, AnalyzerError> {
     let mut issues = Vec::new();
-    for rule in all_rules() {
+    for rule in all_rules(&parameters)? {
         issues.extend(rule.check(tree, source_code)?);
     }
     Ok(issues)
