@@ -37,8 +37,8 @@ class ClippyUtilsTest {
   @Test
   void testParseValidReport() throws IOException {
     var tempFile = prepareTempReportFile("""
-      {"message": {"code": {"code": "clippy::some_lint"}}}
-      {"message": {"code": {"code": "clippy::some_other_lint"}}}
+      {"manifest_path": "/dir/Cargo.toml", "message": {"code": {"code": "clippy::some_lint"}}}
+      {"manifest_path": "/dir/Cargo.toml", "message": {"code": {"code": "clippy::some_other_lint"}}}
       """);
 
     var diagnostics = ClippyUtils.parse(tempFile.toFile());
@@ -122,7 +122,7 @@ class ClippyUtilsTest {
       {}
       {"message": {}}
       {"message": {"code": {}}}
-      {"message": {"code": {"code": "clippy::some_lint"}}}
+      {"manifest_path": "/dir/Cargo.toml", "message": {"code": {"code": "clippy::some_lint"}}}
       """.split("\n")));
     assertThat(diagnostics).hasSize(1);
     var empty = ClippyUtils.parse(Stream.of(""));

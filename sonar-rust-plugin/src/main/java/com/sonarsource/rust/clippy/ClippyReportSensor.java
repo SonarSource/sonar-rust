@@ -73,9 +73,8 @@ public class ClippyReportSensor implements Sensor {
     for (var diagnostic : diagnostics) {
       try {
         LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
-        // TODO SKUNK-42: Improve filename resolution when importing Clippy diagnostics
-        var baseDir = context.fileSystem().baseDir().toPath();
-        saveIssue(context, diagnostic, baseDir);
+        var manifestDir = Path.of(diagnostic.manifest_path()).getParent();
+        saveIssue(context, diagnostic, manifestDir);
         LOG.debug("Successfully saved Clippy diagnostic");
       } catch (Exception e) {
         LOG.warn("Failed to save Clippy diagnostic. {}", e.getMessage());

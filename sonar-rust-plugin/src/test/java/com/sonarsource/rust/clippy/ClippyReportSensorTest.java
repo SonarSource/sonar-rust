@@ -81,7 +81,8 @@ class ClippyReportSensorTest {
   @Test
   void testSaveIssueWithDiagnosticEmptySpans() throws IOException {
     var json = """
-      {"message": {
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
         "code": {
           "code": "clippy::approx_constant"
         },
@@ -105,7 +106,8 @@ class ClippyReportSensorTest {
   @Test
   void testSaveIssueWithUnknownFile() throws IOException {
     var json = """
-      {"message": {
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
         "code": {
           "code": "clippy::approx_constant"
         },
@@ -133,7 +135,8 @@ class ClippyReportSensorTest {
   @Test
   void testSaveIssueWithUnknownRule() throws IOException {
     var json = """
-      {"message": {
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
         "code": {
           "code": "clippy::unknown_rule"
         },
@@ -161,8 +164,10 @@ class ClippyReportSensorTest {
 
   @Test
   void testSaveIssueWithValidDiagnostic() throws IOException {
+    var manifestPath = baseDir.resolve("Cargo.toml");
     var json = """
-      {"message": {
+      {"manifest_path": "%s",
+       "message": {
         "code": {
           "code": "clippy::approx_constant"
         },
@@ -177,7 +182,7 @@ class ClippyReportSensorTest {
           }
         ]
       }}
-      """.replaceAll(System.lineSeparator(), "");
+      """.formatted(manifestPath.toString()).replaceAll(System.lineSeparator(), "");
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
     Files.writeString(tempFile, json);
 
