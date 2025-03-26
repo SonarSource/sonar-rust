@@ -14,7 +14,9 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-use crate::tree::{walk_tree, AnalyzerError, NodeVisitor, SonarLocation, TreeSitterLocation};
+use crate::tree::{
+    child_of_kind, walk_tree, AnalyzerError, NodeVisitor, SonarLocation, TreeSitterLocation,
+};
 use tree_sitter::Node;
 use tree_sitter::Tree;
 
@@ -37,6 +39,7 @@ pub fn calculate_cpd_tokens(
 struct CPDVisitor<'a> {
     source_code: &'a str,
     tokens: Vec<CpdToken>,
+    test_code_node: Option<usize>,
 }
 
 impl<'a> CPDVisitor<'a> {
@@ -44,6 +47,7 @@ impl<'a> CPDVisitor<'a> {
         Self {
             source_code,
             tokens: Vec::new(),
+            test_code_node: None,
         }
     }
 
@@ -58,7 +62,17 @@ impl<'a> CPDVisitor<'a> {
 
 impl NodeVisitor for CPDVisitor<'_> {
     fn enter_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
-        if node.child_count() == 0 {
+        if is_cfg_test_attribute(node, self.source_code) {
+            // Ignore everything under '#[cfg(test)]' nodes as we do not want CPD on test code.
+            // In the grammar, the attribute is not attached to the tree it applies to, rather it's a sibling node, so we'll look for the next sibling
+            // and attach its effects there.
+            if let Some(sibling) = node.next_named_sibling() {
+                self.test_code_node = Some(sibling.id());
+                return Ok(());
+            }
+        }
+
+        if node.child_count() == 0 && self.test_code_node.is_none() {
             // Ignore source files
             // We wrongly consider them as tokens when they denote empty files
             if node.kind() == "source_file" {
@@ -100,9 +114,37 @@ impl NodeVisitor for CPDVisitor<'_> {
             let image = &self.source_code[node.start_byte()..node.end_byte()];
             self.new_token(image, node);
         }
-
         Ok(())
     }
+
+    fn exit_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
+        if Some(node.id()) == self.test_code_node {
+            self.test_code_node = None;
+        }
+        Ok(())
+    }
+}
+
+fn is_cfg_test_attribute(node: Node<'_>, source_code: &str) -> bool {
+    // '#[cfg(test)]' attributes have the following structure:
+    //  (attribute_item (attribute (identifier) arguments: (token_tree (identifier))))
+    if node.kind() != "attribute_item" {
+        return false;
+    }
+
+    if let Some(attribute) = child_of_kind(node, "attribute") {
+        let identifier = child_of_kind(attribute, "identifier")
+            .map(|n| &source_code[n.start_byte()..n.end_byte()]);
+
+        let argument = attribute
+            .child_by_field_name("arguments")
+            .and_then(|arg| child_of_kind(arg, "identifier"))
+            .map(|n| &source_code[n.start_byte()..n.end_byte()]);
+
+        return Some("cfg") == identifier && Some("test") == argument;
+    }
+
+    false
 }
 
 #[cfg(test)]
@@ -200,5 +242,76 @@ fn main() {
         ];
 
         assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_cpd_is_disabled_in_tests_module() {
+        let source_code = r#"
+fn foo() -> String {
+    return "Hello".to_string();
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_foo() {
+        assert_eq!(foo(), "Hello");
+    }
+}
+
+fn bar() {}
+"#;
+        let tree = parse_rust_code(source_code).unwrap();
+        let actual: Vec<String> = calculate_cpd_tokens(&tree, source_code)
+            .unwrap()
+            .iter()
+            .map(|t| t.image.clone())
+            .collect();
+        let expected: Vec<String> = vec![
+            "fn",
+            "foo",
+            "(",
+            ")",
+            "->",
+            "String",
+            "{",
+            "return",
+            "\"",
+            "STRING",
+            "\"",
+            ".",
+            "to_string",
+            "(",
+            ")",
+            ";",
+            "}",
+            "fn",
+            "bar",
+            "(",
+            ")",
+            "{",
+            "}",
+        ]
+        .iter()
+        .map(|t| t.to_string())
+        .collect();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_is_cfg_test_attribute() {
+        fn check(source: &str) -> bool {
+            let tree = parse_rust_code(source).unwrap();
+            is_cfg_test_attribute(tree.root_node().child(0).unwrap(), source)
+        }
+
+        assert_eq!(check("#[cfg(test)]"), true);
+        assert_eq!(check("#[ cfg (test ) ]"), true);
+        assert_eq!(check("#[cfg(abc)]"), false);
+        assert_eq!(check("#[cfg(target=\"Windows\")]"), false);
+        assert_eq!(check("#[cfg(not(test))]"), false);
+        assert_eq!(check("#[test]"), false);
     }
 }
