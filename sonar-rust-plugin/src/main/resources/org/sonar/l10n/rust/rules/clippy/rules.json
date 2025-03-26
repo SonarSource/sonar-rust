@@ -131,8 +131,8 @@
   },
   {
     "lintId": "clippy::mut_from_ref",
-    "ruleKey": null,
-    "message": "Avoid returning mutable references (`&mut T`) from immutable references (`&T`), or ensure the function does not contain unsafe code allowing this transformation."
+    "ruleKey": "S7453",
+    "message": "Declare this parameter as mutable."
   },
   {
     "lintId": "clippy::inline_fn_without_body",
