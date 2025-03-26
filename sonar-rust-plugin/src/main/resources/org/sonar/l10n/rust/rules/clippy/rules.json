@@ -151,8 +151,8 @@
   },
   {
     "lintId": "clippy::invisible_characters",
-    "ruleKey": null,
-    "message": "Remove invisible Unicode characters from the code."
+    "ruleKey": "S2479",
+    "message": "Remove this invisible character from this literal."
   },
   {
     "lintId": "clippy::async_yields_async",
