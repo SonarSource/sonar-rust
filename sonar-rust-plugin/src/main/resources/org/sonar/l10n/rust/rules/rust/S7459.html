@@ -1,0 +1,32 @@
+<h2>Why is this an issue?</h2>
+<p>In Rust, calling <code>Vec::set_len(new_len)</code> directly after allocating or reserving memory using <code>Vec::with_capacity()</code>,
+<code>Vec::new()</code>, <code>Vec::default()</code>, or <code>Vec::reserve()</code> can lead to the creation of a <code>Vec</code> with uninitialized
+elements. This is problematic because most safe Rust operations assume initialized data. Using uninitialized data can result in undefined behavior,
+including memory corruption and unexpected program crashes.</p>
+<p>This rule detects instances where <code>Vec::set_len()</code> is called directly after allocating or reserving memory with
+<code>Vec::with_capacity()</code>, <code>Vec::new()</code>, <code>Vec::default()</code>, or <code>Vec::reserve()</code>, without any prior
+initialization of the vector’s elements. The rule performs a local analysis and only checks for these calls within adjacent statements.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+fn f(reader: &amp;mut dyn std::io::Read) {
+    let mut vec: Vec&lt;u8&gt; = Vec::with_capacity(1000);
+    unsafe { vec.set_len(1000); } // Noncompliant: Uninitialized vector
+    reader.read_exact(&amp;mut vec).unwrap(); // Undefined behavior!
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+fn f(reader: &amp;mut dyn std::io::Read) {
+    let mut vec: Vec&lt;u8&gt; = vec![0; 1000]; // Properly initialized with zeros
+    reader.read_exact(&amp;mut vec).unwrap(); // Safe to use
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec">https://rust-lang.github.io/rust-clippy/master/index.html#uninit_vec</a>
+  </li>
+</ul>
+
