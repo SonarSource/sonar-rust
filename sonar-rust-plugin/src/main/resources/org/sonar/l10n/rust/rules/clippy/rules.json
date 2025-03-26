@@ -86,8 +86,8 @@
   },
   {
     "lintId": "clippy::mistyped_literal_suffixes",
-    "ruleKey": null,
-    "message": "Correct the mistyped literal suffix to avoid potential typos."
+    "ruleKey": "S7454",
+    "message": "Use the correct suffix for this literal to represent the intended value."
   },
   {
     "lintId": "clippy::approx_constant",
