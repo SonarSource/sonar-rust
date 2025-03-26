@@ -101,8 +101,8 @@
   },
   {
     "lintId": "clippy::serde_api_misuse",
-    "ruleKey": null,
-    "message": "Implement all required `Visitor` methods to avoid API misuse."
+    "ruleKey": "S7460",
+    "message": "Implement the `write_str` function as well."
   },
   {
     "lintId": "clippy::let_underscore_lock",
