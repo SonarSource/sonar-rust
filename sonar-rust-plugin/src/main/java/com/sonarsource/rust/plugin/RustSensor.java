@@ -1,13 +1,26 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.plugin;
 
 import com.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.StreamSupport;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +65,19 @@ public class RustSensor implements Sensor {
       return;
     }
     LOG.info("Detected platform: {}", platform);
+
+    // Find rule parameters
+    Map<String, String> parameters = new HashMap<>();
+    for (var parameter : RustRulesDefinition.parameters()) {
+      parameters.put(String.format("%s:%s", parameter.ruleKey(), parameter.paramKey()), parameter.defaultValue());
+    }
+    for (var activeRule : sensorContext.activeRules().findByRepository(RustLanguage.KEY)) {
+      for (var parameter : activeRule.params().entrySet()) {
+        parameters.put(String.format("%s:%s", activeRule.ruleKey(), parameter.getKey()), parameter.getValue());
+      }
+    }
+    analyzerFactory.addParameters(parameters);
+
     try (Analyzer analyzer = analyzerFactory.create(platform)) {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
@@ -86,7 +112,8 @@ public class RustSensor implements Sensor {
     highlighting.onFile(inputFile);
     for (var token : tokens) {
       try {
-        TextRange range = inputFile.newRange(token.startLine(), token.startColumn(), token.endLine(), token.endColumn());
+        Analyzer.Location location = token.location();
+        TextRange range = inputFile.newRange(location.startLine(), location.startColumn(), location.endLine(), location.endColumn());
         highlighting.highlight(range, TypeOfText.valueOf(token.tokenType()));
       } catch (IllegalArgumentException e) {
         LOG.error("Invalid highlighting: {}. Reason: {}", token, e.getMessage());
@@ -116,7 +143,7 @@ public class RustSensor implements Sensor {
     var newCpdTokens = sensorContext.newCpdTokens().onFile(inputFile);
     for (var token : tokens) {
       try {
-        newCpdTokens.addToken(token.startLine(), token.startColumn(), token.endLine(), token.endColumn(), token.image());
+        newCpdTokens.addToken(token.location().startLine(), token.location().startColumn(), token.location().endLine(), token.location().endColumn(), token.image());
       } catch (IllegalArgumentException e) {
         LOG.error("Invalid CPD token: {}. Reason: {}", token, e.getMessage());
       }
@@ -130,12 +157,24 @@ public class RustSensor implements Sensor {
         var newIssue = sensorContext.newIssue();
         var location = newIssue.newLocation()
           .on(inputFile)
-          .at(inputFile.newRange(issue.startLine(), issue.startColumn(), issue.endLine(), issue.endColumn()))
+          .at(inputFile.newRange(issue.location().startLine(), issue.location().startColumn(), issue.location().endLine(), issue.location().endColumn()))
           .message(issue.message());
         newIssue
           .forRule(RuleKey.of(RustLanguage.KEY, issue.ruleKey()))
-          .at(location)
-          .save();
+          .at(location);
+
+        for (var secondaryLocation : issue.secondaryLocations()) {
+          newIssue.addLocation(newIssue.newLocation()
+            .on(inputFile)
+            .at(inputFile.newRange(
+              secondaryLocation.location().startLine(),
+              secondaryLocation.location().startColumn(),
+              secondaryLocation.location().endLine(),
+              secondaryLocation.location().endColumn()))
+            .message(secondaryLocation.message()));
+        }
+
+        newIssue.save();
       } catch (IllegalArgumentException e) {
         LOG.error("Invalid issue: {}. Reason: {}", issue, e.getMessage());
       }

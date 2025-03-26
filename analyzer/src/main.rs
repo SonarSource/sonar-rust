@@ -1,11 +1,23 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 mod analyze;
 mod issue;
 mod rules {
+    pub mod cognitive_complexity_check;
     pub mod parsing_error_check;
     pub mod rule;
 }
@@ -19,10 +31,18 @@ mod visitors {
 }
 
 use analyze::analyze;
-use std::io::{self, Read, Write};
+use std::{
+    collections::HashMap,
+    io::{self, Read, Write},
+};
 use tree::{AnalyzerError, SonarLocation};
 
 fn main() {
+    if read_string() != "sonar" {
+        return;
+    }
+    let parameters = read_map();
+
     loop {
         let command = read_string();
         if command != "analyze" {
@@ -35,7 +55,7 @@ fn main() {
 
         let source_code = std::str::from_utf8(&buf).expect("UTF-8 conversion error");
 
-        let output = match analyze(source_code) {
+        let output = match analyze(source_code, &parameters) {
             Ok(output) => output,
             Err(AnalyzerError::FileError(message)) => {
                 eprintln!("warn {}", message);
@@ -73,6 +93,11 @@ fn main() {
             write_string(&issue.rule_key);
             write_string(&issue.message);
             write_location(&issue.location);
+            write_int(issue.secondary_locations.len() as i32);
+            for secondary in &issue.secondary_locations {
+                write_string(&secondary.message);
+                write_location(&secondary.location);
+            }
         }
 
         write_string("end");
@@ -91,6 +116,18 @@ fn read_string() -> String {
     let mut buf = vec![0u8; len as usize];
     io::stdin().read_exact(&mut buf).expect("read from stdin");
     String::from_utf8(buf).expect("UTF-8 conversion error")
+}
+
+fn read_map() -> HashMap<String, String> {
+    let mut result = HashMap::new();
+    let len = read_i32();
+    for _ in 0..len {
+        let key: String = read_string();
+        let value = read_string();
+        result.insert(key, value);
+    }
+
+    result
 }
 
 fn write_int(value: i32) {

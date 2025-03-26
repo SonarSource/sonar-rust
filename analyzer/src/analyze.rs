@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 use crate::{
     issue::{find_issues, Issue},
@@ -12,6 +23,7 @@ use crate::{
         metrics::{calculate_metrics, Metrics},
     },
 };
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Output {
@@ -21,14 +33,17 @@ pub struct Output {
     pub issues: Vec<Issue>,
 }
 
-pub fn analyze(source_code: &str) -> Result<Output, AnalyzerError> {
+pub fn analyze(
+    source_code: &str,
+    parameters: &HashMap<String, String>,
+) -> Result<Output, AnalyzerError> {
     let tree = parse_rust_code(source_code)?;
 
     Ok(Output {
         highlight_tokens: highlight(&tree, source_code)?,
         metrics: calculate_metrics(&tree, source_code)?,
-        cpd_tokens: calculate_cpd_tokens(&tree, source_code),
-        issues: find_issues(&tree, source_code)?,
+        cpd_tokens: calculate_cpd_tokens(&tree, source_code)?,
+        issues: find_issues(&tree, source_code, parameters)?,
     })
 }
 
@@ -51,7 +66,7 @@ fn main() {
     println!("Hello, world!");
 }
         "#;
-        let output = analyze(source_code).unwrap();
+        let output = analyze(source_code, &test_parameters()).unwrap();
 
         assert_eq!(
             output.metrics,
@@ -137,7 +152,9 @@ fn main() {
     fn test_unicode() {
         // 4 byte value
         assert_eq!(
-            analyze("//𠱓").unwrap().highlight_tokens,
+            analyze("//𠱓", &test_parameters())
+                .unwrap()
+                .highlight_tokens,
             vec![HighlightToken {
                 token_type: HighlightTokenType::Comment,
                 location: SonarLocation {
@@ -152,7 +169,7 @@ fn main() {
 
         // 3 byte unicode
         assert_eq!(
-            analyze("//ॷ").unwrap().highlight_tokens,
+            analyze("//ॷ", &test_parameters()).unwrap().highlight_tokens,
             vec![HighlightToken {
                 token_type: HighlightTokenType::Comment,
                 location: SonarLocation {
@@ -167,7 +184,7 @@ fn main() {
 
         // 2 byte unicode
         assert_eq!(
-            analyze("//©").unwrap().highlight_tokens,
+            analyze("//©", &test_parameters()).unwrap().highlight_tokens,
             vec![HighlightToken {
                 token_type: HighlightTokenType::Comment,
                 location: SonarLocation {
@@ -183,7 +200,9 @@ fn main() {
 
     #[test]
     fn test_multiple_unicode_locations() {
-        let mut actual = analyze("/*𠱓𠱓*/ //𠱓").unwrap().highlight_tokens;
+        let mut actual = analyze("/*𠱓𠱓*/ //𠱓", &test_parameters())
+            .unwrap()
+            .highlight_tokens;
         actual.sort();
 
         let mut expected = vec![
@@ -213,7 +232,9 @@ fn main() {
 
     #[test]
     fn test_multi_line_unicode() {
-        let mut actual = analyze("/*\n𠱓\n𠱓\n    𠱓*/").unwrap().highlight_tokens;
+        let mut actual = analyze("/*\n𠱓\n𠱓\n    𠱓*/", &test_parameters())
+            .unwrap()
+            .highlight_tokens;
         actual.sort();
 
         let mut expected = vec![HighlightToken {
@@ -228,5 +249,9 @@ fn main() {
         expected.sort();
 
         assert_eq!(actual, expected);
+    }
+
+    fn test_parameters() -> HashMap<String, String> {
+        HashMap::from([("S3776:threshold".to_string(), "15".to_string())])
     }
 }

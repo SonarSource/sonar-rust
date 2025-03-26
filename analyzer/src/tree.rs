@@ -1,9 +1,20 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-use tree_sitter::{Node, Parser, Point, Tree};
+use tree_sitter::{Node, Parser, Point, Tree, TreeCursor};
 
 /// Source location as defined by Tree-sitter.
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
@@ -29,10 +40,14 @@ pub struct SonarLocation {
 
 pub trait NodeVisitor {
     /// Callback invoked the first time a node is visited.
-    fn enter_node(&mut self, _node: Node<'_>) {}
+    fn enter_node(&mut self, _node: Node<'_>) -> Result<(), AnalyzerError> {
+        Ok(())
+    }
 
     /// Callback invoked after all children of a node have been visited.
-    fn exit_node(&mut self, _node: Node<'_>) {}
+    fn exit_node(&mut self, _node: Node<'_>) -> Result<(), AnalyzerError> {
+        Ok(())
+    }
 }
 
 #[derive(Debug)]
@@ -84,7 +99,10 @@ impl TreeSitterLocation {
 /// Performs a depth-first traversal of the tree, calling the callbacks defined in the visitor whenever entering and leaving a node.
 /// The visitor visits "extra" nodes (e.g. comments) as well, however, it does not visit their children
 /// (i.e. comments are treated as leaves in the tree).
-pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
+pub(crate) fn walk_tree(
+    tree: Node<'_>,
+    visitor: &mut dyn NodeVisitor,
+) -> Result<(), AnalyzerError> {
     let mut cursor = tree.walk();
     let mut has_next = true;
     let mut visited_children = false;
@@ -98,14 +116,14 @@ pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
         }
 
         if !visited_children {
-            visitor.enter_node(node);
+            visitor.enter_node(node)?;
             if !cursor.goto_first_child() {
                 visited_children = true;
             }
         } else {
             // When this branch is reached, all children of the node have already been processed.
             // Process the information in the node and move on to the next sibling (or backtrack to the parent if there aren't any).
-            visitor.exit_node(node);
+            visitor.exit_node(node)?;
 
             if cursor.goto_next_sibling() {
                 visited_children = false;
@@ -114,6 +132,8 @@ pub(crate) fn walk_tree(tree: Node<'_>, visitor: &mut dyn NodeVisitor) {
             }
         }
     }
+
+    Ok(())
 }
 
 pub(crate) fn parse_rust_code(source_code: &str) -> Result<Tree, AnalyzerError> {
@@ -131,4 +151,75 @@ pub(crate) fn parse_rust_code(source_code: &str) -> Result<Tree, AnalyzerError> 
         ))?;
 
     Ok(tree)
+}
+
+/// Iterator for iterating over nodes of a tree filtered by a predicate.
+///
+/// For example, you can use this iterator to iterate over all function nodes in a tree:
+/// ```rust
+/// let iter = NodeIterator::new(tree.root_node(), |node| node.kind() == "function_item");
+/// while let Some(function) = iter.next() {
+///     // Handle function...
+/// }
+/// ```
+///
+/// The iterator visits all nodes, except for the children "extra" nodes (e.g. comments).
+pub struct NodeIterator<'a> {
+    predicate: Box<dyn Fn(Node<'a>) -> bool>,
+    cursor: TreeCursor<'a>,
+    visited_children: bool,
+}
+
+impl<'a> NodeIterator<'a> {
+    pub fn new<F>(tree: Node<'a>, predicate: F) -> Self
+    where
+        F: Fn(Node<'a>) -> bool + 'static,
+    {
+        Self {
+            predicate: Box::new(predicate),
+            cursor: tree.walk(),
+            visited_children: false,
+        }
+    }
+}
+
+impl<'a> Iterator for NodeIterator<'a> {
+    type Item = Node<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        loop {
+            let node = self.cursor.node();
+
+            if node.is_extra() {
+                self.visited_children = true;
+            }
+
+            if !self.visited_children {
+                if !self.cursor.goto_first_child() {
+                    self.visited_children = true;
+                }
+            } else {
+                if self.cursor.goto_next_sibling() {
+                    self.visited_children = false;
+                } else if !self.cursor.goto_parent() {
+                    return None;
+                }
+
+                if (self.predicate)(node) {
+                    return Some(node);
+                }
+            }
+        }
+    }
+}
+
+/// Returns a child of a given kind of a node, if it exists.
+pub fn child_of_kind<'a>(node: Node<'a>, kind: &str) -> Option<Node<'a>> {
+    for i in 0..node.child_count() {
+        match node.child(i) {
+            Some(child) if child.kind() == kind => return Some(child),
+            _ => {}
+        }
+    }
+    None
 }

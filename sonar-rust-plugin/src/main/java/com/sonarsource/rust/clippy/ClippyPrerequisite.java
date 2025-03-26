@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.clippy;
 
@@ -28,21 +39,27 @@ public class ClippyPrerequisite {
     this.processWrapper = processWrapper;
   }
 
-  public void check(Path workDir) {
-    checkVersion(List.of("cargo", "--version"), "Cargo", workDir);
-    checkVersion(List.of("cargo", "clippy", "--version"), "Clippy", workDir);
+  public ToolVersions check(Path workDir) {
+    String cargoVersion = checkVersion(List.of("cargo", "--version"), "Cargo", workDir);
+    String clippyVersion = checkVersion(List.of("cargo", "clippy", "--version"), "Clippy", workDir);
+
+    return new ToolVersions(cargoVersion, clippyVersion);
   }
 
-  private void checkVersion(List<String> command, String prerequisite, Path workDir) {
+  private String checkVersion(List<String> command, String prerequisite, Path workDir) {
     LOG.debug("Checking {} version", prerequisite);
     try {
       processWrapper.start(command, workDir, null, LOG::warn);
       try (var reader = new BufferedReader(new InputStreamReader(processWrapper.getInputStream()))) {
         var version = reader.readLine();
         LOG.debug("{} version: {}", prerequisite, version);
+        return version;
       }
     } catch (IOException e) {
       throw new IllegalStateException("Failed to check " + prerequisite + " version", e);
     }
+  }
+
+  public record ToolVersions(String cargoVersion, String clippyVersion) {
   }
 }

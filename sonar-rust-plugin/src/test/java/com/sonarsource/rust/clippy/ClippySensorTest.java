@@ -1,18 +1,20 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.clippy;
-
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
 import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
@@ -36,6 +38,15 @@ import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.batch.sensor.issue.Issue;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentCaptor.forClass;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class ClippySensorTest {
 
@@ -103,7 +114,7 @@ class ClippySensorTest {
     Files.createFile(manifest);
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
-    doNothing().when(clippyPrerequisite).check(any());
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
     doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
@@ -129,21 +140,21 @@ class ClippySensorTest {
     Files.createFile(manifest);
 
     ClippyPrerequisite clippyPrerequisite = mock(ClippyPrerequisite.class);
-    doNothing().when(clippyPrerequisite).check(any());
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
-
+    var manifestPath = baseDir.toString();
     List<ClippyDiagnostic> diagnostics = List.of(
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "message",
         List.of(new ClippySpan("file.rs", 1, 2, 1, 4)))),
       // This issue should be ignored because "excluded.rs" is not part of FileSystem and thus not part of the analysis
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "message",
         List.of(new ClippySpan("excluded.rs", 1, 2, 1, 4)))),
       // This issue should be ignored because there is no mapping to SonarQube rule
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::no_mapping"),
         "message",
         List.of(new ClippySpan("excluded.rs", 1, 2, 1, 4))))
@@ -198,11 +209,12 @@ class ClippySensorTest {
     context.fileSystem().add(inputFile);
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
-    doNothing().when(clippyPrerequisite).check(any());
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
+    var manifestPath = subDir.toString();
     List<ClippyDiagnostic> diagnostics = List.of(
-      new ClippyDiagnostic(new ClippyMessage(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
         new ClippyCode("clippy::absurd_extreme_comparisons"),
         "Unnecessary mathematical comparisons should not be made",
         // Note that the filename is relative to the Cargo.toml directory, not the project base directory

@@ -1,18 +1,29 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 use crate::{
-    tree::{walk_tree, NodeVisitor},
+    tree::{walk_tree, AnalyzerError, NodeVisitor},
     visitors::cognitive_complexity::is_logical_operator,
 };
 use tree_sitter::{Node, Tree};
 
-pub(crate) fn calculate_cyclomatic_complexity(tree: &Tree) -> i32 {
+pub(crate) fn calculate_cyclomatic_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
     let mut visitor = CyclomaticComplexityVisitor::default();
-    walk_tree(tree.root_node(), &mut visitor);
-    visitor.complexity
+    walk_tree(tree.root_node(), &mut visitor)?;
+    Ok(visitor.complexity)
 }
 
 #[derive(Debug, Default)]
@@ -21,7 +32,7 @@ struct CyclomaticComplexityVisitor {
 }
 
 impl NodeVisitor for CyclomaticComplexityVisitor {
-    fn enter_node(&mut self, node: Node<'_>) {
+    fn enter_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         match node.kind() {
             "if_expression" | "loop_expression" | "while_expression" | "for_expression"
             | "closure_expression" => {
@@ -38,6 +49,8 @@ impl NodeVisitor for CyclomaticComplexityVisitor {
             }
             _ => {}
         }
+
+        Ok(())
     }
 }
 
@@ -138,6 +151,6 @@ mod tests {
 
     fn complexity(source_code: &str) -> i32 {
         let tree = parse_rust_code(source_code).unwrap();
-        calculate_cyclomatic_complexity(&tree)
+        calculate_cyclomatic_complexity(&tree).unwrap()
     }
 }

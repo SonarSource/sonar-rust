@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 
 use crate::{
@@ -24,19 +35,15 @@ impl ParsingErrorCheck {
 impl Rule for ParsingErrorCheck {
     fn check(&self, tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
         let mut visitor = RuleVisitor::new(source_code);
-        walk_tree(tree.root_node(), &mut visitor);
+        walk_tree(tree.root_node(), &mut visitor)?;
 
-        match visitor.error {
-            Some(error) => Err(error),
-            None => Ok(visitor.issues),
-        }
+        Ok(visitor.issues)
     }
 }
 
 struct RuleVisitor<'a> {
     source_code: &'a str,
     issues: Vec<Issue>,
-    error: Option<AnalyzerError>,
 }
 
 impl<'a> RuleVisitor<'a> {
@@ -44,7 +51,6 @@ impl<'a> RuleVisitor<'a> {
         Self {
             source_code,
             issues: Vec::new(),
-            error: None,
         }
     }
 
@@ -53,12 +59,13 @@ impl<'a> RuleVisitor<'a> {
             rule_key: RULE_KEY.to_string(),
             message,
             location,
+            secondary_locations: vec![],
         });
     }
 }
 
 impl NodeVisitor for RuleVisitor<'_> {
-    fn exit_node(&mut self, node: Node<'_>) {
+    fn exit_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         // Tree-sitter defines two types of error nodes to represent syntax errors:
         // - Error nodes: Syntax errors representing parts of the code that could not be incorporated into a valid syntax tree.
         // - Missing nodes: Missing nodes that are inserted by the parser in order to recover from certain kinds of syntax errors.
@@ -85,21 +92,17 @@ impl NodeVisitor for RuleVisitor<'_> {
             // The location of the missing node is the location of the token that should have been there, which means that the location might not
             // even exist in the original source code. In order to avoid reporting on non-existant locations, we use the location of either the closest
             // sibling (if it exists) or the parent node.
-            let parent = match get_sibling_or_parent(node) {
-                Some(parent) => parent,
-                None => {
-                    self.error = Some(AnalyzerError::FileError(
-                        "a missing node must have a valid parent".to_string(),
-                    ));
-                    return;
-                }
-            };
+            let parent = get_sibling_or_parent(node).ok_or(AnalyzerError::FileError(
+                "a missing node must have a valid parent".to_string(),
+            ))?;
 
             let location = TreeSitterLocation::from_tree_sitter_node(parent)
                 .to_sonar_location(self.source_code);
 
             self.new_issue(message, location);
         }
+
+        Ok(())
     }
 }
 
@@ -156,6 +159,7 @@ fn
                     end_line: 3,
                     end_column: 14,
                 },
+                secondary_locations: vec![],
             },
             Issue {
                 rule_key: RULE_KEY.to_string(),
@@ -166,6 +170,7 @@ fn
                     end_line: 6,
                     end_column: 2,
                 },
+                secondary_locations: vec![],
             },
         ];
 

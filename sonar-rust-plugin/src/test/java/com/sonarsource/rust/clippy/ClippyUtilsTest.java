@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.clippy;
 
@@ -26,8 +37,8 @@ class ClippyUtilsTest {
   @Test
   void testParseValidReport() throws IOException {
     var tempFile = prepareTempReportFile("""
-      {"message": {"code": {"code": "clippy::some_lint"}}}
-      {"message": {"code": {"code": "clippy::some_other_lint"}}}
+      {"manifest_path": "/dir/Cargo.toml", "message": {"code": {"code": "clippy::some_lint"}}}
+      {"manifest_path": "/dir/Cargo.toml", "message": {"code": {"code": "clippy::some_other_lint"}}}
       """);
 
     var diagnostics = ClippyUtils.parse(tempFile.toFile());
@@ -111,7 +122,7 @@ class ClippyUtilsTest {
       {}
       {"message": {}}
       {"message": {"code": {}}}
-      {"message": {"code": {"code": "clippy::some_lint"}}}
+      {"manifest_path": "/dir/Cargo.toml", "message": {"code": {"code": "clippy::some_lint"}}}
       """.split("\n")));
     assertThat(diagnostics).hasSize(1);
     var empty = ClippyUtils.parse(Stream.of(""));

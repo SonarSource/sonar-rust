@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.clippy;
 
@@ -70,7 +81,8 @@ class ClippyReportSensorTest {
   @Test
   void testSaveIssueWithDiagnosticEmptySpans() throws IOException {
     var json = """
-      {"message": {
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
         "code": {
           "code": "clippy::approx_constant"
         },
@@ -94,7 +106,8 @@ class ClippyReportSensorTest {
   @Test
   void testSaveIssueWithUnknownFile() throws IOException {
     var json = """
-      {"message": {
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
         "code": {
           "code": "clippy::approx_constant"
         },
@@ -122,7 +135,8 @@ class ClippyReportSensorTest {
   @Test
   void testSaveIssueWithUnknownRule() throws IOException {
     var json = """
-      {"message": {
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
         "code": {
           "code": "clippy::unknown_rule"
         },
@@ -150,8 +164,10 @@ class ClippyReportSensorTest {
 
   @Test
   void testSaveIssueWithValidDiagnostic() throws IOException {
+    var manifestPath = baseDir.resolve("Cargo.toml");
     var json = """
-      {"message": {
+      {"manifest_path": "%s",
+       "message": {
         "code": {
           "code": "clippy::approx_constant"
         },
@@ -166,7 +182,7 @@ class ClippyReportSensorTest {
           }
         ]
       }}
-      """.replaceAll(System.lineSeparator(), "");
+      """.formatted(manifestPath.toString()).replaceAll(System.lineSeparator(), "");
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
     Files.writeString(tempFile, json);
 

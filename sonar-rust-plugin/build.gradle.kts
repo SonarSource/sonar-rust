@@ -1,7 +1,6 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
-
 plugins {
   id("java")
   id("jacoco")
@@ -34,6 +33,7 @@ dependencies {
   implementation("com.google.code.gson:gson:2.11.0")
   implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:$analyzerCommonsVersion")
   implementation("org.sonarsource.analyzer-commons:sonar-xml-parsing:$analyzerCommonsVersion")
+  implementation("org.tukaani:xz:1.10")
   compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
@@ -68,6 +68,7 @@ tasks.named<Test>("test") {
 tasks.named("check") {
   dependsOn(":analyzer:testRust")
   dependsOn(":analyzer:checkRustFormat")
+  dependsOn(":analyzer:checkRustLicense")
 }
 
 tasks.jar {
@@ -90,19 +91,15 @@ tasks.jar {
 tasks.register<Copy>("copyRustOutputs") {
   description = "Copy native analyzer binary to the build/classes dir for packaging"
   group = "Build"
-  val compileRustLinux = project(":analyzer").tasks.named("compileRustLinux").get()
   val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
   val compileRustLinuxArm = project(":analyzer").tasks.named("compileRustLinuxArm").get()
   val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
   val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
   val compileRustDarwinX86 = project(":analyzer").tasks.named("compileRustDarwinX86").get()
 
-  dependsOn(compileRustLinux, compileRustLinuxMusl, compileRustWin)
+  dependsOn(compileRustLinuxMusl, compileRustWin)
   if (OperatingSystem.current().isMacOsX) {
     dependsOn(compileRustDarwin, compileRustDarwinX86)
-  }
-  from(compileRustLinux.outputs.files) {
-    into("linux-x64")
   }
   from(compileRustLinuxMusl.outputs.files) {
     into("linux-x64-musl")
@@ -114,10 +111,10 @@ tasks.register<Copy>("copyRustOutputs") {
     into("win-x64")
   }
   // we hardcode the path to the binary because on CI binary is downloaded from another task
-  from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer") {
+  from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
     into("darwin-aarch64")
   }
-  from("${project(":analyzer").layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer") {
+  from("${project(":analyzer").layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
     into("darwin-x86_64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
@@ -135,16 +132,10 @@ tasks.shadowJar {
 }
 
 spotless {
+  val licenseHeaderFile = rootProject.file("license-header.txt")
+  val licenseHeader = licenseHeaderFile.readText().trim()
   java {
-    licenseHeader(
-      """
-            /*
-             * Copyright (C) 2025 SonarSource SA
-             * All rights reserved
-             * mailto:info AT sonarsource DOT com
-             */
-            """.trimIndent()
-    )
+    licenseHeader(licenseHeader)
     trimTrailingWhitespace()
   }
 }
@@ -188,7 +179,9 @@ publishing {
         }
         licenses {
           license {
-            name.set("SonarSource")
+            name.set("SSALv1")
+            url.set("https://sonarsource.com/license/ssal/")
+            distribution.set("repo")
           }
         }
         scm {

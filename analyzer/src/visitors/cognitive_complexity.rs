@@ -1,33 +1,40 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 use crate::tree::{walk_tree, AnalyzerError, NodeVisitor, TreeSitterLocation};
 use std::collections::HashSet;
 use tree_sitter::{Node, Tree};
 
 #[allow(dead_code)] // Location is currently only used in tests, so we allow dead code
-pub(crate) struct Increment {
-    location: TreeSitterLocation,
-    nesting: i32,
+pub struct Increment {
+    pub location: TreeSitterLocation,
+    pub nesting: i32,
 }
 
-pub(crate) fn calculate_total_cognitive_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
-    Ok(calculate_cognitive_complexity(tree)?
+pub fn calculate_total_cognitive_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
+    Ok(calculate_cognitive_complexity(tree.root_node())?
         .iter()
         .map(|inc| inc.nesting + 1)
         .sum())
 }
 
-fn calculate_cognitive_complexity(tree: &Tree) -> Result<Vec<Increment>, AnalyzerError> {
+pub fn calculate_cognitive_complexity(node: Node<'_>) -> Result<Vec<Increment>, AnalyzerError> {
     let mut visitor = ComplexityVisitor::default();
 
-    walk_tree(tree.root_node(), &mut visitor);
-
-    if let Some(error) = visitor.error {
-        return Err(error);
-    }
+    walk_tree(node, &mut visitor)?;
 
     Ok(visitor.current_increments)
 }
@@ -38,27 +45,26 @@ struct ComplexityVisitor {
     visited_operators: HashSet<usize>,
     current_nesting: i32,
     current_enclosing_functions: i32,
-    error: Option<AnalyzerError>,
 }
 
 impl ComplexityVisitor {
-    fn increment_with_nesting(&mut self, node: Node<'_>, nesting_level: i32) {
+    fn increment_with_nesting(&mut self, location: Node<'_>, nesting_level: i32) {
         self.current_increments.push(Increment {
-            location: TreeSitterLocation::from_tree_sitter_node(node),
+            location: TreeSitterLocation::from_tree_sitter_node(location),
             nesting: nesting_level,
         });
     }
 
-    fn increment_without_nesting(&mut self, node: Node<'_>) {
+    fn increment_without_nesting(&mut self, location: Node<'_>) {
         self.current_increments.push(Increment {
-            location: TreeSitterLocation::from_tree_sitter_node(node),
+            location: TreeSitterLocation::from_tree_sitter_node(location),
             nesting: 0,
         });
     }
 }
 
 impl NodeVisitor for ComplexityVisitor {
-    fn enter_node(&mut self, node: Node<'_>) {
+    fn enter_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         match node.kind() {
             "function_item" => {
                 if self.current_enclosing_functions > 0 {
@@ -70,15 +76,30 @@ impl NodeVisitor for ComplexityVisitor {
             }
             "if_expression" => {
                 if !is_else_if(node) {
-                    self.increment_with_nesting(node, self.current_nesting);
+                    self.increment_with_nesting(
+                        node.child(0).ok_or(AnalyzerError::FileError(
+                            "an if expression must have an 'if' keyword child".to_string(),
+                        ))?,
+                        self.current_nesting,
+                    );
                     self.current_nesting += 1;
                 }
                 if let Some(alternative) = node.child_by_field_name("alternative") {
-                    self.increment_without_nesting(alternative);
+                    self.increment_without_nesting(alternative.child(0).ok_or(
+                        AnalyzerError::FileError(
+                            "an else clause must have an 'else' keyword child".to_string(),
+                        ),
+                    )?);
                 }
             }
             "while_expression" | "loop_expression" | "for_expression" | "match_expression" => {
-                self.increment_with_nesting(node, self.current_nesting);
+                self.increment_with_nesting(
+                    node.child(0).ok_or(AnalyzerError::FileError(
+                        "a while/loop/for/match must have their respective keywords as a child"
+                            .to_string(),
+                    ))?,
+                    self.current_nesting,
+                );
                 self.current_nesting += 1;
             }
             "label" => {
@@ -90,27 +111,17 @@ impl NodeVisitor for ComplexityVisitor {
                 }
             }
             "binary_expression" if is_logical_operator(node) => {
-                let operator_token = match node.child_by_field_name("operator") {
-                    Some(token) => token,
-                    None => {
-                        self.error = Some(AnalyzerError::FileError(
+                let operator_token =
+                    node.child_by_field_name("operator")
+                        .ok_or(AnalyzerError::FileError(
                             "operator must be present in binary expression".to_string(),
-                        ));
-                        return;
-                    }
-                };
+                        ))?;
 
                 if self.visited_operators.contains(&operator_token.id()) {
-                    return;
+                    return Ok(());
                 }
 
-                let mut operators = match flatten_operators(node) {
-                    Ok(operators) => operators,
-                    Err(err) => {
-                        self.error = Some(err);
-                        return;
-                    }
-                };
+                let mut operators = flatten_operators(node)?;
                 let mut prev: Option<&str> = None;
 
                 while let Some(operator) = operators.pop() {
@@ -127,9 +138,11 @@ impl NodeVisitor for ComplexityVisitor {
             // TODO SKUNK-29: Check calls and handle recursion if/when we are able to reliably infer the called function
             _ => {}
         }
+
+        Ok(())
     }
 
-    fn exit_node(&mut self, node: Node<'_>) {
+    fn exit_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         match node.kind() {
             "if_expression" => {
                 if !is_else_if(node) {
@@ -150,6 +163,8 @@ impl NodeVisitor for ComplexityVisitor {
             }
             _ => {}
         }
+
+        Ok(())
     }
 }
 
@@ -477,7 +492,7 @@ match x { // +1
     fn check_complexity(source_code: &str) {
         let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
 
-        let increments = calculate_cognitive_complexity(&tree).unwrap();
+        let increments = calculate_cognitive_complexity(tree.root_node()).unwrap();
         let mut expected_increments_by_line = collect_complexity_increments(source_code);
 
         let actual_total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();

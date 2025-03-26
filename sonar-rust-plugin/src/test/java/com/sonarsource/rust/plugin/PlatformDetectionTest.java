@@ -1,19 +1,28 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.plugin;
 
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_AARCH64;
-import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_X64;
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.LINUX_X64_MUSL;
 import static com.sonarsource.rust.plugin.PlatformDetection.Platform.UNSUPPORTED;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 
 class PlatformDetectionTest {
@@ -24,18 +33,11 @@ class PlatformDetectionTest {
     PlatformDetection platformDetection = new PlatformDetection(system);
     when(system.getOsName()).thenReturn("Linux");
     when(system.getOsArch()).thenReturn("amd64");
-    assertThat(platformDetection.detect()).isEqualTo(LINUX_X64);
+    assertThat(platformDetection.detect()).isEqualTo(LINUX_X64_MUSL);
     when(system.getOsArch()).thenReturn("x86");
     assertThat(platformDetection.detect()).isEqualTo(UNSUPPORTED);
     when(system.getOsArch()).thenReturn("aarch64");
     assertThat(platformDetection.detect()).isEqualTo(LINUX_AARCH64);
-
-    when(system.fileExists(Path.of("/etc/alpine-release"))).thenReturn(true);
-    assertThat(platformDetection.detect()).isEqualTo(LINUX_AARCH64);
-    when(system.getOsArch()).thenReturn("x86");
-    assertThat(platformDetection.detect()).isEqualTo(UNSUPPORTED);
-    when(system.getOsArch()).thenReturn("amd64");
-    assertThat(platformDetection.detect()).isEqualTo(LINUX_X64_MUSL);
   }
 
   @Test

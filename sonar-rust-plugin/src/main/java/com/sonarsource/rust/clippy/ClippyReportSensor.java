@@ -1,14 +1,24 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.clippy;
 
-import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
-
 import com.sonarsource.rust.common.ReportProvider;
 import com.sonarsource.rust.plugin.RustLanguage;
+import com.sonarsource.rust.plugin.Telemetry;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import org.slf4j.Logger;
@@ -16,6 +26,8 @@ import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.Sensor;
 import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.SensorDescriptor;
+
+import static com.sonarsource.rust.clippy.ClippyUtils.diagnosticToLocation;
 
 public class ClippyReportSensor implements Sensor {
 
@@ -34,6 +46,8 @@ public class ClippyReportSensor implements Sensor {
   @Override
   public void execute(SensorContext context) {
     LOG.debug("Processing Clippy reports");
+
+    Telemetry.reportExternalClippyUsage(context);
 
     var reportProvider = new ReportProvider("Clippy", CLIPPY_REPORT_PATHS);
     var reportFiles = reportProvider.getReportFiles(context);
@@ -59,9 +73,8 @@ public class ClippyReportSensor implements Sensor {
     for (var diagnostic : diagnostics) {
       try {
         LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
-        // TODO SKUNK-42: Improve filename resolution when importing Clippy diagnostics
-        var baseDir = context.fileSystem().baseDir().toPath();
-        saveIssue(context, diagnostic, baseDir);
+        var manifestDir = Path.of(diagnostic.manifest_path()).getParent();
+        saveIssue(context, diagnostic, manifestDir);
         LOG.debug("Successfully saved Clippy diagnostic");
       } catch (Exception e) {
         LOG.warn("Failed to save Clippy diagnostic. {}", e.getMessage());

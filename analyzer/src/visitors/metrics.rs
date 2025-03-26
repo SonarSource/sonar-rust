@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 use crate::tree::{walk_tree, AnalyzerError, NodeVisitor};
 use crate::visitors::cognitive_complexity::calculate_total_cognitive_complexity;
@@ -22,12 +33,12 @@ pub struct Metrics {
 
 pub fn calculate_metrics(tree: &Tree, source_code: &str) -> Result<Metrics, AnalyzerError> {
     let mut metrics_visitor = MetricsVisitor::new(source_code);
-    walk_tree(tree.root_node(), &mut metrics_visitor);
+    walk_tree(tree.root_node(), &mut metrics_visitor)?;
 
     let mut metrics = Metrics::default();
     metrics_visitor.update_metrics(&mut metrics);
     metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree)?;
-    metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree);
+    metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree)?;
 
     Ok(metrics)
 }
@@ -64,7 +75,7 @@ impl<'a> MetricsVisitor<'a> {
 }
 
 impl NodeVisitor for MetricsVisitor<'_> {
-    fn exit_node(&mut self, node: Node<'_>) {
+    fn exit_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
         match node.kind() {
             "line_comment" | "block_comment" => {
                 let mut current_line = node.start_position().row;
@@ -95,6 +106,8 @@ impl NodeVisitor for MetricsVisitor<'_> {
                 self.lines_of_code.insert(line);
             }
         }
+
+        Ok(())
     }
 }
 

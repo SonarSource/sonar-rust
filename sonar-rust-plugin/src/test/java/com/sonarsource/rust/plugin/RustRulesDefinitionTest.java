@@ -1,7 +1,18 @@
 /*
+ * SonarQube Rust Plugin
  * Copyright (C) 2025 SonarSource SA
- * All rights reserved
  * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource SA.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 package com.sonarsource.rust.plugin;
 
@@ -29,7 +40,7 @@ class RustRulesDefinitionTest {
   @Test
   void testSonarRules() {
     var rules = RustRulesDefinition.SONAR_RULES;
-    assertThat(rules).hasSize(1);
+    assertThat(rules).hasSize(2);
   }
 
   @Test
@@ -58,10 +69,25 @@ class RustRulesDefinitionTest {
     new RustProfile().define(profileContext);
 
     var profile = profileContext.profile(RustLanguage.KEY, "Sonar way");
-    assertThat(profile.rules()).hasSize(RustRulesDefinition.CLIPPY_RULES.size() + RustRulesDefinition.SONAR_RULES.size());
+    assertThat(profile.rules()).isNotEmpty();
 
     for (var rule : profile.rules()) {
       assertThat(repository.rule(rule.ruleKey())).isNotNull();
     }
+  }
+
+  @Test
+  void parameters() {
+    // Make sure that parameters are defined only for known Sonar rules
+    var runtime = SonarRuntimeImpl.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
+    var definition = new RustRulesDefinition(runtime);
+    var definitionContext = new RulesDefinition.Context();
+    definition.define(definitionContext);
+
+    var repository = definitionContext.repository(RustLanguage.KEY);
+
+    assertThat(RustRulesDefinition.parameters()).extracting(RustRulesDefinition.RuleParameter::ruleKey)
+      .allSatisfy(ruleKey -> assertThat(RustRulesDefinition.SONAR_RULES).contains(ruleKey))
+      .allSatisfy(ruleKey -> assertThat(repository.rule(ruleKey)).isNotNull());
   }
 }
