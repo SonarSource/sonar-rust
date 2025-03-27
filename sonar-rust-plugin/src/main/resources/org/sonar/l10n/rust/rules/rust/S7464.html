@@ -1,0 +1,23 @@
+<h2>Why is this an issue?</h2>
+<p>Infinite iteration is usually an error in most cases, leading to programs that never terminate. While there are some acceptable use cases such as
+event streams, developers often unintentionally create infinite loops, causing resource exhaustion or unresponsive behavior.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::iter;
+
+iter::repeat(1_u8).collect::&lt;Vec&lt;_&gt;&gt;(); // Noncompliant: This creates an infinite iterator.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::iter;
+
+iter::repeat(1_u8).take(5).collect::&lt;Vec&lt;_&gt;&gt;(); // Compliant: This creates a finite iterator by taking only the first 5 items.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#infinite_iter">https://rust-lang.github.io/rust-clippy/master/index.html#infinite_iter</a> </li>
+</ul>
+

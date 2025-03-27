@@ -121,8 +121,8 @@
   },
   {
     "lintId": "clippy::infinite_iter",
-    "ruleKey": null,
-    "message": "Ensure that iterations are finite or account for infinite iteration in the intended logic."
+    "ruleKey": "S7464",
+    "message": "Apply a terminating operation to this infinite iterator."
   },
   {
     "lintId": "clippy::invalid_null_ptr_usage",
