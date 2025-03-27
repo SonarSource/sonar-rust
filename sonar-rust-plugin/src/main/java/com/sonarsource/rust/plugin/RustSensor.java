@@ -43,10 +43,12 @@ public class RustSensor implements Sensor {
 
   private final AnalyzerFactory analyzerFactory;
   private final PlatformDetection platformDetection;
+  private final AnalysisWarningsWrapper analysisWarnings;
 
-  public RustSensor(AnalyzerFactory analyzerFactory) {
+  public RustSensor(AnalyzerFactory analyzerFactory, AnalysisWarningsWrapper analysisWarnings) {
     this.analyzerFactory = analyzerFactory;
     this.platformDetection = new PlatformDetection();
+    this.analysisWarnings = analysisWarnings;
   }
 
   @Override
@@ -61,7 +63,8 @@ public class RustSensor implements Sensor {
     List<InputFile> inputFiles = inputFiles(sensorContext);
     var platform = platformDetection.detect();
     if (platform == Platform.UNSUPPORTED) {
-      LOG.error("Unsupported platform: {}", platformDetection.debug());
+      LOG.error("Unsupported platform for Rust analysis: {}", platformDetection.debug());
+      analysisWarnings.addUnique("Unsupported platform for Rust analysis: " + platformDetection.debug());
       return;
     }
     LOG.info("Detected platform: {}", platform);
@@ -82,8 +85,9 @@ public class RustSensor implements Sensor {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
-    } catch (IOException ex) {
-      LOG.error("Failed to create analyzer: {}", ex.getMessage());
+    } catch (Exception ex) {
+      LOG.error("Failed to create Rust analyzer: {}", ex.getMessage());
+      analysisWarnings.addUnique("Failed to create Rust analyzer: " + ex.getMessage());
     }
   }
 

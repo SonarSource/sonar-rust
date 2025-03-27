@@ -30,10 +30,10 @@ class RustPluginTest {
   @Test
   void test() {
     var context = new Plugin.Context(SonarRuntimeImpl.forSonarQube(
-        Version.create(10, 9),
+        Version.create(25, 2),
         SonarQubeSide.SCANNER,
-        SonarEdition.DEVELOPER));
+        SonarEdition.COMMUNITY));
     new RustPlugin().define(context);
-    assertEquals(16, context.getExtensions().size());
+    assertEquals(17, context.getExtensions().size());
   }
 }

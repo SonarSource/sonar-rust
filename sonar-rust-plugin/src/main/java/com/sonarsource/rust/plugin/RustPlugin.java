@@ -32,6 +32,7 @@ public class RustPlugin implements Plugin {
   public void define(Context context) {
     context.addExtensions(
       // keep sorted alphabetically
+      AnalysisWarningsWrapper.class,
       AnalyzerFactory.class,
       ClippyRulesDefinition.class,
       ClippyReportSensor.class,

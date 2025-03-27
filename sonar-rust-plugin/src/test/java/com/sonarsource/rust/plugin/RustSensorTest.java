@@ -167,7 +167,7 @@ fn foo(c1: bool) {
       public Analyzer create(Platform platform) {
         return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
       }
-    });
+    }, new AnalysisWarningsWrapper());
   }
 
 }

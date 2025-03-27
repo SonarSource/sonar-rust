@@ -17,6 +17,7 @@
 package com.sonarsource.rust.clippy;
 
 import com.sonarsource.rust.cargo.CargoManifestProvider;
+import com.sonarsource.rust.plugin.AnalysisWarningsWrapper;
 import com.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -73,7 +74,7 @@ class ClippySensorTest {
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
     var clippyRunner = mock(ClippyRunner.class);
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Clippy analysis is disabled");
@@ -85,7 +86,7 @@ class ClippySensorTest {
 
     var clippyPrerequisite = mock(ClippyPrerequisite.class);
     var clippyRunner = mock(ClippyRunner.class);
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("No Cargo manifest found, skipping Clippy analysis");
@@ -101,7 +102,7 @@ class ClippySensorTest {
     doThrow(new IllegalStateException("error")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to check Clippy prerequisites");
@@ -118,7 +119,7 @@ class ClippySensorTest {
 
     var clippyRunner = mock(ClippyRunner.class);
     doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to run Clippy");
@@ -166,7 +167,7 @@ class ClippySensorTest {
       return null;
     }).when(clippyRunner).run(any(), any(), any());
 
-    ClippySensor sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
+    ClippySensor sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     ArgumentCaptor<Path> pathCaptor = forClass(Path.class);
@@ -226,7 +227,7 @@ class ClippySensorTest {
       return null;
     }).when(clippyRunner).run(any(), any(), any());
 
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner);
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     assertThat(context.allIssues()).hasSize(1);
