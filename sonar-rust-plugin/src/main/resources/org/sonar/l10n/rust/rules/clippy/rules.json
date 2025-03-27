@@ -176,8 +176,8 @@
   },
   {
     "lintId": "clippy::inverted_saturating_sub",
-    "ruleKey": null,
-    "message": "Substitute the conditional subtraction with `saturating_sub`."
+    "ruleKey": "S7463",
+    "message": "Substitute this conditional subtraction with `saturating_sub`."
   },
   {
     "lintId": "clippy::almost_swapped",
