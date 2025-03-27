@@ -10,6 +10,11 @@
     "message": "Remove or replace the loop over the result of this `next()` call."
   },
   {
+    "lintId": "clippy::impl_hash_borrow_with_str_and_bytes",
+    "ruleKey": "S7461",
+    "message": "Remove one of the incompatible `Hash`, `Borrow<str>` or `Borrow<[u8]>` implementations."
+  },
+  {
     "lintId": "clippy::match_str_case_mismatch",
     "ruleKey": "S7428",
     "message": "Refactor this `match` so that all arms compare strings in consistent casing."

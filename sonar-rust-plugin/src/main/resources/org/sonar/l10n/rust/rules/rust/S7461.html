@@ -1,0 +1,41 @@
+<h2>Why is this an issue?</h2>
+<p>When a type implements <code>Borrow&lt;T&gt;</code>, it should provide consistent behavior between the borrowed and owned values, especially
+regarding <code>Eq</code>, <code>Ord</code>, and <code>Hash</code>. However, <code>str</code> and <code>[u8]</code> have different Hash
+implementations, leading to inconsistent hash values for the same underlying data when accessed through different Borrow implementations. This
+violates the principle that <code>hash(x) == hashx as Borrow&lt;[u8]&gt;).borrow( == hashx as Borrow&lt;str&gt;).borrow(</code> must hold, and can
+cause issues with hash-based collections and comparisons.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre>
+use std::borrow::Borrow;
+use std::hash::{Hash, Hasher};
+
+struct ExampleType {
+    data: String,
+}
+
+impl Hash for ExampleType {
+    fn hash&lt;H: Hasher&gt;(&amp;self, state: &amp;mut H) {
+        self.data.hash(state); // Noncompliant: Inconsistent Hash
+    }
+}
+
+impl Borrow&lt;str&gt; for ExampleType {
+    fn borrow(&amp;self) -&gt; &amp;str {
+        &amp;self.data
+    }
+}
+
+impl Borrow&lt;[u8]&gt; for ExampleType {
+    fn borrow(&amp;self) -&gt; &amp;[u8] {
+        self.data.as_bytes()
+    }
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#impl_hash_borrow_with_str_and_bytes">https://rust-lang.github.io/rust-clippy/master/index.html#impl_hash_borrow_with_str_and_bytes</a> </li>
+</ul>
+
