@@ -63,8 +63,9 @@ public class RustSensor implements Sensor {
     List<InputFile> inputFiles = inputFiles(sensorContext);
     var platform = platformDetection.detect();
     if (platform == Platform.UNSUPPORTED) {
-      LOG.error("Unsupported platform for Rust analysis: {}", platformDetection.debug());
-      analysisWarnings.addUnique("Unsupported platform for Rust analysis: " + platformDetection.debug());
+      String msg = "Unsupported platform for Rust analysis: " + platformDetection.debug();
+      LOG.error(msg);
+      analysisWarnings.addUnique(msg);
       return;
     }
     LOG.info("Detected platform: {}", platform);
