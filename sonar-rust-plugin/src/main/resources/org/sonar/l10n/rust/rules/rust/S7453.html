@@ -1,14 +1,27 @@
-<p>FIXME: add a description</p>
 <h2>Why is this an issue?</h2>
-<p>FIXME: remove the unused optional headers (that are commented out)</p>
-<h2>How to fix it</h2>
+<p>Creating a mutable reference from an immutable one is unsound because it can lead to multiple live mutable references to the same object, breaking
+Rust’s guarantees of memory safety. Such patterns are particularly dangerous if unsafe code is present as it can lead to undefined behavior.</p>
 <h3>Code examples</h3>
 <h4>Noncompliant code example</h4>
 <pre data-diff-id="1" data-diff-type="noncompliant">
-FIXME
+fn foo(x: &amp;Foo) -&gt; &amp;mut Bar {
+    unsafe {
+        // Noncompliant: Converting immutable reference to mutable.
+        &amp;mut *(x as *const Foo as *mut Foo).bar
+    }
+}
 </pre>
 <h4>Compliant solution</h4>
 <pre data-diff-id="1" data-diff-type="compliant">
-FIXME
+fn foo(x: &amp;mut Foo) -&gt; &amp;mut Bar {
+    // Compliant: Taking a mutable reference and returning a mutable reference.
+    &amp;mut x.bar
+}
 </pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#mut_from_ref">https://rust-lang.github.io/rust-clippy/master/index.html#mut_from_ref</a> </li>
+</ul>
 
