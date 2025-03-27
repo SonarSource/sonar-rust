@@ -6,8 +6,8 @@
   },
   {
     "lintId": "clippy::iter_next_loop",
-    "ruleKey": null,
-    "message": "Replace the loop on `x.next()` with a more explicit and clear iteration."
+    "ruleKey": "S7455",
+    "message": "Remove or replace the loop over the result of this `next()` call."
   },
   {
     "lintId": "clippy::match_str_case_mismatch",

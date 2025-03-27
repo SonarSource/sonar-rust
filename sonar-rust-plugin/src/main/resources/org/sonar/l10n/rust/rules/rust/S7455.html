@@ -1,0 +1,33 @@
+<h2>Why is this an issue?</h2>
+<p>Looping over <code>x.next()</code> is misleading and can introduce subtle bugs. <code>x.next()</code> returns an <code>Option</code> which should
+be handled properly. When used in a loop, <code>Option</code> implements <code>IntoIterator</code>, resulting in unexpected behavior where only a
+single element or <code>None</code> might be processed, leading to difficult-to-diagnose errors.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+for value in iterator.next() {
+    // Noncompliant: Looping directly over `iterator.next()`
+    println!("{value}");
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+for value in iterator {
+    // Compliant: Looping directly over `iterator`
+    println!("{value}");
+}
+</pre>
+<p>Alternatively, handling the Option:</p>
+<pre data-diff-id="1" data-diff-type="compliant">
+if let Some(value) = iterator.next() {
+    // Process the single value
+    println!("{value}");
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#iter_next_loop">https://rust-lang.github.io/rust-clippy/master/index.html#iter_next_loop</a> </li>
+</ul>
+
