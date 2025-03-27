@@ -126,7 +126,7 @@
   },
   {
     "lintId": "clippy::invalid_null_ptr_usage",
-    "ruleKey": null,
+    "ruleKey": "S3807",
     "message": "Use `NonNull::dangling().as_ptr()` instead of `ptr::null()` to prevent undefined behavior."
   },
   {
