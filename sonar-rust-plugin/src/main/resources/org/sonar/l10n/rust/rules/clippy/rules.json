@@ -161,8 +161,8 @@
   },
   {
     "lintId": "clippy::mem_replace_with_uninit",
-    "ruleKey": null,
-    "message": "Replace `mem::replace(&mut _, mem::uninitialized())` or `mem::replace(&mut _, mem::zeroed())` with a safer alternative to avoid undefined behavior."
+    "ruleKey": "S7462",
+    "message": "Replace this value with a safer alternative to avoid undefined behavior."
   },
   {
     "lintId": "clippy::overly_complex_bool_expr",
