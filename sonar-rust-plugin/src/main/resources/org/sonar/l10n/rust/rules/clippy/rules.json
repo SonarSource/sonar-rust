@@ -71,7 +71,7 @@
   },
   {
     "lintId": "clippy::iter_skip_zero",
-    "ruleKey": null,
+    "ruleKey": "S7456",
     "message": "Remove `.skip(0)` from the iterator or change it to `.skip(1)` if the intention is to skip the first element."
   },
   {
