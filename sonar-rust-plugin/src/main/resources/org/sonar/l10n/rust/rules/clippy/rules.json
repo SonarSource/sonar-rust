@@ -81,8 +81,8 @@
   },
   {
     "lintId": "clippy::iterator_step_by_zero",
-    "ruleKey": null,
-    "message": "Replace `.step_by(0)` with `panic!()` if you intend to panic; otherwise, correct the step value."
+    "ruleKey": "S7457",
+    "message": "Correct the step value in this `.step_by(0)` call."
   },
   {
     "lintId": "clippy::mistyped_literal_suffixes",
