@@ -196,8 +196,8 @@
   },
   {
     "lintId": "clippy::inherent_to_string_shadow_display",
-    "ruleKey": null,
-    "message": "Eliminate `to_string(&self) -> String` as it will shadow the `Display` trait implementation."
+    "ruleKey": "S7458",
+    "message": "Remove this `to_string` function as it will shadow the `Display` trait implementation."
   },
   {
     "lintId": "clippy::eager_transmute",
