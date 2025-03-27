@@ -6,8 +6,13 @@
   },
   {
     "lintId": "clippy::iter_next_loop",
-    "ruleKey": null,
-    "message": "Replace the loop on `x.next()` with a more explicit and clear iteration."
+    "ruleKey": "S7455",
+    "message": "Remove or replace the loop over the result of this `next()` call."
+  },
+  {
+    "lintId": "clippy::impl_hash_borrow_with_str_and_bytes",
+    "ruleKey": "S7461",
+    "message": "Remove one of the incompatible `Hash`, `Borrow<str>` or `Borrow<[u8]>` implementations."
   },
   {
     "lintId": "clippy::match_str_case_mismatch",
@@ -71,7 +76,7 @@
   },
   {
     "lintId": "clippy::iter_skip_zero",
-    "ruleKey": null,
+    "ruleKey": "S7456",
     "message": "Remove `.skip(0)` from the iterator or change it to `.skip(1)` if the intention is to skip the first element."
   },
   {
@@ -81,8 +86,8 @@
   },
   {
     "lintId": "clippy::iterator_step_by_zero",
-    "ruleKey": null,
-    "message": "Replace `.step_by(0)` with `panic!()` if you intend to panic; otherwise, correct the step value."
+    "ruleKey": "S7457",
+    "message": "Correct the step value in this `.step_by(0)` call."
   },
   {
     "lintId": "clippy::mistyped_literal_suffixes",
@@ -196,8 +201,8 @@
   },
   {
     "lintId": "clippy::inherent_to_string_shadow_display",
-    "ruleKey": null,
-    "message": "Eliminate `to_string(&self) -> String` as it will shadow the `Display` trait implementation."
+    "ruleKey": "S7458",
+    "message": "Remove this `to_string` function as it will shadow the `Display` trait implementation."
   },
   {
     "lintId": "clippy::eager_transmute",
