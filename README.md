@@ -6,7 +6,7 @@ This SonarSource project is a code analyzer for Rust projects to help developers
 
 ## Features
 
-- 50+ rules
+- 80+ rules
 - Metrics (cognitive complexity, cyclomatic complexity, number of lines, etc.)
 - Import of [test coverage reports](https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/overview/)
 - Import of [external Clippy reports](https://docs.sonarsource.com/sonarqube-cloud/enriching/external-analyzer-reports/)
