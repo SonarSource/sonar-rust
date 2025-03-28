@@ -42,6 +42,7 @@ import org.sonar.api.rule.RuleKey;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doAnswer;
@@ -124,7 +125,8 @@ class ClippySensorTest {
     doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
     var warnings = new TestAnalysisWarnigs();
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper(warnings));
-    sensor.execute(context);
+    context.settings().setProperty("sonar.internal.analysis.failFast", "true");
+    assertThatThrownBy(() -> sensor.execute(context)).isInstanceOf(IllegalStateException.class);
 
     assertThat(logTester.logs()).contains("Failed to run Clippy");
     assertThat(warnings.warnings).contains("Failed to run Clippy. See logs for details.");

@@ -70,6 +70,7 @@ public class RustSensor implements Sensor {
       String msg = "Unsupported platform for Rust analysis: " + platformDetection.debug();
       LOG.error(msg);
       analysisWarnings.addUnique(msg);
+      failFastCheck(sensorContext, new IllegalStateException(msg));
       return;
     }
     LOG.info("Detected platform: {}", platform);
@@ -93,6 +94,13 @@ public class RustSensor implements Sensor {
     } catch (Exception ex) {
       LOG.error("Failed to create Rust analyzer: {}", ex.getMessage());
       analysisWarnings.addUnique("Failed to create Rust analyzer: " + ex.getMessage());
+      failFastCheck(sensorContext, ex);
+    }
+  }
+
+  private static void failFastCheck(SensorContext sensorContext, Exception ex) {
+    if (sensorContext.config().getBoolean(RustPlugin.FAIL_FAST_PROPERTY).orElse(false)) {
+      throw new IllegalStateException("Analysis failed", ex);
     }
   }
 

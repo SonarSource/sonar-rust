@@ -28,6 +28,8 @@ import org.sonar.api.config.PropertyDefinition.ConfigScope;
 
 public class RustPlugin implements Plugin {
 
+  public static final String FAIL_FAST_PROPERTY = "sonar.internal.analysis.failFast";
+
   @Override
   public void define(Context context) {
     context.addExtensions(
