@@ -70,7 +70,7 @@ public class ClippySensor implements Sensor {
 
     var manifests = CargoManifestProvider.getManifests(context);
     if (manifests.isEmpty()) {
-      String msg = "No Cargo manifest found, skipping Clippy analysis";
+      var msg = "No Cargo manifest found, skipping Clippy analysis";
       LOG.warn(msg);
       analysisWarnings.addUnique(msg);
       failFastCheck(context, new IllegalStateException(msg));
