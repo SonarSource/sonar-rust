@@ -16,6 +16,7 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.TestAnalysisWarnigs;
 import com.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -33,6 +34,7 @@ import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RustSensorTest {
 
@@ -151,6 +153,47 @@ fn foo(c1: bool) {
     assertThat(issue.flows()).hasSize(16);
   }
 
+  @Test
+  void test_unsupported_platform() {
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    PlatformDetection mockUnsupportedPlatform = new PlatformDetection() {
+      @Override
+      public Platform detect() {
+        return Platform.UNSUPPORTED;
+      }
+
+      @Override
+      public String debug() {
+        return "unit test";
+      }
+
+    };
+    var sensor = new RustSensor(null, new AnalysisWarningsWrapper(warnings), mockUnsupportedPlatform);
+
+    sensor.execute(context);
+    assertThat(warnings.warnings).hasSize(1);
+    assertThat(warnings.warnings.get(0)).isEqualTo("Unsupported platform for Rust analysis: unit test");
+  }
+
+  @Test
+  void test_analyzer_failure() {
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    var sensor = new RustSensor(new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        throw new RuntimeException("Cannot run program");
+      }
+    }, new AnalysisWarningsWrapper(warnings));
+
+    context.settings().setProperty("sonar.internal.analysis.failFast", "true");
+
+    assertThatThrownBy(() -> sensor.execute(context))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessage("Analysis failed");
+    assertThat(warnings.warnings).hasSize(1);
+    assertThat(warnings.warnings.get(0)).startsWith("Failed to create Rust analyzer: Cannot run program");
+  }
+
   private InputFile inputFile(String relativePath, String content) {
     return new TestInputFileBuilder(PROJECT_KEY, relativePath)
       .setModuleBaseDir(baseDir.toPath())
@@ -167,7 +210,7 @@ fn foo(c1: bool) {
       public Analyzer create(Platform platform) {
         return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
       }
-    });
+    }, new AnalysisWarningsWrapper());
   }
 
 }

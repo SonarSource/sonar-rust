@@ -28,16 +28,19 @@ import org.sonar.api.config.PropertyDefinition.ConfigScope;
 
 public class RustPlugin implements Plugin {
 
+  public static final String FAIL_FAST_PROPERTY = "sonar.internal.analysis.failFast";
+
   @Override
   public void define(Context context) {
     context.addExtensions(
       // keep sorted alphabetically
+      AnalysisWarningsWrapper.class,
       AnalyzerFactory.class,
       ClippyRulesDefinition.class,
       ClippyReportSensor.class,
       ClippySensor.class,
-      LcovSensor.class,
       CoberturaSensor.class,
+      LcovSensor.class,
       RustLanguage.class,
       RustProfile.class,
       RustRulesDefinition.class,

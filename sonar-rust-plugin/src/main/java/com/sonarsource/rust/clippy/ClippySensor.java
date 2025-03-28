@@ -17,7 +17,9 @@
 package com.sonarsource.rust.clippy;
 
 import com.sonarsource.rust.cargo.CargoManifestProvider;
+import com.sonarsource.rust.plugin.AnalysisWarningsWrapper;
 import com.sonarsource.rust.plugin.RustLanguage;
+import com.sonarsource.rust.plugin.RustPlugin;
 import com.sonarsource.rust.plugin.RustRulesDefinition;
 import com.sonarsource.rust.plugin.Telemetry;
 import java.nio.file.Path;
@@ -39,14 +41,16 @@ public class ClippySensor implements Sensor {
 
   private final ClippyPrerequisite clippyPrerequisite;
   private final ClippyRunner clippy;
+  private final AnalysisWarningsWrapper analysisWarnings;
 
   public ClippySensor() {
-    this(new ClippyPrerequisite(), new ClippyRunner());
+    this(new ClippyPrerequisite(), new ClippyRunner(), new AnalysisWarningsWrapper());
   }
 
-  ClippySensor(ClippyPrerequisite clippyPrerequisite, ClippyRunner clippy) {
+  ClippySensor(ClippyPrerequisite clippyPrerequisite, ClippyRunner clippy, AnalysisWarningsWrapper analysisWarnings) {
     this.clippyPrerequisite = clippyPrerequisite;
     this.clippy = clippy;
+    this.analysisWarnings = analysisWarnings;
   }
 
   @Override
@@ -66,7 +70,10 @@ public class ClippySensor implements Sensor {
 
     var manifests = CargoManifestProvider.getManifests(context);
     if (manifests.isEmpty()) {
-      LOG.warn("No Cargo manifest found, skipping Clippy analysis");
+      var msg = "No Cargo manifest found, skipping Clippy analysis";
+      LOG.warn(msg);
+      analysisWarnings.addUnique(msg);
+      failFastCheck(context, new IllegalStateException(msg));
       return;
     }
 
@@ -79,6 +86,8 @@ public class ClippySensor implements Sensor {
       Telemetry.reportClippyVersion(context, versions.clippyVersion());
     } catch (Exception e) {
       LOG.error("Failed to check Clippy prerequisites", e);
+      analysisWarnings.addUnique("Failed to check Clippy prerequisites. See logs for details.");
+      failFastCheck(context, e);
       return;
     }
 
@@ -98,6 +107,14 @@ public class ClippySensor implements Sensor {
       }
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);
+      analysisWarnings.addUnique("Failed to run Clippy. See logs for details.");
+      failFastCheck(context, e);
+    }
+  }
+
+  private static void failFastCheck(SensorContext sensorContext, Exception ex) {
+    if (sensorContext.config().getBoolean(RustPlugin.FAIL_FAST_PROPERTY).orElse(false)) {
+      throw new IllegalStateException("Analysis failed", ex);
     }
   }
 

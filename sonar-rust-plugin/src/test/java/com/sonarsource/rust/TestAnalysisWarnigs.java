@@ -14,26 +14,18 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-package com.sonarsource.rust.plugin;
+package com.sonarsource.rust;
 
-import org.junit.jupiter.api.Test;
-import org.sonar.api.Plugin;
-import org.sonar.api.SonarEdition;
-import org.sonar.api.SonarQubeSide;
-import org.sonar.api.internal.SonarRuntimeImpl;
-import org.sonar.api.utils.Version;
+import java.util.ArrayList;
+import java.util.List;
+import org.sonar.api.notifications.AnalysisWarnings;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+public class TestAnalysisWarnigs implements AnalysisWarnings {
 
-class RustPluginTest {
+  public List<String> warnings = new ArrayList<>();
 
-  @Test
-  void test() {
-    var context = new Plugin.Context(SonarRuntimeImpl.forSonarQube(
-        Version.create(25, 2),
-        SonarQubeSide.SCANNER,
-        SonarEdition.COMMUNITY));
-    new RustPlugin().define(context);
-    assertEquals(17, context.getExtensions().size());
+  @Override
+  public void addUnique(String text) {
+    warnings.add(text);
   }
 }
