@@ -16,6 +16,7 @@
  */
 package com.sonarsource.rust.plugin;
 
+import com.sonarsource.rust.TestAnalysisWarnigs;
 import com.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
@@ -149,6 +150,28 @@ fn foo(c1: bool) {
     assertThat(issue.primaryLocation().message()).isEqualTo("Refactor this function to reduce its Cognitive Complexity from 16 to the 15 allowed.");
     assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
     assertThat(issue.flows()).hasSize(16);
+  }
+
+  @Test
+  void test_unsupported_platform() {
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    PlatformDetection mockUnsupportedPlatform = new PlatformDetection() {
+      @Override
+      public Platform detect() {
+        return Platform.UNSUPPORTED;
+      }
+
+      @Override
+      public String debug() {
+        return "unit test";
+      }
+
+    };
+    var sensor = new RustSensor(null, new AnalysisWarningsWrapper(warnings), mockUnsupportedPlatform);
+
+    sensor.execute(context);
+    assertThat(warnings.warnings).hasSize(1);
+    assertThat(warnings.warnings.get(0)).isEqualTo("Unsupported platform for Rust analysis: unit test");
   }
 
   private InputFile inputFile(String relativePath, String content) {

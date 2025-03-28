@@ -104,7 +104,7 @@ public class ClippySensor implements Sensor {
       }
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);
-      analysisWarnings.addUnique("Failed to check Clippy prerequisites. See logs for details.");
+      analysisWarnings.addUnique("Failed to run Clippy. See logs for details.");
     }
   }
 

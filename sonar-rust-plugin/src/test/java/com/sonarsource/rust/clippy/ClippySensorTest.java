@@ -16,6 +16,7 @@
  */
 package com.sonarsource.rust.clippy;
 
+import com.sonarsource.rust.TestAnalysisWarnigs;
 import com.sonarsource.rust.cargo.CargoManifestProvider;
 import com.sonarsource.rust.plugin.AnalysisWarningsWrapper;
 import com.sonarsource.rust.plugin.RustLanguage;
@@ -102,10 +103,12 @@ class ClippySensorTest {
     doThrow(new IllegalStateException("error")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
+    var warnings = new TestAnalysisWarnigs();
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper(warnings));
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to check Clippy prerequisites");
+    assertThat(warnings.warnings).contains("Failed to check Clippy prerequisites. See logs for details.");
   }
 
   @Test
@@ -119,10 +122,12 @@ class ClippySensorTest {
 
     var clippyRunner = mock(ClippyRunner.class);
     doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
-    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
+    var warnings = new TestAnalysisWarnigs();
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper(warnings));
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to run Clippy");
+    assertThat(warnings.warnings).contains("Failed to run Clippy. See logs for details.");
   }
 
   @Test

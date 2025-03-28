@@ -46,8 +46,12 @@ public class RustSensor implements Sensor {
   private final AnalysisWarningsWrapper analysisWarnings;
 
   public RustSensor(AnalyzerFactory analyzerFactory, AnalysisWarningsWrapper analysisWarnings) {
+    this(analyzerFactory, analysisWarnings, new PlatformDetection());
+  }
+
+  RustSensor(AnalyzerFactory analyzerFactory, AnalysisWarningsWrapper analysisWarnings, PlatformDetection platformDetection) {
     this.analyzerFactory = analyzerFactory;
-    this.platformDetection = new PlatformDetection();
+    this.platformDetection = platformDetection;
     this.analysisWarnings = analysisWarnings;
   }
 
