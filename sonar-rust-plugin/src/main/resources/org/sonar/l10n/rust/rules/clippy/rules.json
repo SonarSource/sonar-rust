@@ -1,8 +1,8 @@
 [
   {
     "lintId": "clippy::never_loop",
-    "ruleKey": null,
-    "message": "Refactor the loop to perform useful iterations or remove it entirely."
+    "ruleKey": "S1751",
+    "message": "Refactor this loop to perform more than one iteration or remove it."
   },
   {
     "lintId": "clippy::iter_next_loop",
@@ -41,7 +41,7 @@
   },
   {
     "lintId": "clippy::erasing_op",
-    "ruleKey": null,
+    "ruleKey": "S2185",
     "message": "Replace `x * 0`, `0 / x`, or `x & 0` with a direct constant value."
   },
   {
@@ -56,8 +56,8 @@
   },
   {
     "lintId": "clippy::ineffective_bit_mask",
-    "ruleKey": null,
-    "message": "Remove bit masks in comparisons which do not change the outcome."
+    "ruleKey": "S2437",
+    "message": "Remove this unnecessary bit mask operation."
   },
   {
     "lintId": "clippy::bad_bit_mask",
@@ -91,8 +91,8 @@
   },
   {
     "lintId": "clippy::mistyped_literal_suffixes",
-    "ruleKey": null,
-    "message": "Correct the mistyped literal suffix to avoid potential typos."
+    "ruleKey": "S7454",
+    "message": "Use the correct suffix for this literal to represent the intended value."
   },
   {
     "lintId": "clippy::approx_constant",
@@ -106,8 +106,8 @@
   },
   {
     "lintId": "clippy::serde_api_misuse",
-    "ruleKey": null,
-    "message": "Implement all required `Visitor` methods to avoid API misuse."
+    "ruleKey": "S7460",
+    "message": "Implement the `write_str` function as well."
   },
   {
     "lintId": "clippy::let_underscore_lock",
@@ -126,18 +126,18 @@
   },
   {
     "lintId": "clippy::infinite_iter",
-    "ruleKey": null,
-    "message": "Ensure that iterations are finite or account for infinite iteration in the intended logic."
+    "ruleKey": "S7464",
+    "message": "Apply a terminating operation to this infinite iterator."
   },
   {
     "lintId": "clippy::invalid_null_ptr_usage",
-    "ruleKey": null,
+    "ruleKey": "S3807",
     "message": "Use `NonNull::dangling().as_ptr()` instead of `ptr::null()` to prevent undefined behavior."
   },
   {
     "lintId": "clippy::mut_from_ref",
-    "ruleKey": null,
-    "message": "Avoid returning mutable references (`&mut T`) from immutable references (`&T`), or ensure the function does not contain unsafe code allowing this transformation."
+    "ruleKey": "S7453",
+    "message": "Declare this parameter as mutable."
   },
   {
     "lintId": "clippy::inline_fn_without_body",
@@ -156,8 +156,8 @@
   },
   {
     "lintId": "clippy::invisible_characters",
-    "ruleKey": null,
-    "message": "Remove invisible Unicode characters from the code."
+    "ruleKey": "S2479",
+    "message": "Remove this invisible character from this literal."
   },
   {
     "lintId": "clippy::async_yields_async",
@@ -166,8 +166,8 @@
   },
   {
     "lintId": "clippy::mem_replace_with_uninit",
-    "ruleKey": null,
-    "message": "Replace `mem::replace(&mut _, mem::uninitialized())` or `mem::replace(&mut _, mem::zeroed())` with a safer alternative to avoid undefined behavior."
+    "ruleKey": "S7462",
+    "message": "Replace this value with a safer alternative to avoid undefined behavior."
   },
   {
     "lintId": "clippy::overly_complex_bool_expr",
@@ -181,8 +181,8 @@
   },
   {
     "lintId": "clippy::inverted_saturating_sub",
-    "ruleKey": null,
-    "message": "Substitute the conditional subtraction with `saturating_sub`."
+    "ruleKey": "S7463",
+    "message": "Substitute this conditional subtraction with `saturating_sub`."
   },
   {
     "lintId": "clippy::almost_swapped",
@@ -428,5 +428,10 @@
     "lintId": "clippy::non_octal_unix_permissions",
     "ruleKey": "S7448",
     "message": "Use octal values to set Unix file permissions."
+  },
+  {
+    "lintId": "clippy::uninit_vec",
+    "ruleKey": "S7459",
+    "message": "Initialize this vector before using it."
   }
 ]

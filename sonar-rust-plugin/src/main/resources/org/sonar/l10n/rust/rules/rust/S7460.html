@@ -1,0 +1,60 @@
+<h2>Why is this an issue?</h2>
+<p>Serde is a popular framework in the Rust ecosystem for serializing and deserializing data. It provides a flexible and efficient way to convert Rust
+data structures into various formats (e.g., JSON, YAML) and vice versa.</p>
+<p>One of the core components of Serde is the <code>Visitor</code> trait, which allows custom deserialization logic by visiting each element of the
+data structure. According to Serde’s <a href="https://docs.rs/serde/latest/serde/de/trait.Visitor.html#method.visit_str">documentation</a>, any
+implementation of the <code>Visitor</code> trait that implements the <code>visit_string</code> method must also implement the <code>visit_str</code>
+method. Failing to do so can lead to unexpected behavior.</p>
+<p>This rule ensures that implementations of the <code>Visitor</code> trait adhere to this requirement, promoting correctness and preventing subtle
+bugs in deserialization logic.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+struct A;
+
+impl&lt;'de&gt; serde::de::Visitor&lt;'de&gt; for A {
+    type Value = ();
+
+    fn expecting(&amp;self, _: &amp;mut ::std::fmt::Formatter) -&gt; ::std::fmt::Result {
+      unimplemented!()
+    }
+
+    fn visit_string&lt;E&gt;(self, _v: String) -&gt; Result&lt;Self::Value, E&gt;
+    where
+        E: serde::de::Error,
+    {
+      unimplemented!()
+    }
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+impl&lt;'de&gt; serde::de::Visitor&lt;'de&gt; for A {
+    type Value = ();
+
+    fn expecting(&amp;self, _: &amp;mut ::std::fmt::Formatter) -&gt; ::std::fmt::Result {
+        unimplemented!()
+    }
+
+    fn visit_str&lt;E&gt;(self, _v: &amp;str) -&gt; Result&lt;Self::Value, E&gt;
+    where
+        E: serde::de::Error,
+    {
+        unimplemented!()
+    }
+
+    fn visit_string&lt;E&gt;(self, _v: String) -&gt; Result&lt;Self::Value, E&gt;
+    where
+        E: serde::de::Error,
+    {
+        unimplemented!()
+    }
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#serde_api_misuse">https://rust-lang.github.io/rust-clippy/master/index.html#serde_api_misuse</a> </li>
+</ul>
+

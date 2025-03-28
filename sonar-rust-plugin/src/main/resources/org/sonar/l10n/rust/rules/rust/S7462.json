@@ -1,0 +1,23 @@
+{
+  "title": "`mem::uninitialized` and `mem::zeroed()` should not be used to replace values",
+  "type": "BUG",
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "5min"
+  },
+  "tags": [
+    "clippy"
+  ],
+  "defaultSeverity": "Major",
+  "ruleSpecification": "RSPEC-7462",
+  "sqKey": "S7462",
+  "scope": "All",
+  "quickfix": "unknown",
+  "code": {
+    "impacts": {
+      "RELIABILITY": "MEDIUM"
+    },
+    "attribute": "LOGICAL"
+  }
+}

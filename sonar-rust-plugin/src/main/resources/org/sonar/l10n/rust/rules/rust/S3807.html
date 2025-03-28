@@ -1,0 +1,38 @@
+<h2>Why is this an issue?</h2>
+<p>The standard Rust library includes a variety of functions for pointer manipulations. Many of these functions require non-null ponter parameters,
+including:</p>
+<ul>
+  <li> <code>sym::ptr_read</code> </li>
+  <li> <code>sym::ptr_read_unaligned</code> </li>
+  <li> <code>sym::ptr_read_volatile</code> </li>
+  <li> <code>sym::ptr_replace</code> </li>
+  <li> <code>sym::ptr_write</code> </li>
+  <li> <code>sym::ptr_write_bytes</code> </li>
+  <li> <code>sym::ptr_write_unaligned</code> </li>
+  <li> <code>sym::ptr_write_volatile</code> </li>
+  <li> <code>sym::slice_from_raw_parts</code> </li>
+  <li> <code>sym::slice_from_raw_parts_mut</code> </li>
+  <li> <code>sym::ptr_copy</code> </li>
+  <li> <code>sym::ptr_copy_nonoverlapping</code> </li>
+  <li> <code>sym::ptr_swap</code> </li>
+  <li> <code>sym::ptr_swap_nonoverlapping</code> </li>
+</ul>
+<p>Using <code>ptr::null</code> in unsafe code can result in undefined behavior, compromising the stability and safety of the program. Undefined
+behavior occurs when the program does something the Rust language specifications do not define, often leading to crashes or security
+vulnerabilities.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+unsafe { std::slice::from_raw_parts(ptr::null(), 0); } // Noncompliant: Usage of `ptr::null()`.
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+unsafe { std::slice::from_raw_parts(NonNull::dangling().as_ptr(), 0); } // Compliant: Uses `NonNull::dangling().as_ptr()` to avoid undefined behavior.
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#invalid_null_ptr_usage">https://rust-lang.github.io/rust-clippy/master/index.html#invalid_null_ptr_usage</a> </li>
+</ul>
+

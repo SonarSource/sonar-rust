@@ -1,0 +1,37 @@
+<h2>Why is this an issue?</h2>
+<p>Using <code>mem::replace(&amp;mut _, mem::uninitialized())</code> or <code>mem::replace(&amp;mut _, mem::zeroed())</code> leads to undefined
+behavior even if the value is overwritten later. This is because the uninitialized value might be observed in the case of a panic, which can lead to
+unpredictable and dangerous consequences in your program.</p>
+<h3>Code examples</h3>
+<h4>Noncompliant code example</h4>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+use std::mem;
+
+fn may_panic(v: Vec&lt;i32&gt;) -&gt; Vec&lt;i32&gt; { v }
+
+#[allow(deprecated, invalid_value)]
+fn myfunc(v: &amp;mut Vec&lt;i32&gt;) {
+    let taken_v = unsafe { mem::replace(v, mem::uninitialized()) }; // Noncompliant
+    let new_v = may_panic(taken_v); // undefined behavior on panic
+    mem::forget(mem::replace(v, new_v));
+}
+</pre>
+<h4>Compliant solution</h4>
+<pre data-diff-id="1" data-diff-type="compliant">
+use std::mem;
+use take_mut::take;
+
+fn may_panic(v: Vec&lt;i32&gt;) -&gt; Vec&lt;i32&gt; { v }
+
+fn myfunc(v: &amp;mut Vec&lt;i32&gt;) {
+    let new_v = take(v, |old_v| may_panic(old_v)); // Compliant
+    mem::forget(mem::replace(v, new_v));
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_with_uninit">https://rust-lang.github.io/rust-clippy/master/index.html#mem_replace_with_uninit</a> </li>
+</ul>
+

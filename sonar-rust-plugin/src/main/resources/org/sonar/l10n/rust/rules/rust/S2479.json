@@ -1,0 +1,24 @@
+{
+  "title": "Invisible Unicode characters should not be used",
+  "type": "CODE_SMELL",
+  "code": {
+    "impacts": {
+      "MAINTAINABILITY": "HIGH"
+    },
+    "attribute": "CLEAR"
+  },
+  "status": "ready",
+  "remediation": {
+    "func": "Constant\/Issue",
+    "constantCost": "10min"
+  },
+  "tags": [
+    "pitfall",
+    "clippy"
+  ],
+  "defaultSeverity": "Critical",
+  "ruleSpecification": "RSPEC-2479",
+  "sqKey": "S2479",
+  "scope": "Main",
+  "quickfix": "unknown"
+}

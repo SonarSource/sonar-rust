@@ -1,0 +1,33 @@
+<h2>Why is this an issue?</h2>
+<p>A loop with at most one iteration is equivalent to the use of an <code>if</code> statement to conditionally execute one piece of code. No developer
+expects to find such a use of a loop statement. If the initial intention of the author was really to conditionally execute one piece of code, an
+<code>if</code> statement should be used instead.</p>
+<p>At worst that was not the initial intention of the author and so the body of the loop should be fixed to use the nested <code>return</code>,
+<code>break</code> or <code>throw</code> statements in a more appropriate way.</p>
+<h3>Noncompliant code example</h3>
+<pre data-diff-id="1" data-diff-type="noncompliant">
+let mut x = 0;
+loop {
+    x += 1;
+    if x == 1 {
+        return;
+    }
+    break;
+}
+</pre>
+<h3>Compliant solution</h3>
+<pre data-diff-id="1" data-diff-type="compliant">
+let mut x = 0;
+x += 1;
+if x == 1 {
+    return;
+}
+</pre>
+<h2>Resources</h2>
+<h3>Documentation</h3>
+<ul>
+  <li> Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#never_loop">https://rust-lang.github.io/rust-clippy/master/index.html#never_loop</a>
+  </li>
+</ul>
+
