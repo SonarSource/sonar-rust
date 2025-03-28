@@ -34,6 +34,7 @@ import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 class RustSensorTest {
 
@@ -172,6 +173,25 @@ fn foo(c1: bool) {
     sensor.execute(context);
     assertThat(warnings.warnings).hasSize(1);
     assertThat(warnings.warnings.get(0)).isEqualTo("Unsupported platform for Rust analysis: unit test");
+  }
+
+  @Test
+  void test_analyzer_failure() {
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    var sensor = new RustSensor(new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        throw new RuntimeException("Cannot run program");
+      }
+    }, new AnalysisWarningsWrapper(warnings));
+
+    context.settings().setProperty("sonar.internal.analysis.failFast", "true");
+
+    assertThatThrownBy(() -> sensor.execute(context))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessage("Analysis failed");
+    assertThat(warnings.warnings).hasSize(1);
+    assertThat(warnings.warnings.get(0)).startsWith("Failed to create Rust analyzer: Cannot run program");
   }
 
   private InputFile inputFile(String relativePath, String content) {
