@@ -185,7 +185,7 @@ fn foo(c1: bool) {
       }
     }, new AnalysisWarningsWrapper(warnings));
 
-    context.settings().setProperty("sonar.internal.analysis.failFast", "true");
+    context.settings().setProperty("sonar.internal.analysis.rust.failFast", "true");
 
     assertThatThrownBy(() -> sensor.execute(context))
       .isInstanceOf(IllegalStateException.class)

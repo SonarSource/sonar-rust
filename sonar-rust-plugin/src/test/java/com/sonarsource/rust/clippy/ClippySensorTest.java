@@ -125,7 +125,7 @@ class ClippySensorTest {
     doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
     var warnings = new TestAnalysisWarnigs();
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper(warnings));
-    context.settings().setProperty("sonar.internal.analysis.failFast", "true");
+    context.settings().setProperty("sonar.internal.analysis.rust.failFast", "true");
     assertThatThrownBy(() -> sensor.execute(context)).isInstanceOf(IllegalStateException.class);
 
     assertThat(logTester.logs()).contains("Failed to run Clippy");
