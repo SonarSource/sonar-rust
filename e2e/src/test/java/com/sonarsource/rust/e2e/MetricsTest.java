@@ -34,6 +34,7 @@ class MetricsTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs("src");
 
     var wsClient = WsClientFactories.getDefault()

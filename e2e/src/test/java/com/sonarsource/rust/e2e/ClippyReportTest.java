@@ -49,6 +49,7 @@ class ClippyReportTest {
       .setProjectName(projectName)
       .setProjectDir(projectDir)
       .setSourceDirs("src")
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setProperty("sonar.rust.clippy.enabled", "false")
       .setProperty("sonar.rust.clippyReport.reportPaths", "report.json");
 

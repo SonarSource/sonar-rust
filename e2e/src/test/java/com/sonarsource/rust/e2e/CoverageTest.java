@@ -34,6 +34,7 @@ class CoverageTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs("src")
       .setProperty("sonar.rust.lcov.reportPaths", "lcov.info");
 
@@ -72,6 +73,7 @@ class CoverageTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs("src")
       .setProperty("sonar.rust.cobertura.reportPaths", "cobertura.xml");
 

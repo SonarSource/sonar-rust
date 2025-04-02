@@ -35,6 +35,7 @@ class ClippyRunnerTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setDebugLogs(true)
       .setSourceDirs("src");
 
