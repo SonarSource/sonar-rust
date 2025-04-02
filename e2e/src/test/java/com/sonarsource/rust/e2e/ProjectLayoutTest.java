@@ -45,6 +45,7 @@ class ProjectLayoutTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs(".");
 
     var wsClient = WsClientFactories.getDefault()
@@ -89,6 +90,7 @@ class ProjectLayoutTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs(".")
       .setProperty("sonar.rust.cargo.manifestPaths", "rust-crate/Cargo.toml");
 
@@ -136,6 +138,7 @@ class ProjectLayoutTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs(".")
       .setProperty("sonar.rust.cargo.manifestPaths", "**/Cargo.toml");
 
@@ -184,6 +187,7 @@ class ProjectLayoutTest {
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
+      .setProperty("sonar.internal.analysis.rust.failFast", "true")
       .setSourceDirs(".");
 
     var wsClient = WsClientFactories.getDefault()
