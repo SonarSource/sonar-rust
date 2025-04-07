@@ -13,7 +13,7 @@ plugins {
 }
 
 
-group = "com.sonarsource.rust"
+group = "org.sonarsource.rust"
 version = "0.1.0-SNAPSHOT"
 
 // Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
@@ -81,7 +81,7 @@ tasks.jar {
         "Plugin-Name" to "Rust Code Quality and Security",
         "Plugin-Version" to project.version,
         "Implementation-Version" to project.version, // class.getPackage().getImplementationVersion()
-        "Plugin-Class" to "com.sonarsource.rust.plugin.RustPlugin",
+        "Plugin-Class" to "org.sonarsource.rust.plugin.RustPlugin",
         "Plugin-RequiredForLanguages" to "rust",
       )
     )
