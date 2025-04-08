@@ -13,9 +13,6 @@ plugins {
 }
 
 
-group = "org.sonarsource.rust"
-version = "0.1.0-SNAPSHOT"
-
 // Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
 val buildNumber: String? = System.getProperty("buildNumber")
 project.ext["buildNumber"] = buildNumber
