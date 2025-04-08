@@ -89,7 +89,7 @@ build_task:
     ORG_GRADLE_PROJECT_signingPassword: VAULT[development/kv/data/sign data.passphrase]
     ORG_GRADLE_PROJECT_signingKeyId: VAULT[development/kv/data/sign data.key_id]
 
-    ARTIFACTORY_DEPLOY_REPO: sonarsource-private-qa
+    ARTIFACTORY_DEPLOY_REPO: sonarsource-public-qa
     ARTIFACTORY_DEPLOY_USERNAME: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer username]
     ARTIFACTORY_DEPLOY_PASSWORD: VAULT[development/artifactory/token/${CIRRUS_REPO_OWNER}-${CIRRUS_REPO_NAME}-qa-deployer access_token]
     DEPLOY_PULL_REQUEST: "true"
