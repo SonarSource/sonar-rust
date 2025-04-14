@@ -196,6 +196,8 @@ publishing {
       artifact(tasks.shadowJar) {
         classifier = null
       }
+      artifact(tasks.named("javadocJar"))
+      artifact(tasks.named("sourcesJar"))
     }
   }
 }
