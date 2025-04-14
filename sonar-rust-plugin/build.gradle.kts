@@ -47,6 +47,8 @@ java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(17)
   }
+  withSourcesJar()
+  withJavadocJar()
 }
 
 tasks.jacocoTestReport {

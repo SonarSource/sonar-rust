@@ -26,7 +26,7 @@ import org.sonar.api.utils.PathUtils;
  * It is responsible for locating files based on their paths using a reverse path tree to index and retrieve files efficiently.
  * The logic for this class was adapted from the JavaScript analyzer, which uses similar logic for parsing LCOV files.
  *
- * @see https://github.com/SonarSource/SonarJS/blob/master/sonar-plugin/sonar-javascript-plugin/src/main/java/org/sonar/plugins/javascript/lcov/FileLocator.java
+ * @see <a href="https://github.com/SonarSource/SonarJS/blob/master/sonar-plugin/sonar-javascript-plugin/src/main/java/org/sonar/plugins/javascript/lcov/FileLocator.java">SonarJS FileLocator</a>
  */
 public class FileLocator {
 
