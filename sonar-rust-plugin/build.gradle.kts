@@ -47,6 +47,8 @@ java {
   toolchain {
     languageVersion = JavaLanguageVersion.of(17)
   }
+  withSourcesJar()
+  withJavadocJar()
 }
 
 tasks.jacocoTestReport {
@@ -194,6 +196,8 @@ publishing {
       artifact(tasks.shadowJar) {
         classifier = null
       }
+      artifact(tasks.named("javadocJar"))
+      artifact(tasks.named("sourcesJar"))
     }
   }
 }
