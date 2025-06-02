@@ -8,7 +8,6 @@ package org.sonarsource.rust.e2e;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 
-import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import java.nio.file.Paths;
@@ -41,7 +40,7 @@ class ProjectLayoutTest {
     var projectName = "Package Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/package").toURI()).toFile();
 
-    var scanner = SonarScanner.create()
+    var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
@@ -86,7 +85,7 @@ class ProjectLayoutTest {
     var projectName = "Hybrid Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/hybrid").toURI()).toFile();
 
-    var scanner = SonarScanner.create()
+    var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
@@ -134,7 +133,7 @@ class ProjectLayoutTest {
     var projectName = "Monorepo Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/monorepo").toURI()).toFile();
 
-    var scanner = SonarScanner.create()
+    var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
@@ -183,7 +182,7 @@ class ProjectLayoutTest {
     var projectName = "Workspace Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/workspace").toURI()).toFile();
 
-    var scanner = SonarScanner.create()
+    var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
