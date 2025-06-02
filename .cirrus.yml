@@ -142,6 +142,8 @@ e2e_task:
     <<: *CONTAINER_DEFINITION
     cpu: 4
     memory: 16G
+  env:
+    GITHUB_TOKEN: VAULT[development/github/token/licenses-ro token]
   <<: *SETUP_GRADLE_CACHE
   <<: *ORCHESTRATOR_CACHE
   script:
@@ -161,6 +163,8 @@ e2e_win_task:
     type: c6id.xlarge
     region: eu-central-1
     use_ssd: true
+  env:
+    GITHUB_TOKEN: VAULT[development/github/token/licenses-ro token]
   <<: *WIN_SSD_AND_CLONE
   <<: *ORCHESTRATOR_CACHE
   env:
@@ -208,6 +212,8 @@ e2e_linux_arm64_task:
     dockerfile: .cirrus/arm64.Dockerfile
     docker_arguments:
       CIRRUS_AWS_ACCOUNT: ${CIRRUS_AWS_ACCOUNT}
+  env:
+    GITHUB_TOKEN: VAULT[development/github/token/licenses-ro token]
   gradle_cache:
     folder: "${GRADLE_USER_HOME}/caches"
   <<: *ORCHESTRATOR_CACHE

@@ -8,6 +8,7 @@ package org.sonarsource.rust.e2e;
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
 import com.sonar.orchestrator.build.SonarScanner;
+import com.sonar.orchestrator.container.Edition;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import com.sonar.orchestrator.locator.FileLocation;
 import com.sonar.orchestrator.locator.Location;
@@ -33,6 +34,8 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
       pluginLocation = MavenLocation.of("org.sonarsource.rust", "sonar-rust-plugin", version);
     }
     return OrchestratorExtension.builderEnv()
+      .setEdition(Edition.ENTERPRISE_LW)
+      .activateLicense()
       .useDefaultAdminCredentialsForBuilds(true)
       .setSonarVersion(System.getProperty("sonar.runtimeVersion", "LATEST_RELEASE"))
       .addPlugin(pluginLocation)
