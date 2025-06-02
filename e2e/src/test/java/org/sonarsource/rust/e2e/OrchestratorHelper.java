@@ -7,6 +7,7 @@ package org.sonarsource.rust.e2e;
 
 import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
+import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import com.sonar.orchestrator.locator.FileLocation;
 import com.sonar.orchestrator.locator.Location;
@@ -55,5 +56,10 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
 
   static OrchestratorExtension orchestrator() {
     return orchestrator;
+  }
+
+  static SonarScanner createSonarScanner() {
+    return SonarScanner.create()
+      .setProperty("sonar.scanner.skipJreProvisioning", "true");
   }
 }

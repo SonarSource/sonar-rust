@@ -7,7 +7,6 @@ package org.sonarsource.rust.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import java.nio.file.Paths;
@@ -30,7 +29,7 @@ class DuplicationTest {
     var projectName = "Code Duplication";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/duplication").toURI()).toFile();
 
-    var scanner = SonarScanner.create()
+    var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
       .setProjectDir(projectDir)
