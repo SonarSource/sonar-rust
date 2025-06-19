@@ -54,8 +54,6 @@ if [[ "${PULL_REQUEST}" ]] || [[ "${GITHUB_BRANCH}" == "master" ]]; then
     "-Dsonar.links.issue=https://jira.sonarsource.com/projects/SKUNK"
     "-Dsonar.rust.lcov.reportPaths=analyzer/target/llvm-cov-target/coverage.lcov"
     "-Dsonar.rust.cargo.manifestPaths=analyzer/Cargo.toml"
-    "-Dsonar.sources=."
-    "-Dsonar.tests=."
     # "-Dsonar.test.inclusions=**/src/test/**,**/tests/**"
   )
 
