@@ -305,7 +305,7 @@ run_iris_task:
     <<: *CONTAINER_DEFINITION
   depends_on:
     - sonar_shadow_scan_sqc_us
-    - sonar_shadow_scan_next
+    - sonar_shadow_scan_sqc_eu
   env:
     SONAR_SQC_EU_URL: "https://sonarcloud.io"
     SONAR_IRIS_SQC_EU_TOKEN: VAULT[development/kv/data/iris data.sqc-eu]
