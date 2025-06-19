@@ -60,7 +60,7 @@ if [[ "${PULL_REQUEST}" ]] || [[ "${GITHUB_BRANCH}" == "master" ]]; then
   )
 
   echo "[DEBUG] Running sonar-scanner with params: ${scanner_params[*]}"
-  sonar-scanner "${scanner_params[@]}"
+  gradle --no-daemon --info --stacktrace --console plain build sonar "${scanner_params[@]}"
 else
   echo "[DEBUG] Skipping scan: neither PULL_REQUEST nor GITHUB_BRANCH=master."
 fi
