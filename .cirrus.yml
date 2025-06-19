@@ -279,7 +279,7 @@ sonar_shadow_scan_sqc_eu_task:
   eks_container:
     <<: *CONTAINER_DEFINITION
   depends_on:
-    - build_task
+    - build
   env:
     SONAR_TOKEN: VAULT[development/kv/data/sonarcloud data.token]
     PROJECT_KEY: "SonarSource_sonar-rust"
@@ -292,7 +292,7 @@ sonar_shadow_scan_sqc_us_task:
   eks_container:
     <<: *CONTAINER_DEFINITION
   depends_on:
-    - build_task
+    - build
   env:
     SONAR_TOKEN: VAULT[development/kv/data/sonarqube-us data.token]
     PROJECT_KEY: "SonarSource_sonar-rust"
