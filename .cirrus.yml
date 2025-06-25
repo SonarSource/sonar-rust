@@ -275,7 +275,7 @@ promote_task:
   <<: *CLEANUP_GRADLE_CACHE_SCRIPT
 
 sonar_shadow_scan_sqc_eu_task:
-
+  only_if: $CIRRUS_CRON == "daily"
   eks_container:
     <<: *CONTAINER_DEFINITION
   depends_on:
@@ -288,7 +288,7 @@ sonar_shadow_scan_sqc_eu_task:
     - source .cirrus/shadow-scan.sh
 
 sonar_shadow_scan_sqc_us_task:
-
+  only_if: $CIRRUS_CRON == "daily"
   eks_container:
     <<: *CONTAINER_DEFINITION
   depends_on:
@@ -301,6 +301,7 @@ sonar_shadow_scan_sqc_us_task:
     - source .cirrus/shadow-scan.sh
 
 run_iris_task:
+  only_if: $CIRRUS_CRON == "daily"
   eks_container:
     <<: *CONTAINER_DEFINITION
   depends_on:
