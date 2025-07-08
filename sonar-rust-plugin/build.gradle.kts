@@ -184,7 +184,7 @@ publishing {
           }
         }
         scm {
-          url.set("https://github.com/SonarSource/sonar-armor")
+          url.set("https://github.com/SonarSource/sonar-rust")
         }
         developers {
           developer {
