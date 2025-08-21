@@ -101,6 +101,17 @@ public class RustPlugin implements Plugin {
         .defaultValue("true")
         .build());
 
+    context.addExtension(
+      PropertyDefinition
+        .builder(ClippySensor.CLIPPY_OFFLINE)
+        .category("Rust")
+        .subCategory("Clippy")
+        .name("Execute Clippy in offline mode")
+        .description("Whether to execute Clippy in offline mode.")
+        .onConfigScopes(ConfigScope.PROJECT)
+        .defaultValue("false")
+        .build());
+
     ////////////////////////// COVERAGE //////////////////////////
 
     // LCOV report paths

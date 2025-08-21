@@ -115,9 +115,28 @@ class ClippyRunnerTest {
       when(processWrapper.waitFor()).thenReturn(0);
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
       List<ClippyDiagnostic>  diagnostics = new ArrayList<>();
-      clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), diagnostics::add);
+      clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), diagnostics::add, false);
       verify(processWrapper).start(
         eq(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--", "-A", "clippy::all", "-Wclippy::some_lint")),
+        eq(Path.of("path/workdir")), any(), any());
+      assertThat(diagnostics).hasSize(1);
+      assertThat(diagnostics.get(0).lintId()).isEqualTo("clippy::absolute_paths");
+    }
+
+    @Test
+    void test_offline_mode() throws Exception {
+      ProcessWrapper processWrapper = mock(ProcessWrapper.class);
+      doAnswer(invocation -> {
+        Consumer<String> outputConsumer = invocation.getArgument(2);
+        outputConsumer.accept(CLIPPY_MESSAGE);
+        return null;
+      }).when(processWrapper).start(any(), any(), any(), any());
+      when(processWrapper.waitFor()).thenReturn(0);
+      ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
+      List<ClippyDiagnostic>  diagnostics = new ArrayList<>();
+      clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), diagnostics::add, true);
+      verify(processWrapper).start(
+        eq(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--offline", "--", "-A", "clippy::all", "-Wclippy::some_lint")),
         eq(Path.of("path/workdir")), any(), any());
       assertThat(diagnostics).hasSize(1);
       assertThat(diagnostics.get(0).lintId()).isEqualTo("clippy::absolute_paths");
@@ -129,7 +148,7 @@ class ClippyRunnerTest {
       when(processWrapper.getInputStream()).thenReturn(new ByteArrayInputStream("".getBytes()));
       when(processWrapper.waitFor()).thenReturn(1);
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}))
+      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}, false))
         .isInstanceOf(IllegalStateException.class).hasMessage("Clippy failed with exit code 1");
     }
 
@@ -138,7 +157,7 @@ class ClippyRunnerTest {
       ProcessWrapper processWrapper = mock(ProcessWrapper.class);
       doThrow(new IOException("error")).when(processWrapper).start(any(), any(), any(), any());
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}))
+      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}, false))
         .isInstanceOf(IllegalStateException.class).hasMessage("Failed to run Clippy ");
     }
 
@@ -148,7 +167,7 @@ class ClippyRunnerTest {
       when(processWrapper.getInputStream()).thenReturn(new ByteArrayInputStream(CLIPPY_MESSAGE.getBytes()));
       doThrow(new InterruptedException("error")).when(processWrapper).waitFor();
       ClippyRunner clippyRunner = new ClippyRunner(processWrapper);
-      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}))
+      assertThatThrownBy(() -> clippyRunner.run(Path.of("path/workdir"), List.of("clippy::some_lint"), d -> {}, false))
         .isInstanceOf(IllegalStateException.class).hasMessage("Clippy was interrupted");
     }
 
