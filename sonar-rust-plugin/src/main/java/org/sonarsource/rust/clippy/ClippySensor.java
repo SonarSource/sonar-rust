@@ -38,6 +38,7 @@ public class ClippySensor implements Sensor {
   private static final Logger LOG = LoggerFactory.getLogger(ClippySensor.class);
 
   public static final String CLIPPY_ANALYSIS_ENABLED = "sonar.rust.clippy.enabled";
+  public static final String CLIPPY_OFFLINE = "sonar.rust.clippy.offline";
 
   private final ClippyPrerequisite clippyPrerequisite;
   private final ClippyRunner clippy;
@@ -66,6 +67,11 @@ public class ClippySensor implements Sensor {
     if (!context.config().getBoolean(CLIPPY_ANALYSIS_ENABLED).orElse(true)) {
       LOG.debug("Clippy analysis is disabled");
       return;
+    }
+
+    boolean offlineMode = context.config().getBoolean(CLIPPY_OFFLINE).orElse(false);
+    if (offlineMode) {
+      LOG.debug("Clippy running in offline mode. Use `cargo fetch` to make sure all prerequisites are available.");
     }
 
     var manifests = CargoManifestProvider.getManifests(context);
@@ -103,7 +109,7 @@ public class ClippySensor implements Sensor {
         Telemetry.reportManifestInfo(context, manifestPath);
 
         var workDir = manifestPath.getParent();
-        clippy.run(workDir, lints, diagnostic -> saveIssue(context, diagnostic, workDir));
+        clippy.run(workDir, lints, diagnostic -> saveIssue(context, diagnostic, workDir), offlineMode);
       }
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);

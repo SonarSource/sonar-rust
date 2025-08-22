@@ -45,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentCaptor.forClass;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -122,7 +123,7 @@ class ClippySensorTest {
     doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
 
     var clippyRunner = mock(ClippyRunner.class);
-    doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any());
+    doThrow(new IllegalStateException("error")).when(clippyRunner).run(any(), any(), any(), anyBoolean());
     var warnings = new TestAnalysisWarnigs();
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper(warnings));
     context.settings().setProperty("sonar.internal.analysis.rust.failFast", "true");
@@ -172,14 +173,14 @@ class ClippySensorTest {
       Consumer<ClippyDiagnostic> diagnosticsConsumer = invocation.getArgument(2);
       diagnostics.forEach(diagnosticsConsumer);
       return null;
-    }).when(clippyRunner).run(any(), any(), any());
+    }).when(clippyRunner).run(any(), any(), any(), anyBoolean());
 
     ClippySensor sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
 
     ArgumentCaptor<Path> pathCaptor = forClass(Path.class);
     @SuppressWarnings("unchecked") ArgumentCaptor<List<String>> lintsCaptor = forClass(List.class);
-    verify(clippyRunner).run(pathCaptor.capture(), lintsCaptor.capture(), any());
+    verify(clippyRunner).run(pathCaptor.capture(), lintsCaptor.capture(), any(), anyBoolean());
     assertThat(pathCaptor.getValue()).isEqualTo(baseDir);
     assertThat(lintsCaptor.getValue()).containsExactly("clippy::absurd_extreme_comparisons");
 
@@ -232,7 +233,7 @@ class ClippySensorTest {
       Consumer<ClippyDiagnostic> diagnosticsConsumer = invocation.getArgument(2);
       diagnostics.forEach(diagnosticsConsumer);
       return null;
-    }).when(clippyRunner).run(any(), any(), any());
+    }).when(clippyRunner).run(any(), any(), any(), anyBoolean());
 
     var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
     sensor.execute(context);
@@ -243,5 +244,18 @@ class ClippySensorTest {
     assertThat(issue.primaryLocation().inputComponent().key()).isEqualTo("moduleKey:subdir/src/file.rs");
     assertThat(issue.primaryLocation().textRange().start().line()).isEqualTo(1);
     assertThat(issue.primaryLocation().message()).isEqualTo("Remove the unnecessary comparison or correct the logic to use an appropriate check.");
+  }
+
+  @Test
+  void test_offline_property() {
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty(ClippySensor.CLIPPY_OFFLINE, "true");
+
+    var clippyPrerequisite = mock(ClippyPrerequisite.class);
+    var clippyRunner = mock(ClippyRunner.class);
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
+    sensor.execute(context);
+
+    assertThat(logTester.logs()).contains("Clippy running in offline mode. Use `cargo fetch` to make sure all prerequisites are available.");
   }
 }

@@ -40,8 +40,8 @@ public class ClippyRunner {
     this.processWrapper = processWrapper;
   }
 
-  public void run(Path workDir, List<String> lints, Consumer<ClippyDiagnostic> consumer) {
-    var command = buildCommand(lints);
+  public void run(Path workDir, List<String> lints, Consumer<ClippyDiagnostic> consumer, boolean offline) {
+    var command = buildCommand(lints, offline);
     LOG.debug("Running Clippy: {}", command);
     try {
       processWrapper.start(command, workDir, output -> readOutput(output, consumer), LOG::warn);
@@ -59,8 +59,12 @@ public class ClippyRunner {
     }
   }
 
-  private static List<String> buildCommand(List<String> lints) {
-    var cmd = new ArrayList<>(List.of("cargo", "clippy", "--quiet", "--message-format=json", "--", "-A", "clippy::all"));
+  private static List<String> buildCommand(List<String> lints, boolean offline) {
+    var cmd = new ArrayList<>(List.of("cargo", "clippy", "--quiet", "--message-format=json"));
+    if (offline) {
+      cmd.add("--offline");
+    }
+    cmd.addAll(List.of("--", "-A", "clippy::all"));
     lints.stream().map(lint -> String.format("-W%s", lint)).forEach(cmd::add);
     return cmd;
   }

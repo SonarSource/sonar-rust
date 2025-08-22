@@ -29,6 +29,8 @@ import org.sonar.api.config.PropertyDefinition.ConfigScope;
 public class RustPlugin implements Plugin {
 
   public static final String FAIL_FAST_PROPERTY = "sonar.internal.analysis.rust.failFast";
+  public static final String CATEGORY_RUST = "Rust";
+  public static final String SUBCATEGORY_CLIPPY = "Clippy";
 
   @Override
   public void define(Context context) {
@@ -53,7 +55,7 @@ public class RustPlugin implements Plugin {
     context.addExtension(
       PropertyDefinition
         .builder(RustLanguage.FILE_SUFFIXES_PROPERTY)
-        .category("Rust")
+        .category(CATEGORY_RUST)
         .subCategory("Analysis Scope")
         .name("Rust file suffixes")
         .description("List of suffixes of Rust files to index and consider for analyses.")
@@ -66,7 +68,7 @@ public class RustPlugin implements Plugin {
     context.addExtension(
       PropertyDefinition
         .builder(CargoManifestProvider.CARGO_MANIFEST_PATHS)
-        .category("Rust")
+        .category(CATEGORY_RUST)
         .subCategory("Analysis Scope")
         .name("Cargo manifest paths")
         .description("Comma-delimited list of paths to Cargo.toml files. The root Cargo.toml, if any, is considered by default.")
@@ -80,8 +82,8 @@ public class RustPlugin implements Plugin {
     context.addExtension(
       PropertyDefinition
         .builder(ClippyReportSensor.CLIPPY_REPORT_PATHS)
-        .category("Rust")
-        .subCategory("Clippy")
+        .category(CATEGORY_RUST)
+        .subCategory(SUBCATEGORY_CLIPPY)
         .name("Clippy report paths")
         .description("Comma-delimited list of paths to Clippy reports generated with the command "
           + "<code>cargo clippy --message-format=json</code>.")
@@ -93,12 +95,23 @@ public class RustPlugin implements Plugin {
     context.addExtension(
       PropertyDefinition
         .builder(ClippySensor.CLIPPY_ANALYSIS_ENABLED)
-        .category("Rust")
-        .subCategory("Clippy")
+        .category(CATEGORY_RUST)
+        .subCategory(SUBCATEGORY_CLIPPY)
         .name("Execute Clippy analysis")
         .description("Whether to execute Clippy analysis.")
         .onConfigScopes(ConfigScope.PROJECT)
         .defaultValue("true")
+        .build());
+
+    context.addExtension(
+      PropertyDefinition
+        .builder(ClippySensor.CLIPPY_OFFLINE)
+        .category(CATEGORY_RUST)
+        .subCategory(SUBCATEGORY_CLIPPY)
+        .name("Execute Clippy in offline mode")
+        .description("Whether to execute Clippy in offline mode.")
+        .onConfigScopes(ConfigScope.PROJECT)
+        .defaultValue("false")
         .build());
 
     ////////////////////////// COVERAGE //////////////////////////
@@ -107,7 +120,7 @@ public class RustPlugin implements Plugin {
     context.addExtension(
       PropertyDefinition
         .builder(LcovSensor.COVERAGE_REPORT_PATHS)
-        .category("Rust")
+        .category(CATEGORY_RUST)
         .subCategory("Coverage")
         .name("LCOV report paths")
         .description("Comma-delimited list of paths to LCOV reports.")
@@ -119,7 +132,7 @@ public class RustPlugin implements Plugin {
     context.addExtension(
       PropertyDefinition
         .builder(CoberturaSensor.COBERTURA_REPORT_PATHS)
-        .category("Rust")
+        .category(CATEGORY_RUST)
         .subCategory("Coverage")
         .name("Cobertura report paths")
         .description("Comma-delimited list of paths to Cobertura reports.")
