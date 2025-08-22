@@ -69,7 +69,7 @@ public class ClippySensor implements Sensor {
       return;
     }
 
-    boolean offlineMode = context.config().getBoolean(CLIPPY_OFFLINE).orElse(false);
+    var offlineMode = context.config().getBoolean(CLIPPY_OFFLINE).orElse(false);
     if (offlineMode) {
       LOG.debug("Clippy running in offline mode. Use `cargo fetch` to make sure all prerequisites are available.");
     }
