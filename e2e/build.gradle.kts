@@ -15,6 +15,16 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:1.12.0")
 
+
+    // Force specific versions of transitive dependencies
+    constraints {
+      implementation("ch.qos.logback:logback-classic:1.5.18") {
+        because("CVE-2023-6378 - Deserialization of Untrusted Data")
+      }
+      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.20.0") {
+        because("CVE-2020-36518 - Out-of-bounds Write")
+      }
+    }
 }
 
 repositories {

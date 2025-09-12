@@ -22,8 +22,8 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
-val sonarApiVersion = "11.4.0.2922"
-val sonarApiImplVersion = "25.2.0.102705"
+val sonarApiVersion = "13.1.0.3124"
+val sonarApiImplVersion = "25.8.0.112029"
 val analyzerCommonsVersion = "2.17.0.3322"
 
 dependencies {
@@ -40,6 +40,13 @@ dependencies {
   testImplementation("org.assertj:assertj-core:3.27.3")
   testImplementation("org.mockito:mockito-core:5.18.0")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  
+  // Force specific versions of transitive dependencies
+  constraints {
+    implementation("ch.qos.logback:logback-classic:1.5.18") {
+      because("CVE-2023-6378 - Deserialization of Untrusted Data")
+    }
+  }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
