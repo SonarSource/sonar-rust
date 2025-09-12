@@ -50,7 +50,7 @@ HTTP_CODE=$(\
     "${ARTIFACTORY_URL}/sonarsource-private-releases/com/sonarsource/iris/iris/${VERSION}/iris-${VERSION}-jar-with-dependencies.jar"\
 )
 
-if [ "${HTTP_CODE}" != "200" ]; then
+if [[ "${HTTP_CODE}" != "200" ]]; then
   echo "Download ${VERSION} failed -> ${HTTP_CODE}"
   exit 1
 else
@@ -60,7 +60,7 @@ fi
 echo "===== Execute IRIS SQC EU as dry-run"
 run_iris_sqc_eu "true"
 STATUS="${?}"
-if [ "${STATUS}" -ne 0 ]; then
+if [[ "${STATUS}" -ne 0 ]]; then
   echo "===== Failed to run IRIS SQC EU dry-run"
   exit 1
 else
@@ -71,7 +71,7 @@ fi
 echo "===== Execute IRIS SQC US as dry-run"
 run_iris_sqc_us "true"
 STATUS="${?}"
-if [ "${STATUS}" -ne 0 ]; then
+if [[ "${STATUS}" -ne 0 ]]; then
   echo "===== Failed to run IRIS dry-run"
   exit 1
 else
