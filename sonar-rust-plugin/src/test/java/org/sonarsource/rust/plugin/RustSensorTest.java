@@ -32,9 +32,14 @@ import org.sonar.api.batch.sensor.internal.DefaultSensorDescriptor;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
+import org.sonar.api.batch.rule.internal.ActiveRulesBuilder;
+import org.sonar.api.batch.rule.internal.NewActiveRule;
+import org.sonar.api.rule.RuleKey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 class RustSensorTest {
 
@@ -192,6 +197,80 @@ fn foo(c1: bool) {
       .hasMessage("Analysis failed");
     assertThat(warnings.warnings).hasSize(1);
     assertThat(warnings.warnings.get(0)).startsWith("Failed to create Rust analyzer: Cannot run program");
+  }
+
+  @Test
+  void active_rule_parameters_passed_to_analyzer_factory() {
+    // Capture parameters passed to analyzer factory
+    AtomicReference<Map<String, String>> capturedParameters = new AtomicReference<>();
+
+    var mockAnalyzerFactory = new AnalyzerFactory(null) {
+      @Override
+      public void addParameters(Map<String, String> parameters) {
+        capturedParameters.set(Map.copyOf(parameters)); // Capture the parameters
+      }
+
+      @Override
+      public Analyzer create(Platform platform) {
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+
+    var sensor = new RustSensor(mockAnalyzerFactory, new AnalysisWarningsWrapper());
+
+    // Setup active rules with custom parameters
+    var activeRulesBuilder = new ActiveRulesBuilder();
+
+    // Add S3776 (cognitive complexity) rule with custom threshold
+    activeRulesBuilder.addRule(new NewActiveRule.Builder()
+        .setRuleKey(RuleKey.of(RustLanguage.KEY, "S3776"))
+        .setParam("threshold", "25") // Custom value, not default "15"
+        .build());
+
+    context.setActiveRules(activeRulesBuilder.build());
+    context.fileSystem().add(inputFile("test.rs", "fn main() {}"));
+
+    // Execute sensor
+    sensor.execute(context);
+
+    // Verify parameters were captured and contain both default and active rule parameters
+    Map<String, String> parameters = capturedParameters.get();
+    assertThat(parameters)
+        .isNotNull()
+        .containsEntry("S3776:threshold", "25") // Should contain the active rule parameter (overriding default)
+        .doesNotContainEntry("S3776:threshold", "15"); // Verify the default parameter was overridden
+  }
+
+  @Test
+  void default_rule_parameters_passed_to_analyzer_factory() {
+    // Capture parameters passed to analyzer factory
+    AtomicReference<Map<String, String>> capturedParameters = new AtomicReference<>();
+
+    var mockAnalyzerFactory = new AnalyzerFactory(null) {
+      @Override
+      public void addParameters(Map<String, String> parameters) {
+        capturedParameters.set(Map.copyOf(parameters)); // Capture the parameters
+      }
+
+      @Override
+      public Analyzer create(Platform platform) {
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+
+    var sensor = new RustSensor(mockAnalyzerFactory, new AnalysisWarningsWrapper());
+
+    // No active rules set - should use default parameters only
+    context.fileSystem().add(inputFile("test.rs", "fn main() {}"));
+
+    // Execute sensor
+    sensor.execute(context);
+
+    // Verify parameters were captured and contain default values
+    Map<String, String> parameters = capturedParameters.get();
+    assertThat(parameters)
+        .isNotNull()
+        .containsEntry("S3776:threshold", "15"); // Should contain the default parameter from RustRulesDefinition.parameters()
   }
 
   private InputFile inputFile(String relativePath, String content) {
