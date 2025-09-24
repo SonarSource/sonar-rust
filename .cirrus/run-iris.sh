@@ -21,7 +21,7 @@ function run_iris_sqc_eu () {
     -Diris.destination.token="${SONAR_IRIS_SQC_EU_TOKEN}" \
     -Diris.dryrun="${dryrun}" \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
-  return "${?}"
+  return $?
 }
 
 # Run IRIS from SQS to SQC US
