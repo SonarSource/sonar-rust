@@ -6,32 +6,38 @@ set -euo pipefail
 : "${SONAR_SQC_US_URL?}" "${SONAR_IRIS_SQC_US_TOKEN?}"
 : "${SONAR_NEXT_URL?}" "${SONAR_IRIS_NEXT_TOKEN?}"
 
+readonly PROJECT_KEY="SonarSource_sonar-rust"
+
 # Run IRIS from SQS to SQC EU
 function run_iris_sqc_eu () {
+  local dryrun="${1}"
   java \
-    -Diris.source.projectKey="SonarSource_sonar-rust" \
-    -Diris.source.url="$SONAR_NEXT_URL" \
-    -Diris.source.token="$SONAR_IRIS_NEXT_TOKEN" \
-    -Diris.destination.projectKey="SonarSource_sonar-rust" \
+    -Diris.source.projectKey="${PROJECT_KEY}" \
+    -Diris.source.url="${SONAR_NEXT_URL}" \
+    -Diris.source.token="${SONAR_IRIS_NEXT_TOKEN}" \
+    -Diris.destination.projectKey="${PROJECT_KEY}" \
     -Diris.destination.organization="sonarsource" \
-    -Diris.destination.url="$SONAR_SQC_EU_URL" \
-    -Diris.destination.token="$SONAR_IRIS_SQC_EU_TOKEN" \
-    -Diris.dryrun=$1 \
+    -Diris.destination.url="${SONAR_SQC_EU_URL}" \
+    -Diris.destination.token="${SONAR_IRIS_SQC_EU_TOKEN}" \
+    -Diris.dryrun="${dryrun}" \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
+  return $?
 }
 
 # Run IRIS from SQS to SQC US
 function run_iris_sqc_us () {
+  local dryrun="${1}"
   java \
-    -Diris.source.projectKey="SonarSource_sonar-rust" \
-    -Diris.source.url="$SONAR_NEXT_URL" \
-    -Diris.source.token="$SONAR_IRIS_NEXT_TOKEN" \
-    -Diris.destination.projectKey="SonarSource_sonar-rust" \
+    -Diris.source.projectKey="${PROJECT_KEY}" \
+    -Diris.source.url="${SONAR_NEXT_URL}" \
+    -Diris.source.token="${SONAR_IRIS_NEXT_TOKEN}" \
+    -Diris.destination.projectKey="${PROJECT_KEY}" \
     -Diris.destination.organization="sonarsource" \
-    -Diris.destination.url="$SONAR_SQC_US_URL" \
-    -Diris.destination.token="$SONAR_IRIS_SQC_US_TOKEN" \
-    -Diris.dryrun=$1 \
+    -Diris.destination.url="${SONAR_SQC_US_URL}" \
+    -Diris.destination.token="${SONAR_IRIS_SQC_US_TOKEN}" \
+    -Diris.dryrun="${dryrun}" \
     -jar iris-\[RELEASE\]-jar-with-dependencies.jar
+  return "${?}"
 }
 
 VERSION="\[RELEASE\]"
@@ -40,21 +46,21 @@ HTTP_CODE=$(\
     --write-out '%{http_code}' \
     --location \
     --remote-name \
-    --user "$ARTIFACTORY_USER:$ARTIFACTORY_ACCESS_TOKEN" \
-    "$ARTIFACTORY_URL/sonarsource-private-releases/com/sonarsource/iris/iris/$VERSION/iris-$VERSION-jar-with-dependencies.jar"\
+    --user "${ARTIFACTORY_USER}:${ARTIFACTORY_ACCESS_TOKEN}" \
+    "${ARTIFACTORY_URL}/sonarsource-private-releases/com/sonarsource/iris/iris/${VERSION}/iris-${VERSION}-jar-with-dependencies.jar"\
 )
 
-if [ "$HTTP_CODE" != "200" ]; then
-  echo "Download $VERSION failed -> $HTTP_CODE"
+if [[ "${HTTP_CODE}" != "200" ]]; then
+  echo "Download ${VERSION} failed -> ${HTTP_CODE}"
   exit 1
 else
-  echo "Downloaded $VERSION"
+  echo "Downloaded ${VERSION}"
 fi
 
 echo "===== Execute IRIS SQC EU as dry-run"
 run_iris_sqc_eu "true"
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
+STATUS="${?}"
+if [[ "${STATUS}" -ne 0 ]]; then
   echo "===== Failed to run IRIS SQC EU dry-run"
   exit 1
 else
@@ -64,8 +70,8 @@ fi
 
 echo "===== Execute IRIS SQC US as dry-run"
 run_iris_sqc_us "true"
-STATUS=$?
-if [ $STATUS -ne 0 ]; then
+STATUS="${?}"
+if [[ "${STATUS}" -ne 0 ]]; then
   echo "===== Failed to run IRIS dry-run"
   exit 1
 else
