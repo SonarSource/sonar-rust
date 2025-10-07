@@ -82,7 +82,7 @@ public class RustSensor implements Sensor {
     }
     for (var activeRule : sensorContext.activeRules().findByRepository(RustLanguage.KEY)) {
       for (var parameter : activeRule.params().entrySet()) {
-        parameters.put(String.format("%s:%s", activeRule.ruleKey(), parameter.getKey()), parameter.getValue());
+        parameters.put(String.format("%s:%s", activeRule.ruleKey().rule(), parameter.getKey()), parameter.getValue());
       }
     }
     analyzerFactory.addParameters(parameters);
