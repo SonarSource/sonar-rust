@@ -10,7 +10,7 @@ USER sonarsource
 RUN <<EOF
 rustup-init -y
 source "$HOME/.cargo/env"
-rustup default 1.85.0
+rustup default 1.91.1
 rustup component add llvm-tools clippy
 cargo install cargo-llvm-cov
 EOF
