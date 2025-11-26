@@ -23,7 +23,7 @@ EOF
 USER sonarsource
 
 RUN <<EOF
-rustup default 1.85.0
+rustup default 1.91.1
 rustup component add llvm-tools
 cargo install cargo-llvm-cov
 rustup target add x86_64-pc-windows-gnu
