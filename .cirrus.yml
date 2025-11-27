@@ -225,27 +225,6 @@ e2e_linux_arm64_task:
     report_artifacts:
       path: "e2e/build/reports/tests/**"
 
-mend_scan_task:
-  depends_on:
-    - build
-  only_if: $CIRRUS_USER_COLLABORATOR == 'true' && $CIRRUS_TAG == "" && ($CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH =~ "branch-.*")
-  eks_container:
-    <<: *CONTAINER_DEFINITION
-    cpu: 4
-    memory: 16G
-  <<: *SETUP_GRADLE_CACHE
-  env:
-    WS_APIKEY: VAULT[development/kv/data/mend data.apikey]
-  mend_script:
-    - source cirrus-env QA
-    - source .cirrus/use-gradle-wrapper.sh
-    - source set_gradle_build_version
-    - source ws_scan.sh
-  <<: *CLEANUP_GRADLE_CACHE_SCRIPT
-  allow_failures: "true"
-  always:
-    ws_scan_artifacts:
-      path: "whitesource/**/*"
 
 promote_task:
   only_if: $CIRRUS_BRANCH == "master" || $CIRRUS_BRANCH == "dogfood-on-peach" || $CIRRUS_BRANCH =~ "branch-.*"
@@ -254,7 +233,6 @@ promote_task:
     - e2e
     - e2e_win
     - e2e_linux_arm64
-    - mend_scan
   eks_container:
     <<: *CONTAINER_DEFINITION
     cpu: 1
