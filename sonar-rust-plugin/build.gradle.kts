@@ -22,8 +22,8 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
-val sonarApiVersion = "13.1.0.3124"
-val sonarApiImplVersion = "25.8.0.112029"
+val sonarApiVersion = "13.2.0.3137"
+val sonarApiImplVersion = "25.11.0.114957"
 val analyzerCommonsVersion = "2.17.0.3322"
 
 dependencies {
