@@ -92,10 +92,7 @@ public class Telemetry {
   }
 
   private static void saveTelemetry(SensorContext context, String key, String value) {
-    // TODO SKUNK-65 - Remove this check when we are ready to bundle the plugin in SQ Server
-    if (context.runtime().getEdition() == SonarEdition.SONARCLOUD) {
       context.addTelemetryProperty(key, value);
-    }
   }
 
 }

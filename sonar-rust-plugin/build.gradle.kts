@@ -86,6 +86,7 @@ tasks.jar {
         "Plugin-Key" to "rust",
         "Plugin-Name" to "Rust Code Quality and Security",
         "Plugin-Version" to project.version,
+        "Plugin-Organization" to "SonarSource",
         "Implementation-Version" to project.version, // class.getPackage().getImplementationVersion()
         "Plugin-Class" to "org.sonarsource.rust.plugin.RustPlugin",
         "Plugin-RequiredForLanguages" to "rust",

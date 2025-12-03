@@ -42,15 +42,6 @@ class TelemetryTest {
 
   private static final SonarRuntime SONAR_RUNTIME = SonarRuntimeImpl.forSonarQube(Version.create(10, 14), SonarQubeSide.SCANNER, SonarEdition.SONARCLOUD);
 
-  @Test
-  void telemetry_not_reported_on_sonarqube_server() {
-    // TODO SKUNK-65 - Remove this check when we are ready to bundle the plugin in SQ Server
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SonarRuntimeImpl.forSonarQube(Version.create(10, 14), SonarQubeSide.SCANNER, SonarEdition.DEVELOPER)));
-    Telemetry.reportExternalClippyUsage(sct);
-
-    Mockito.verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
-  }
-
   @ParameterizedTest(name = "{0}")
   @MethodSource("manifestFiles")
   void report_manifest_info(String name, @Nullable String expected, String manifestContent) throws IOException {
