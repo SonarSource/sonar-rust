@@ -21,7 +21,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
-import org.sonar.api.SonarEdition;
 import org.sonar.api.batch.sensor.SensorContext;
 
 public class Telemetry {
@@ -92,7 +91,7 @@ public class Telemetry {
   }
 
   private static void saveTelemetry(SensorContext context, String key, String value) {
-      context.addTelemetryProperty(key, value);
+    context.addTelemetryProperty(key, value);
   }
 
 }
