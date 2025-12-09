@@ -50,7 +50,7 @@ jobs:
   build:
     needs: [macos_arm64]
     if: '!cancelled()'
-    runs-on: sonar-s
+    runs-on: github-ubuntu-latest-s
     name: Build
     permissions:
       id-token: write
@@ -79,7 +79,7 @@ jobs:
 
   e2e:
     needs: [build]
-    runs-on: sonar-s
+    runs-on: github-ubuntu-latest-s
     name: E2E Tests
     permissions:
       id-token: write
@@ -104,7 +104,7 @@ jobs:
 
   e2e_win:
     needs: [build]
-    runs-on: windows-latest
+    runs-on: github-windows-latest-s
     name: E2E Tests Windows
     permissions:
       id-token: write
@@ -145,7 +145,7 @@ jobs:
 
   e2e_linux_arm64:
     needs: [build]
-    runs-on: ubuntu-latest
+    runs-on: github-ubuntu-24.04-arm-s
     name: E2E Tests Linux ARM64
     permissions:
       id-token: write
