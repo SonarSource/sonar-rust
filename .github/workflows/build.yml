@@ -1,0 +1,198 @@
+name: Build
+on:
+  push:
+    branches:
+      - master
+      - branch-*
+      - dogfood-*
+  pull_request:
+  merge_group:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  macos_arm64:
+    runs-on: macos-latest
+    name: macOS ARM64 Build
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Install Rust
+        run: |
+          curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+          source $HOME/.cargo/env
+          rustup target add x86_64-apple-darwin
+      - name: Build Rust analyzers
+        run: |
+          echo "org.gradle.daemon=false" >> "gradle.properties"
+          echo "org.gradle.vfs.watch=false" >> "gradle.properties"
+          source $HOME/.cargo/env
+          ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
+      - name: Upload Darwin ARM64 artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: analyzer-aarch64-apple-darwin
+          path: analyzer/target/aarch64-apple-darwin/release/analyzer.xz
+      - name: Upload Darwin x86_64 artifact
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: analyzer-x86_64-apple-darwin
+          path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
+
+  build:
+    needs: [macos_arm64]
+    runs-on: sonar-s
+    name: Build
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Download Darwin ARM64 artifact
+        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: analyzer-aarch64-apple-darwin
+          path: analyzer/target/aarch64-apple-darwin/release/
+      - name: Download Darwin x86_64 artifact
+        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: analyzer-x86_64-apple-darwin
+          path: analyzer/target/x86_64-apple-darwin/release/
+      - uses: SonarSource/ci-github-actions/build-gradle@v1
+        with:
+          deploy-pull-request: true
+          gradle-args: "--info --stacktrace"
+
+  e2e:
+    needs: [build]
+    runs-on: sonar-s
+    name: E2E Tests
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Vault
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/licenses-ro token | GITHUB_TOKEN;
+      - name: Run E2E tests
+        env:
+          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+        run: |
+          source .cirrus/use-gradle-wrapper.sh
+          source set_gradle_build_version
+          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+
+  e2e_win:
+    needs: [build]
+    runs-on: windows-latest
+    name: E2E Tests Windows
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Vault
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/licenses-ro token | GITHUB_TOKEN;
+      - name: Install Rust
+        run: |
+          curl -O https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
+          ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
+          $env:PATH += ";$env:USERPROFILE\.cargo\bin"
+          rustup component add clippy
+      - name: Run E2E tests
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+        run: |
+          echo "org.gradle.daemon=false" >> "gradle.properties"
+          export PATH=$PATH:$HOME/.cargo/bin
+          source .cirrus/use-gradle-wrapper.sh
+          source set_gradle_build_version
+          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: e2e-test-reports-windows
+          path: e2e/build/reports/tests/**
+
+  e2e_linux_arm64:
+    needs: [build]
+    runs-on: ubuntu-latest
+    name: E2E Tests Linux ARM64
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Vault
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/licenses-ro token | GITHUB_TOKEN;
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+      - name: Run E2E tests in ARM64 container
+        env:
+          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+        run: |
+          docker run --rm --platform linux/arm64 \
+            -v ${{ github.workspace }}:/workspace \
+            -w /workspace \
+            -e GITHUB_TOKEN="${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}" \
+            eclipse-temurin:17 \
+            bash -c "
+              echo 'org.gradle.daemon=false' >> gradle.properties
+              export PATH=\$PATH:\$HOME/.cargo/bin
+              source .cirrus/use-gradle-wrapper.sh
+              source .cirrus/custom_set_gradle_build_version.sh
+              ./gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace
+            "
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: e2e-test-reports-linux-arm64
+          path: e2e/build/reports/tests/**
+
+  promote:
+    needs: [build, e2e, e2e_win, e2e_linux_arm64]
+    runs-on: sonar-xs
+    name: Promote
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+    permissions:
+      id-token: write
+    steps:      
+      - uses: SonarSource/ci-github-actions/promote@v1
+        with:
+          promote-pull-request: true
