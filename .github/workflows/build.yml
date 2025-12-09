@@ -17,7 +17,7 @@ jobs:
   macos_arm64:
     runs-on: macos-latest
     name: macOS ARM64 Build
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+#    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
     permissions:
       id-token: write
     steps:
@@ -49,6 +49,7 @@ jobs:
 
   build:
     needs: [macos_arm64]
+    if: '!cancelled()'
     runs-on: sonar-s
     name: Build
     permissions:
