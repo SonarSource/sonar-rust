@@ -60,11 +60,34 @@ jobs:
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
           version: 2025.7.12
-      - name: Add rust target
+      - name: Setup Rust toolchain and targets
         run: |
+          # Install system dependencies
+          sudo apt-get update
+          sudo apt-get -y install autoconf build-essential gcc-mingw-w64 git libtool musl-dev musl-tools pkg-config rustup
+          sudo apt-get clean
+          
+          # Build and install aarch64-linux-musl cross-compiler
+          # This approach is based on https://github.com/cross-rs/cross/blob/main/docker/musl.sh
+          git clone https://github.com/richfelker/musl-cross-make.git
+          cd musl-cross-make
+          # we checkout a specific commit to guarantee reproducibility (tags can be moved)
+          git checkout 6f3701d08137496d5aac479e3a3977b5ae993c1f
+          echo -e "TARGET = aarch64-linux-musl\nOUTPUT = /usr/local\n" >> config.mak
+          make
+          sudo make install
+          cd ..
+          
+          # Setup Rust toolchain (matching Dockerfile)
+          rustup default 1.91.1
+          rustup component add llvm-tools
+          cargo install cargo-llvm-cov
+          
+          # Add target platforms
+          rustup target add x86_64-pc-windows-gnu
           rustup target add x86_64-unknown-linux-musl
+          rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-unknown-linux-musl
-          sudo apt-get install -y musl-tools musl-dev
       - name: Download Darwin ARM64 artifact
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
