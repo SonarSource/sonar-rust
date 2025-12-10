@@ -64,6 +64,7 @@ jobs:
         run: |
           rustup target add x86_64-unknown-linux-musl
           rustup target add aarch64-unknown-linux-musl
+          apt-get install -y musl-tools musl-dev
       - name: Download Darwin ARM64 artifact
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
