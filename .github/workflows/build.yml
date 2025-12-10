@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos_arm64:
+  macos:
     runs-on: macos-latest
-    name: macOS ARM64 Build
+    name: macOS Build
 #    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
     permissions:
       id-token: write
@@ -48,7 +48,7 @@ jobs:
           path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
 
   build:
-    needs: [macos_arm64]
+    needs: [macos]
     if: '!cancelled()'
     runs-on: github-ubuntu-latest-s
     name: Build
