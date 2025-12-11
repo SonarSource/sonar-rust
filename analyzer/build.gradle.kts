@@ -23,6 +23,8 @@ buildscript {
   }
 }
 
+val skipAnalyzerBuild = project.findProperty("skipAnalyzerBuild")?.toString()?.toBoolean() ?: false
+
 fun createCompileRustTask(target: String, name: String, envVars: Map<String, String> = emptyMap()): TaskProvider<Exec> {
   return tasks.register<Exec>("compileRust$name") {
     description = "Compiles Rust code for target $target."
@@ -127,3 +129,10 @@ task<Exec>("clippyRust") {
   standardOutput = outputFile.outputStream()
 }
 
+
+if (skipAnalyzerBuild) {
+  logger.lifecycle("Skipping :analyzer project (skipAnalyzerBuild=true)")
+  tasks.configureEach {
+    enabled = false
+  }
+}

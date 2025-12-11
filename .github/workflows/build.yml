@@ -17,7 +17,7 @@ jobs:
   macos_analyzers:
     runs-on: macos-latest
     name: macOS Analyzers Build
-#    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
     permissions:
       id-token: write
     steps:
@@ -52,7 +52,6 @@ jobs:
     name: Cross-Platform Analyzers Build
     permissions:
       id-token: write
-      contents: write
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
@@ -121,6 +120,33 @@ jobs:
           name: analyzer-x86_64-pc-windows-gnu
           path: analyzer/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz
 
+  unit_test_and_analysis:
+    runs-on: github-ubuntu-latest-m
+    name: Unit Tests and Analysis
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      - name: Setup Rust toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install rustup
+          sudo apt-get clean
+          
+          # Setup Rust toolchain (default target only)
+          rustup default 1.91.1
+          rustup component add llvm-tools rustfmt clippy
+          cargo install cargo-llvm-cov
+      - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - uses: SonarSource/ci-github-actions/build-gradle@v1
+        with:
+          deploy: false
+          deploy-pull-request: false
+          gradle-args: "--info --stacktrace"
+
   build:
     needs: [macos_analyzers, cross_platform_analyzers]
     if: '!cancelled()'
@@ -134,15 +160,15 @@ jobs:
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
           version: 2025.7.12
-      # Download Darwin artifacts (only built on master/branch/dogfood)
+      # Download Darwin artifacts (only if macos_analyzers job succeeded)
       - name: Download Darwin ARM64 artifact
-        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+        if: needs.macos_analyzers.result == 'success'
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: analyzer-aarch64-apple-darwin
           path: analyzer/target/aarch64-apple-darwin/release/
       - name: Download Darwin x86_64 artifact
-        if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+        if: needs.macos_analyzers.result == 'success'
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: analyzer-x86_64-apple-darwin
@@ -162,11 +188,13 @@ jobs:
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
         with:
           name: analyzer-x86_64-pc-windows-gnu
-          path: analyzer/target/x86_64-pc-windows-gnu/release/
+          path: analyzer/target/x86_64-pc-windows-gnu/release/      
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         with:
           deploy-pull-request: true
-          gradle-args: "--info --stacktrace"
+          gradle-args: "-PskipAnalyzerBuild --info --stacktrace"
+          sonar-platform: 'none' # skip SQ analysis, it's done in analysis job
+          skip-tests: true
 
   e2e:
     needs: [build]
