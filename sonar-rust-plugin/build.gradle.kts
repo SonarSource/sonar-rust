@@ -99,20 +99,28 @@ tasks.register<Copy>("copyRustOutputs") {
   description = "Copy native analyzer binary to the build/classes dir for packaging"
   group = "Build"
   val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
-  val compileRustLinuxArm = project(":analyzer").tasks.named("compileRustLinuxArm").get()
+  val compileRustLinuxArm = if (!project.hasProperty("skipLinuxArmBuild")) {
+    project(":analyzer").tasks.named("compileRustLinuxArm").get()
+  } else {
+    null
+  }
   val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
   val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
   val compileRustDarwinX86 = project(":analyzer").tasks.named("compileRustDarwinX86").get()
 
-  dependsOn(compileRustLinuxMusl, compileRustWin)
+  val dependencies = mutableListOf(compileRustLinuxMusl, compileRustWin)
+  compileRustLinuxArm?.let { dependencies.add(it) }
+  dependsOn(dependencies)
   if (OperatingSystem.current().isMacOsX) {
     dependsOn(compileRustDarwin, compileRustDarwinX86)
   }
   from(compileRustLinuxMusl.outputs.files) {
     into("linux-x64-musl")
   }
-  from(compileRustLinuxArm.outputs.files) {
-    into("linux-aarch64-musl")
+  compileRustLinuxArm?.let { task ->
+    from(task.outputs.files) {
+      into("linux-aarch64-musl")
+    }
   }
   from(compileRustWin.outputs.files) {
     into("win-x64")
