@@ -133,9 +133,9 @@ jobs:
       - name: Setup Rust toolchain
         run: |
           sudo apt-get update
-          sudo apt-get -y install rustup
+          sudo apt-get -y install rustup musl-tools
           sudo apt-get clean
-          
+
           # Setup Rust toolchain (default target only)
           rustup default 1.91.1
           rustup component add llvm-tools rustfmt clippy
