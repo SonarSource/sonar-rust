@@ -78,9 +78,9 @@ jobs:
           sudo make install
           cd ..
           
-          # Setup Rust toolchain (matching Dockerfile)
+          # Setup Rust toolchain
           rustup default 1.91.1
-          rustup component add llvm-tools
+          rustup component add llvm-tools rustfmt
           cargo install cargo-llvm-cov
           
           # Add target platforms
