@@ -3,6 +3,10 @@ import org.tukaani.xz.LZMA2Options
 import org.tukaani.xz.XZOutputStream
 import java.nio.file.Files
 
+plugins {
+  base
+}
+
 buildscript {
   repositories {
     val artifactoryUsername = System.getenv("ARTIFACTORY_PRIVATE_USERNAME") ?: project.findProperty("artifactoryUsername")
@@ -22,6 +26,14 @@ buildscript {
     classpath("org.tukaani:xz:1.10")
   }
 }
+
+val skipAnalyzerBuild = providers.gradleProperty("skipAnalyzerBuild").map {
+  it.isEmpty() || it.toBoolean()
+}.getOrElse(false)
+
+val skipCrossCompile = providers.gradleProperty("skipCrossCompile").map {
+  it.isEmpty() || it.toBoolean()
+}.getOrElse(false)
 
 fun createCompileRustTask(target: String, name: String, envVars: Map<String, String> = emptyMap()): TaskProvider<Exec> {
   return tasks.register<Exec>("compileRust$name") {
@@ -58,17 +70,50 @@ val compileRustLinuxMusl = createCompileRustTask(
     "AR_x86_64_unknown_linux_musl" to muslAr
   )
 )
-val compileRustLinuxArm = createCompileRustTask(
-  "aarch64-unknown-linux-musl", "LinuxArm",
-  mapOf(
-    "TARGET_CC" to "aarch64-linux-musl-gcc",
-    "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER" to "aarch64-linux-musl-gcc",
+val compileRustLinuxArm = if (!skipCrossCompile) {
+  createCompileRustTask(
+    "aarch64-unknown-linux-musl", "LinuxArm",
+    mapOf(
+      "TARGET_CC" to "aarch64-linux-musl-gcc",
+      "CARGO_TARGET_AARCH64_UNKNOWN_LINUX_MUSL_LINKER" to "aarch64-linux-musl-gcc",
+    )
   )
-)
-val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
-val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin", "Darwin")
-val compileRustDarwinX86 = createCompileRustTask("x86_64-apple-darwin", "DarwinX86")
+} else {
+  null
+}
+val compileRustWin = if (!skipCrossCompile) {
+  createCompileRustTask("x86_64-pc-windows-gnu", "Win")
+} else {
+  null
+}
+val compileRustDarwin = if (!skipCrossCompile) {
+  createCompileRustTask("aarch64-apple-darwin", "Darwin")
+} else {
+  null
+}
+val compileRustDarwinX86 = if (!skipCrossCompile) {
+  createCompileRustTask("x86_64-apple-darwin", "DarwinX86")
+} else {
+  null
+}
 
+// Connect compile tasks to assemble lifecycle (only if not skipping analyzer build)
+if (!skipAnalyzerBuild) {
+  tasks.assemble {
+    dependsOn(compileRustLinuxMusl)
+    compileRustWin?.let { dependsOn(it) }
+    compileRustLinuxArm?.let { dependsOn(it) }
+    if (OperatingSystem.current().isMacOsX) {
+      compileRustDarwin?.let { dependsOn(it) }
+      compileRustDarwinX86?.let { dependsOn(it) }
+    }
+  }
+
+  // Connect testRust to check lifecycle
+  tasks.check {
+    dependsOn(tasks.named("testRust"))
+  }
+}
 
 task<Exec>("testRust") {
   description = "Runs Rust tests."
@@ -127,3 +172,10 @@ task<Exec>("clippyRust") {
   standardOutput = outputFile.outputStream()
 }
 
+
+if (skipAnalyzerBuild) {
+  logger.lifecycle("Skipping :analyzer project (skipAnalyzerBuild=true)")
+  tasks.all {
+    enabled = false
+  }
+}
