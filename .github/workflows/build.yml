@@ -104,7 +104,7 @@ jobs:
           rustup target add aarch64-unknown-linux-musl
       - name: Build Rust analyzers
         run: |
-          ./gradlew :analyzer:compileRustLinux :analyzer:compileRustLinuxArm64 :analyzer:compileRustWindows --info --stacktrace
+          ./gradlew :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --info --stacktrace
       - name: Upload Linux x86_64 analyzer
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
