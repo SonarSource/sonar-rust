@@ -3,6 +3,10 @@ import org.tukaani.xz.LZMA2Options
 import org.tukaani.xz.XZOutputStream
 import java.nio.file.Files
 
+plugins {
+  base
+}
+
 buildscript {
   repositories {
     val artifactoryUsername = System.getenv("ARTIFACTORY_PRIVATE_USERNAME") ?: project.findProperty("artifactoryUsername")
@@ -75,6 +79,19 @@ val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
 val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin", "Darwin")
 val compileRustDarwinX86 = createCompileRustTask("x86_64-apple-darwin", "DarwinX86")
 
+// Connect compile tasks to assemble lifecycle
+tasks.assemble {
+  dependsOn(compileRustLinuxMusl, compileRustWin)
+  compileRustLinuxArm?.let { dependsOn(it) }
+  if (OperatingSystem.current().isMacOsX) {
+    dependsOn(compileRustDarwin, compileRustDarwinX86)
+  }
+}
+
+// Connect testRust to check lifecycle
+tasks.check {
+  dependsOn(tasks.named("testRust"))
+}
 
 task<Exec>("testRust") {
   description = "Runs Rust tests."

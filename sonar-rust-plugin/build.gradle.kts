@@ -98,38 +98,40 @@ tasks.jar {
 tasks.register<Copy>("copyRustOutputs") {
   description = "Copy native analyzer binary to the build/classes dir for packaging"
   group = "Build"
-  val compileRustLinuxMusl = project(":analyzer").tasks.named("compileRustLinuxMusl").get()
-  val compileRustLinuxArm = if (!project.hasProperty("skipLinuxArmBuild")) {
-    project(":analyzer").tasks.named("compileRustLinuxArm").get()
-  } else {
-    null
+  
+  // Establish task ordering: if compile tasks run, they must run before copyRustOutputs
+  // This doesn't force compilation - files may already exist from CI downloads
+  val analyzerProject = project(":analyzer")
+  val compileTasks = mutableListOf<Task>()
+  compileTasks.add(analyzerProject.tasks.named("compileRustLinuxMusl").get())
+  compileTasks.add(analyzerProject.tasks.named("compileRustWin").get())
+  if (!project.hasProperty("skipLinuxArmBuild")) {
+    analyzerProject.tasks.findByName("compileRustLinuxArm")?.let {
+      compileTasks.add(it)
+    }
   }
-  val compileRustWin = project(":analyzer").tasks.named("compileRustWin").get()
-  val compileRustDarwin = project(":analyzer").tasks.named("compileRustDarwin").get()
-  val compileRustDarwinX86 = project(":analyzer").tasks.named("compileRustDarwinX86").get()
-
-  val dependencies = mutableListOf(compileRustLinuxMusl, compileRustWin)
-  compileRustLinuxArm?.let { dependencies.add(it) }
-  dependsOn(dependencies)
   if (OperatingSystem.current().isMacOsX) {
-    dependsOn(compileRustDarwin, compileRustDarwinX86)
+    compileTasks.add(analyzerProject.tasks.named("compileRustDarwin").get())
+    compileTasks.add(analyzerProject.tasks.named("compileRustDarwinX86").get())
   }
-  from(compileRustLinuxMusl.outputs.files) {
+  mustRunAfter(compileTasks)
+  
+  // we hardcode the paths to the binaries because on CI binaries are downloaded from other jobs
+  from("${analyzerProject.layout.projectDirectory}/target/x86_64-unknown-linux-musl/release/analyzer.xz") {
     into("linux-x64-musl")
   }
-  compileRustLinuxArm?.let { task ->
-    from(task.outputs.files) {
+  if (!project.hasProperty("skipLinuxArmBuild")) {
+    from("${analyzerProject.layout.projectDirectory}/target/aarch64-unknown-linux-musl/release/analyzer.xz") {
       into("linux-aarch64-musl")
     }
   }
-  from(compileRustWin.outputs.files) {
+  from("${analyzerProject.layout.projectDirectory}/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz") {
     into("win-x64")
   }
-  // we hardcode the path to the binary because on CI binary is downloaded from another task
-  from("${project(":analyzer").layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
+  from("${analyzerProject.layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
     into("darwin-aarch64")
   }
-  from("${project(":analyzer").layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
+  from("${analyzerProject.layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
     into("darwin-x86_64")
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
