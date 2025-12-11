@@ -199,6 +199,7 @@ jobs:
 
   e2e:
     needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-ubuntu-latest-s
     name: E2E Tests
     permissions:
@@ -223,6 +224,7 @@ jobs:
 
   e2e_win:
     needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-windows-latest-s
     name: E2E Tests Windows
     permissions:
@@ -263,6 +265,7 @@ jobs:
 
   e2e_linux_arm64:
     needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-ubuntu-24.04-arm-s
     name: E2E Tests Linux ARM64
     permissions:
@@ -295,7 +298,7 @@ jobs:
           path: e2e/build/reports/tests/**
 
   promote:
-    needs: [build, e2e, e2e_win, e2e_linux_arm64]
+    needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64]
     runs-on: sonar-xs
     name: Promote
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
