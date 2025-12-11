@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  macos:
+  macos_analyzers:
     runs-on: macos-latest
-    name: macOS Build
+    name: macOS Analyzers Build
 #    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
     permissions:
       id-token: write
@@ -47,11 +47,9 @@ jobs:
           name: analyzer-x86_64-apple-darwin
           path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
 
-  build:
-    needs: [macos]
-    if: '!cancelled()'
+  cross_platform_analyzers:
     runs-on: github-ubuntu-latest-m
-    name: Build
+    name: Cross-Platform Analyzers Build
     permissions:
       id-token: write
       contents: write
@@ -69,7 +67,7 @@ jobs:
         id: cache-cross-compiler
         env:
           MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
-        uses: SonarSource/ci-github-actions/cache@v1
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
         with:
           path: cross-compiler-output
           key: musl-cross-compiler-aarch64-${{ env.MUSL_CROSS_MAKE_COMMIT }}
@@ -84,7 +82,7 @@ jobs:
           cd musl-cross-make
           # we checkout a specific commit to guarantee reproducibility (tags can be moved)
           git checkout $MUSL_CROSS_MAKE_COMMIT
-          echo -e "TARGET = aarch64-linux-musl\nOUTPUT = ../cross-compiler-output\n" >> config.mak
+          echo -e "TARGET = aarch64-linux-musl\nOUTPUT = $PWD/../cross-compiler-output\n" >> config.mak
           make
           make install
           cd ..
@@ -104,6 +102,39 @@ jobs:
           rustup target add x86_64-unknown-linux-musl
           rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-unknown-linux-musl
+      - name: Build Rust analyzers
+        run: |
+          ./gradlew :analyzer:compileRustLinux :analyzer:compileRustLinuxArm64 :analyzer:compileRustWindows --info --stacktrace
+      - name: Upload Linux x86_64 analyzer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: analyzer-x86_64-unknown-linux-musl
+          path: analyzer/target/x86_64-unknown-linux-musl/release/analyzer.xz
+      - name: Upload Linux ARM64 analyzer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: analyzer-aarch64-unknown-linux-musl
+          path: analyzer/target/aarch64-unknown-linux-musl/release/analyzer.xz
+      - name: Upload Windows analyzer
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: analyzer-x86_64-pc-windows-gnu
+          path: analyzer/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz
+
+  build:
+    needs: [macos_analyzers, cross_platform_analyzers]
+    if: '!cancelled()'
+    runs-on: github-ubuntu-latest-m
+    name: Build
+    permissions:
+      id-token: write
+      contents: write
+    steps:
+      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+        with:
+          version: 2025.7.12
+      # Download Darwin artifacts (only built on master/branch/dogfood)
       - name: Download Darwin ARM64 artifact
         if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
         uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
@@ -116,6 +147,22 @@ jobs:
         with:
           name: analyzer-x86_64-apple-darwin
           path: analyzer/target/x86_64-apple-darwin/release/
+      # Download Linux/Windows artifacts (always built)
+      - name: Download Linux x86_64 analyzer
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: analyzer-x86_64-unknown-linux-musl
+          path: analyzer/target/x86_64-unknown-linux-musl/release/
+      - name: Download Linux ARM64 analyzer
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: analyzer-aarch64-unknown-linux-musl
+          path: analyzer/target/aarch64-unknown-linux-musl/release/
+      - name: Download Windows analyzer
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: analyzer-x86_64-pc-windows-gnu
+          path: analyzer/target/x86_64-pc-windows-gnu/release/
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         with:
           deploy-pull-request: true
