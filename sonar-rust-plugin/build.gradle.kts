@@ -74,6 +74,11 @@ tasks.named<Test>("test") {
 val skipAnalyzerBuild = providers.gradleProperty("skipAnalyzerBuild").map {
   it.isEmpty() || it.toBoolean()
 }.getOrElse(false)
+
+val skipCrossCompile = providers.gradleProperty("skipCrossCompile").map {
+  it.isEmpty() || it.toBoolean()
+}.getOrElse(false)
+
 if (!skipAnalyzerBuild) {
   tasks.named("check") {
     dependsOn(":analyzer:testRust")
@@ -103,41 +108,47 @@ tasks.jar {
 tasks.register<Copy>("copyRustOutputs") {
   description = "Copy native analyzer binary to the build/classes dir for packaging"
   group = "Build"
-  
+
   // Establish task ordering: if compile tasks run, they must run before copyRustOutputs
   // This doesn't force compilation - files may already exist from CI downloads
   val analyzerProject = project(":analyzer")
   val compileTasks = mutableListOf<Task>()
   compileTasks.add(analyzerProject.tasks.named("compileRustLinuxMusl").get())
-  compileTasks.add(analyzerProject.tasks.named("compileRustWin").get())
-  if (!project.hasProperty("skipLinuxArmBuild")) {
+  if (!skipCrossCompile) {
+    analyzerProject.tasks.findByName("compileRustWin")?.let {
+      compileTasks.add(it)
+    }
     analyzerProject.tasks.findByName("compileRustLinuxArm")?.let {
       compileTasks.add(it)
     }
-  }
-  if (OperatingSystem.current().isMacOsX) {
-    compileTasks.add(analyzerProject.tasks.named("compileRustDarwin").get())
-    compileTasks.add(analyzerProject.tasks.named("compileRustDarwinX86").get())
+    if (OperatingSystem.current().isMacOsX) {
+      analyzerProject.tasks.findByName("compileRustDarwin")?.let {
+        compileTasks.add(it)
+      }
+      analyzerProject.tasks.findByName("compileRustDarwinX86")?.let {
+        compileTasks.add(it)
+      }
+    }
   }
   mustRunAfter(compileTasks)
-  
+
   // we hardcode the paths to the binaries because on CI binaries are downloaded from other jobs
   from("${analyzerProject.layout.projectDirectory}/target/x86_64-unknown-linux-musl/release/analyzer.xz") {
     into("linux-x64-musl")
   }
-  if (!project.hasProperty("skipLinuxArmBuild")) {
+  if (!skipCrossCompile) {
     from("${analyzerProject.layout.projectDirectory}/target/aarch64-unknown-linux-musl/release/analyzer.xz") {
       into("linux-aarch64-musl")
     }
-  }
-  from("${analyzerProject.layout.projectDirectory}/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz") {
-    into("win-x64")
-  }
-  from("${analyzerProject.layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
-    into("darwin-aarch64")
-  }
-  from("${analyzerProject.layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
-    into("darwin-x86_64")
+    from("${analyzerProject.layout.projectDirectory}/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz") {
+      into("win-x64")
+    }
+    from("${analyzerProject.layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
+      into("darwin-aarch64")
+    }
+    from("${analyzerProject.layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
+      into("darwin-x86_64")
+    }
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
 }

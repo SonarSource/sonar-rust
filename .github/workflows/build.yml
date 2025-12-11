@@ -146,7 +146,7 @@ jobs:
         with:
           deploy: false
           deploy-pull-request: false
-          gradle-args: "-PskipLinuxArmBuild --info --stacktrace"
+          gradle-args: "-PskipCrossCompile --info --stacktrace"
 
   build:
     needs: [macos_analyzers, cross_platform_analyzers]
