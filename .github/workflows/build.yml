@@ -60,24 +60,40 @@ jobs:
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
           version: 2025.7.12
-      - name: Setup Rust toolchain and targets
+      - name: Install system dependencies
         run: |
-          # Install system dependencies
           sudo apt-get update
           sudo apt-get -y install autoconf build-essential gcc-mingw-w64 git libtool musl-dev musl-tools pkg-config rustup
           sudo apt-get clean
-          
-          # Build and install aarch64-linux-musl cross-compiler
+      - name: Cache cross-compiler
+        id: cache-cross-compiler
+        env:
+          MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
+        uses: SonarSource/ci-github-actions/cache@v1
+        with:
+          path: cross-compiler-output
+          key: musl-cross-compiler-aarch64-${{ env.MUSL_CROSS_MAKE_COMMIT }}
+      - name: Build cross-compiler
+        if: steps.cache-cross-compiler.outputs.cache-hit != 'true'
+        env:
+          MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
+        run: |
+          # Build aarch64-linux-musl cross-compiler
           # This approach is based on https://github.com/cross-rs/cross/blob/main/docker/musl.sh
           git clone https://github.com/richfelker/musl-cross-make.git
           cd musl-cross-make
           # we checkout a specific commit to guarantee reproducibility (tags can be moved)
-          git checkout 6f3701d08137496d5aac479e3a3977b5ae993c1f
-          echo -e "TARGET = aarch64-linux-musl\nOUTPUT = /usr/local\n" >> config.mak
+          git checkout $MUSL_CROSS_MAKE_COMMIT
+          echo -e "TARGET = aarch64-linux-musl\nOUTPUT = ../cross-compiler-output\n" >> config.mak
           make
-          sudo make install
+          make install
           cd ..
-          
+      - name: Install cross-compiler
+        run: |
+          # Install cross-compiler to system location
+          sudo cp -r cross-compiler-output/* /usr/local/
+      - name: Setup Rust toolchain
+        run: |
           # Setup Rust toolchain
           rustup default 1.91.1
           rustup component add llvm-tools rustfmt clippy
