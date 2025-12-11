@@ -27,7 +27,9 @@ buildscript {
   }
 }
 
-val skipAnalyzerBuild = project.findProperty("skipAnalyzerBuild")?.toString()?.toBoolean() ?: false
+val skipAnalyzerBuild = providers.gradleProperty("skipAnalyzerBuild").map {
+  it.isEmpty() || it.toBoolean()
+}.getOrElse(false)
 
 fun createCompileRustTask(target: String, name: String, envVars: Map<String, String> = emptyMap()): TaskProvider<Exec> {
   return tasks.register<Exec>("compileRust$name") {
@@ -155,7 +157,7 @@ task<Exec>("clippyRust") {
 
 if (skipAnalyzerBuild) {
   logger.lifecycle("Skipping :analyzer project (skipAnalyzerBuild=true)")
-  tasks.configureEach {
+  tasks.all {
     enabled = false
   }
 }

@@ -71,10 +71,15 @@ tasks.named<Test>("test") {
   finalizedBy("jacocoTestReport")
 }
 
-tasks.named("check") {
-  dependsOn(":analyzer:testRust")
-  dependsOn(":analyzer:checkRustFormat")
-  dependsOn(":analyzer:checkRustLicense")
+val skipAnalyzerBuild = providers.gradleProperty("skipAnalyzerBuild").map {
+  it.isEmpty() || it.toBoolean()
+}.getOrElse(false)
+if (!skipAnalyzerBuild) {
+  tasks.named("check") {
+    dependsOn(":analyzer:testRust")
+    dependsOn(":analyzer:checkRustFormat")
+    dependsOn(":analyzer:checkRustLicense")
+  }
 }
 
 tasks.jar {
