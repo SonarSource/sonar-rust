@@ -139,6 +139,7 @@ jobs:
           # Setup Rust toolchain (default target only)
           rustup default 1.91.1
           rustup component add llvm-tools rustfmt clippy
+          rustup target add x86_64-unknown-linux-musl
           cargo install cargo-llvm-cov
       - uses: SonarSource/ci-github-actions/config-gradle@v1
       - uses: SonarSource/ci-github-actions/build-gradle@v1
