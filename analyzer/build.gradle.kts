@@ -79,18 +79,20 @@ val compileRustWin = createCompileRustTask("x86_64-pc-windows-gnu", "Win")
 val compileRustDarwin = createCompileRustTask("aarch64-apple-darwin", "Darwin")
 val compileRustDarwinX86 = createCompileRustTask("x86_64-apple-darwin", "DarwinX86")
 
-// Connect compile tasks to assemble lifecycle
-tasks.assemble {
-  dependsOn(compileRustLinuxMusl, compileRustWin)
-  compileRustLinuxArm?.let { dependsOn(it) }
-  if (OperatingSystem.current().isMacOsX) {
-    dependsOn(compileRustDarwin, compileRustDarwinX86)
+// Connect compile tasks to assemble lifecycle (only if not skipping analyzer build)
+if (!skipAnalyzerBuild) {
+  tasks.assemble {
+    dependsOn(compileRustLinuxMusl, compileRustWin)
+    compileRustLinuxArm?.let { dependsOn(it) }
+    if (OperatingSystem.current().isMacOsX) {
+      dependsOn(compileRustDarwin, compileRustDarwinX86)
+    }
   }
-}
 
-// Connect testRust to check lifecycle
-tasks.check {
-  dependsOn(tasks.named("testRust"))
+  // Connect testRust to check lifecycle
+  tasks.check {
+    dependsOn(tasks.named("testRust"))
+  }
 }
 
 task<Exec>("testRust") {
