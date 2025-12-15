@@ -38,6 +38,7 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
       .activateLicense()
       .useDefaultAdminCredentialsForBuilds(true)
       .setSonarVersion(System.getProperty("sonar.runtimeVersion", "LATEST_RELEASE"))
+      .setServerProperty("sonar.ce.javaAdditionalOpts", "-Dcom.sun.management.jmxremote=false")
       .addPlugin(pluginLocation)
       .build();
   }
