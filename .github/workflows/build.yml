@@ -282,6 +282,11 @@ jobs:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - name: Install bash
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install bash
+          sudo apt-get clean
       - name: Run E2E tests in ARM64 container
         shell: bash
         env:
