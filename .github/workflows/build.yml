@@ -282,18 +282,14 @@ jobs:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v1
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get -y install findutils
-          sudo apt-get clean
       - name: Run E2E tests in ARM64 container
+        shell: bash
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
         run: |
             echo 'org.gradle.daemon=false' >> gradle.properties
             export PATH=\$PATH:\$HOME/.cargo/bin
-            ./gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace            
+            bash gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace            
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
