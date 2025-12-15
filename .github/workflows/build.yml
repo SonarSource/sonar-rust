@@ -35,7 +35,7 @@ jobs:
           echo "org.gradle.daemon=false" >> "gradle.properties"
           echo "org.gradle.vfs.watch=false" >> "gradle.properties"
           source $HOME/.cargo/env
-          gradle :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
+          ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
       - name: Upload Darwin ARM64 artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -103,7 +103,7 @@ jobs:
           rustup target add aarch64-unknown-linux-musl
       - name: Build Rust analyzers
         run: |
-          gradle :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --info --stacktrace
+          ./gradlew :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --info --stacktrace
       - name: Upload Linux x86_64 analyzer
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
@@ -220,7 +220,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
         run: |
-          gradle :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
 
   e2e_win:
     needs: [build]
@@ -255,7 +255,7 @@ jobs:
         run: |
           echo "org.gradle.daemon=false" >> "gradle.properties"
           export PATH=$PATH:$HOME/.cargo/bin          
-          gradle :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
@@ -289,7 +289,7 @@ jobs:
         run: |
             echo 'org.gradle.daemon=false' >> gradle.properties
             export PATH=\$PATH:\$HOME/.cargo/bin
-            gradle :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace            
+            ./gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace            
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
