@@ -303,7 +303,7 @@ jobs:
 
             echo 'org.gradle.daemon=false' >> gradle.properties
             export PATH=\$PATH:\$HOME/.cargo/bin
-            bash gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace            
+            /bin/bash gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
