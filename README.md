@@ -44,9 +44,7 @@ cross-compilers for different platforms:
 ##### Mac OS X
 
 ```shell
-brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu
-brew install filosottile/musl-cross/musl-cross
-brew install mingw-w64
+brew install SergioBenitez/osxct/x86_64-unknown-linux-gnu filosottile/musl-cross/musl-cross mingw-w64
 ```
 
 ##### Ubuntu
@@ -60,17 +58,13 @@ apt-get -y install rustup gcc-mingw-w64 musl-tools musl-dev build-essential auto
 You also need to install the Rust toolchains for the target platforms:
 
 ```shell
-rustup target add x86_64-pc-windows-gnu
-rustup target add x86_64-unknown-linux-musl
-rustup target add x86_64-unknown-linux-gnu
-rustup target add aarch64-unknown-linux-musl
-rustup target add x86_64-apple-darwin
+rustup target add x86_64-pc-windows-gnu x86_64-unknown-linux-musl x86_64-unknown-linux-gnu aarch64-unknown-linux-musl x86_64-apple-darwin
 ```
 
 To verify installed toolchains, you can run the following command:
 
 ```shell
-rustup target list
+rustup target list --installed
 ```
 
 ### Running End-to-End Tests

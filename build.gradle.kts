@@ -5,7 +5,6 @@ plugins {
   id("com.jfrog.artifactory") version "5.2.5"
 }
 
-
 // Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
 val buildNumber: String? = System.getProperty("buildNumber")
 project.ext["buildNumber"] = buildNumber
@@ -14,8 +13,6 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   val versionSuffix = if (project.version.toString().count { it == '.' } == 1) ".0.$buildNumber" else ".$buildNumber"
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
-
-
 
 repositories {
   val artifactoryUsername = System.getenv("ARTIFACTORY_PRIVATE_USERNAME") ?: project.findProperty("artifactoryUsername")
