@@ -292,6 +292,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
         run: |
+            echo "=== Debug: Shell and bash information ==="
+            echo "Current shell: $SHELL"
+            which bash || echo "bash not found in PATH"
+            echo "PATH: $PATH"
+            ls -la /bin/bash || echo "/bin/bash not found"
+            ls -la /usr/bin/bash || echo "/usr/bin/bash not found"
+            bash --version || echo "bash version failed"
+            echo "=== End Debug ==="
+
             echo 'org.gradle.daemon=false' >> gradle.properties
             export PATH=\$PATH:\$HOME/.cargo/bin
             bash gradlew :e2e:test -Pe2e -DpluginVersion=\${PROJECT_VERSION} --info --stacktrace            
