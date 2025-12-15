@@ -270,7 +270,6 @@ jobs:
     name: E2E Tests Linux ARM64
     permissions:
       id-token: write
-      contents: write
     steps:
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
@@ -283,6 +282,11 @@ jobs:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install findutils
+          sudo apt-get clean
       - name: Run E2E tests in ARM64 container
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
