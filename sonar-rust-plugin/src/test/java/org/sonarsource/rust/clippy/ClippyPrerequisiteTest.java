@@ -16,6 +16,9 @@
  */
 package org.sonarsource.rust.clippy;
 
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.sonarsource.rust.common.ProcessWrapper;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -27,6 +30,7 @@ import org.slf4j.event.Level;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -60,6 +64,23 @@ class ClippyPrerequisiteTest {
       "Cargo version: cargo 1.0.0",
       "Checking Clippy version",
       "Clippy version: clippy 1.0.0");
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = {"", "   "})
+  void test_clippy_missing(String clippyVersionOutput) {
+    var process = mock(ProcessWrapper.class);
+    var clippyPrerequisite = new ClippyPrerequisite(process);
+    var workDir = Path.of("some/dir");
+    var output = clippyVersionOutput == null ? null : new ByteArrayInputStream(clippyVersionOutput.getBytes());
+
+    when(process.getInputStream())
+      .thenReturn(new ByteArrayInputStream("cargo 1.0.0".getBytes()))
+      .thenReturn(output);
+
+    assertThatThrownBy(() -> clippyPrerequisite.check(workDir))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("Unable to retrieve Clippy version");
   }
 
   @Test
