@@ -21,6 +21,10 @@ jobs:
     permissions:
       id-token: write
     steps:
+      # see https://xtranet-sonarsource.atlassian.net/wiki/spaces/Platform/pages/4412309510/MacOS+Runners+-+GitHub
+      - name: Setup Cloudflare WARP
+        uses: SonarSource/gh-action_setup-cloudflare-warp@v1
+        id: warp
       - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
