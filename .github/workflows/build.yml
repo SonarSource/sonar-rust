@@ -305,7 +305,7 @@ jobs:
 
   promote:
     needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64]
-    runs-on: sonar-xs
+    runs-on: github-ubuntu-latest-s
     name: Promote
     permissions:
       id-token: write
