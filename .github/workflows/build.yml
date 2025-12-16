@@ -208,7 +208,7 @@ jobs:
 
   e2e:
     needs: [build]
-    runs-on: github-ubuntu-latest-s
+    runs-on: github-ubuntu-latest-m
     name: E2E Tests
     permissions:
       id-token: write
@@ -232,7 +232,7 @@ jobs:
 
   e2e_win:
     needs: [build]
-    runs-on: github-windows-latest-s
+    runs-on: github-windows-latest-m
     name: E2E Tests Windows
     permissions:
       id-token: write
@@ -272,7 +272,7 @@ jobs:
 
   e2e_linux_arm64:
     needs: [build]
-    runs-on: github-ubuntu-24.04-arm-s
+    runs-on: github-ubuntu-24.04-arm-m
     name: E2E Tests Linux ARM64
     permissions:
       id-token: write
