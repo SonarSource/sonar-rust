@@ -52,6 +52,9 @@ public class ClippyPrerequisite {
       processWrapper.start(command, workDir, null, LOG::warn);
       try (var reader = new BufferedReader(new InputStreamReader(processWrapper.getInputStream()))) {
         var version = reader.readLine();
+        if (version == null || version.isBlank()) {
+          throw new IllegalStateException("Unable to retrieve " + prerequisite + " version");
+        }
         LOG.debug("{} version: {}", prerequisite, version);
         return version;
       }
