@@ -17,7 +17,6 @@
 package org.sonarsource.rust.clippy;
 
 import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.sonarsource.rust.common.ProcessWrapper;
 import java.io.ByteArrayInputStream;
