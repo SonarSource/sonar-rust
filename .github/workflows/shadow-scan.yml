@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: sonar-xs
+    runs-on: github-ubuntu-latest-s
     name: Build for Shadow Scan
     permissions:
       id-token: write

@@ -13,6 +13,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
 
+env:
+  RUST_VERSION: 1.91.1
+
 jobs:
   macos_analyzers:
     runs-on: macos-latest
@@ -96,10 +99,10 @@ jobs:
       - name: Setup Rust toolchain
         run: |
           # Setup Rust toolchain
-          rustup default 1.91.1
+          rustup default ${{ env.RUST_VERSION }}
           rustup component add llvm-tools rustfmt clippy
           cargo install cargo-llvm-cov
-          
+
           # Add target platforms
           rustup target add x86_64-pc-windows-gnu
           rustup target add x86_64-unknown-linux-musl
@@ -141,7 +144,7 @@ jobs:
           sudo apt-get clean
 
           # Setup Rust toolchain (default target only)
-          rustup default 1.91.1
+          rustup default ${{ env.RUST_VERSION }}
           rustup component add llvm-tools rustfmt clippy
           rustup target add x86_64-unknown-linux-musl
           cargo install cargo-llvm-cov
@@ -153,7 +156,10 @@ jobs:
 
   build:
     needs: [macos_analyzers, cross_platform_analyzers]
-    if: '!cancelled()'
+    if: |
+      !cancelled() &&
+      (needs.macos_analyzers.result == 'success' || needs.macos_analyzers.result == 'skipped') &&
+      needs.cross_platform_analyzers.result == 'success'
     runs-on: github-ubuntu-latest-m
     name: Build
     permissions:
@@ -202,7 +208,6 @@ jobs:
 
   e2e:
     needs: [build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-ubuntu-latest-s
     name: E2E Tests
     permissions:
@@ -227,7 +232,6 @@ jobs:
 
   e2e_win:
     needs: [build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-windows-latest-s
     name: E2E Tests Windows
     permissions:
@@ -268,7 +272,6 @@ jobs:
 
   e2e_linux_arm64:
     needs: [build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-ubuntu-24.04-arm-s
     name: E2E Tests Linux ARM64
     permissions:
