@@ -308,6 +308,13 @@ jobs:
 
   promote:
     needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64]
+    if: |
+      !cancelled() &&
+      needs.build.result == 'success' &&
+      needs.unit_test_and_analysis.result == 'success' &&
+      needs.e2e.result == 'success' &&
+      needs.e2e_win.result == 'success' &&
+      needs.e2e_linux_arm64.result == 'success'
     runs-on: github-ubuntu-latest-s
     name: Promote
     permissions:
