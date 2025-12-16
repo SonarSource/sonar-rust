@@ -208,6 +208,7 @@ jobs:
 
   e2e:
     needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-ubuntu-latest-m
     name: E2E Tests
     permissions:
@@ -232,6 +233,7 @@ jobs:
 
   e2e_win:
     needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-windows-latest-m
     name: E2E Tests Windows
     permissions:
@@ -272,6 +274,7 @@ jobs:
 
   e2e_linux_arm64:
     needs: [build]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
     runs-on: github-ubuntu-24.04-arm-m
     name: E2E Tests Linux ARM64
     permissions:
