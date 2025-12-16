@@ -300,7 +300,6 @@ jobs:
     needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64]
     runs-on: sonar-xs
     name: Promote
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
     permissions:
       id-token: write
     steps:      
