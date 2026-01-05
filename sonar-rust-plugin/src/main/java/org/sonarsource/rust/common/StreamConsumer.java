@@ -47,7 +47,7 @@ class StreamConsumer {
   }
 
   void consumeStream(InputStream inputStream, Consumer<String> consumer) {
-    executorService.submit(() -> {
+    executorService.execute(() -> {
       try (
         var reader = new BufferedReader(
           new InputStreamReader(inputStream, StandardCharsets.UTF_8)
