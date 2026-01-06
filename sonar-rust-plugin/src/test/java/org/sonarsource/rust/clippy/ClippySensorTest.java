@@ -258,4 +258,53 @@ class ClippySensorTest {
 
     assertThat(logTester.logs()).contains("Clippy running in offline mode. Use `cargo fetch` to make sure all prerequisites are available.");
   }
+
+  @Test
+  void executeFailsToSaveIssueWithMalformedDiagnosticLocation() throws IOException {
+    var context = SensorContextTester.create(baseDir);
+    var activeRules = new ActiveRulesBuilder()
+      .addRule(new NewActiveRule.Builder().setRuleKey(RuleKey.of(RustLanguage.KEY, "S2198")).build())
+      .build();
+    context.setActiveRules(activeRules);
+
+    var inputFile = new TestInputFileBuilder("moduleKey", "file.rs")
+      .setContents("fn main() {}")
+      .build();
+    context.fileSystem().add(inputFile);
+
+    var manifest = baseDir.resolve("Cargo.toml");
+    Files.createFile(manifest);
+
+    var clippyPrerequisite = mock(ClippyPrerequisite.class);
+    doReturn(new ClippyPrerequisite.ToolVersions("cargo 1.2.3", "clippy 1.2.3")).when(clippyPrerequisite).check(any());
+
+    var manifestPath = baseDir.toString();
+    // Create a diagnostic with malformed location: same line and same column for both start and end
+    // This will result in an invalid range when column_start - 1 == column_end - 1 on the same line
+    var diagnostics = List.of(
+      new ClippyDiagnostic(manifestPath, new ClippyMessage(
+        new ClippyCode("clippy::absurd_extreme_comparisons"),
+        "message",
+        // Same line (1) and same column (2) for both start and end
+        List.of(new ClippySpan("file.rs", 1, 1, 1, 1))))
+    );
+    var clippyRunner = mock(ClippyRunner.class);
+    doAnswer(invocation -> {
+      Consumer<ClippyDiagnostic> diagnosticsConsumer = invocation.getArgument(2);
+      diagnostics.forEach(diagnosticsConsumer);
+      return null;
+    }).when(clippyRunner).run(any(), any(), any(), anyBoolean());
+
+    var sensor = new ClippySensor(clippyPrerequisite, clippyRunner, new AnalysisWarningsWrapper());
+    sensor.execute(context);
+
+    // Verify that a warning was logged about the failure
+    assertThat(logTester.logs(Level.WARN)).anyMatch(log ->
+      log.contains("Failed to save Clippy issue"));
+
+    // Verify that no issue was saved due to the malformed location
+    assertThat(context.allIssues()).isEmpty();
+  }
+
+
 }

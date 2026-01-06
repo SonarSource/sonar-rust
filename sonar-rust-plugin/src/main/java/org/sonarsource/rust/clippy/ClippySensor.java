@@ -109,7 +109,13 @@ public class ClippySensor implements Sensor {
         Telemetry.reportManifestInfo(context, manifestPath);
 
         var workDir = manifestPath.getParent();
-        clippy.run(workDir, lints, diagnostic -> saveIssue(context, diagnostic, workDir), offlineMode);
+        clippy.run(workDir, lints, diagnostic -> {
+          try {
+            saveIssue(context, diagnostic, workDir);
+          } catch (Exception e) {
+            LOG.warn("Failed to save Clippy issue: {}", diagnostic, e);
+          }
+        }, offlineMode);
       }
     } catch (Exception e) {
       LOG.error("Failed to run Clippy", e);
