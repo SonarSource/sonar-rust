@@ -5,7 +5,7 @@ plugins {
 val orchestratorVersion = "6.0.1.3892"
 
 dependencies {
-    testImplementation("org.assertj:assertj-core:3.26.0")
+    testImplementation("org.assertj:assertj-core:3.27.7")
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator-junit5:$orchestratorVersion")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator:$orchestratorVersion")

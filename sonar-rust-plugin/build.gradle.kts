@@ -37,7 +37,7 @@ dependencies {
   testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
   testImplementation(platform("org.junit:junit-bom:5.12.2"))
   testImplementation("org.junit.jupiter:junit-jupiter")
-  testImplementation("org.assertj:assertj-core:3.27.3")
+  testImplementation("org.assertj:assertj-core:3.27.7")
   testImplementation("org.mockito:mockito-core:5.18.0")
   testImplementation("org.awaitility:awaitility:4.2.0")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
