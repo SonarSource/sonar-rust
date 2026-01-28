@@ -5,6 +5,7 @@ import java.nio.file.Files
 
 plugins {
   base
+  id("rust-license-file-generator")
 }
 
 buildscript {

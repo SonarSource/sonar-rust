@@ -1,0 +1,40 @@
+# cargo-about configuration
+# https://embarkstudios.github.io/cargo-about/
+
+accepted = [
+    "Apache-2.0",
+    "MIT",
+    "BSD-2-Clause",
+    "BSD-3-Clause",
+    "ISC",
+    "Zlib",
+    "0BSD",
+    "Unlicense",
+    "BSL-1.0",
+    "Unicode-3.0",
+    "Unicode-DFS-2016",
+]
+
+# Ignore the analyzer crate itself (it's an unpublished workspace member)
+private = { ignore = true }
+
+# Clarifications for crates that don't include LICENSE files in their packages.
+# These fetch the license from the git repository associated with the crate.
+
+[tree-sitter-rust.clarify]
+license = "MIT"
+[[tree-sitter-rust.clarify.git]]
+path = "LICENSE"
+checksum = "31d5b6f4243d5c7c6e1c4ebbbb9f6407bd1457a08bcc4f706521710341acba36"
+
+[tree-sitter.clarify]
+license = "MIT"
+[[tree-sitter.clarify.git]]
+path = "LICENSE"
+checksum = "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147"
+
+[tree-sitter-language.clarify]
+license = "MIT"
+[[tree-sitter-language.clarify.git]]
+path = "LICENSE"
+checksum = "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147"

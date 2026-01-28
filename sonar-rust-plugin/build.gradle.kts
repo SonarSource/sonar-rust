@@ -108,7 +108,7 @@ tasks.jar {
 }
 
 tasks.register<Copy>("copyRustOutputs") {
-  description = "Copy native analyzer binary to the build/classes dir for packaging"
+  description = "Copy native analyzer binary and licenses to the build/classes dir for packaging"
   group = "Build"
 
   // Establish task ordering: if compile tasks run, they must run before copyRustOutputs
@@ -134,22 +134,39 @@ tasks.register<Copy>("copyRustOutputs") {
   }
   mustRunAfter(compileTasks)
 
+  val analyzerLicensesDir = "${analyzerProject.layout.projectDirectory}/licenses"
+
   // we hardcode the paths to the binaries because on CI binaries are downloaded from other jobs
   from("${analyzerProject.layout.projectDirectory}/target/x86_64-unknown-linux-musl/release/analyzer.xz") {
     into("linux-x64-musl")
+  }
+  from(analyzerLicensesDir) {
+    into("linux-x64-musl/licenses")
   }
   if (!skipCrossCompile) {
     from("${analyzerProject.layout.projectDirectory}/target/aarch64-unknown-linux-musl/release/analyzer.xz") {
       into("linux-aarch64-musl")
     }
+    from(analyzerLicensesDir) {
+      into("linux-aarch64-musl/licenses")
+    }
     from("${analyzerProject.layout.projectDirectory}/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz") {
       into("win-x64")
+    }
+    from(analyzerLicensesDir) {
+      into("win-x64/licenses")
     }
     from("${analyzerProject.layout.projectDirectory}/target/aarch64-apple-darwin/release/analyzer.xz") {
       into("darwin-aarch64")
     }
+    from(analyzerLicensesDir) {
+      into("darwin-aarch64/licenses")
+    }
     from("${analyzerProject.layout.projectDirectory}/target/x86_64-apple-darwin/release/analyzer.xz") {
       into("darwin-x86_64")
+    }
+    from(analyzerLicensesDir) {
+      into("darwin-x86_64/licenses")
     }
   }
   into("${layout.buildDirectory.get()}/resources/main/analyzer")
