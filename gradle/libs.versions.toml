@@ -3,6 +3,11 @@
 
 [versions]
 junit-jupiter = "5.11.1"
+license-report = "2.9"
 
 [libraries]
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter", version.ref = "junit-jupiter" }
+license-report-plugin = { module = "com.github.jk1:gradle-license-report", version.ref = "license-report" }
+
+[plugins]
+license-report = { id = "com.github.jk1.dependency-license-report", version.ref = "license-report" }

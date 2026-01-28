@@ -10,6 +10,7 @@ plugins {
   id("org.sonarqube")
   id("com.jfrog.artifactory")
   id("com.gradleup.shadow") version "8.3.5"
+  id("license-file-generator")
 }
 
 
