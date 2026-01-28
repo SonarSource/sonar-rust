@@ -116,7 +116,7 @@ def collect_clippy_lints(clippy_dir: str):
 
             collect_lints_from_ast(tree.root_node, lints)
 
-    sorted(lints, key=lambda x: x['key'])
+    lints = sorted(lints, key=lambda x: x['key'])
 
     return lints
 
@@ -201,7 +201,7 @@ def glean_chat(message, glean_token):
     data['messages'] = prompts
 
     try:
-        print(f'Sending request...')
+        print('Sending request...')
         with requests.post(GLEAN_URL, headers=headers, json=data, stream=False) as response:
             if response.status_code == 200:
                 resp_json = json.loads(response.text)
@@ -305,7 +305,7 @@ if __name__ == "__main__":
     processed_responses = {}
     prompt_clippy_lints = []
 
-    queue = [lint for lint in clippy_lints]
+    queue = clippy_lints.copy()
     tries = {lint['key']: 0 for lint in clippy_lints }
 
     while queue:
@@ -313,9 +313,8 @@ if __name__ == "__main__":
         clippy_key = lint['key']
 
         tries[clippy_key] = tries[clippy_key] + 1
-        if categories is not None:
-            if lint['category'] not in categories:
-                continue
+        if categories is not None and lint['category'] not in categories:
+            continue
 
         # Glean API tends to rate limit requests very early, so we need to add some delay
         time.sleep(0.5)
