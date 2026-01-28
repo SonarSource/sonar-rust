@@ -41,6 +41,7 @@ sonar {
     property("sonar.links.issue", "https://jira.sonarsource.com/projects/SKUNK")
     property("sonar.rust.lcov.reportPaths", "analyzer/target/llvm-cov-target/coverage.lcov")
     property("sonar.rust.cargo.manifestPaths", "analyzer/Cargo.toml")
+    property("sonar.coverage.exclusions", "tools/**/*")
   }
 }
 
