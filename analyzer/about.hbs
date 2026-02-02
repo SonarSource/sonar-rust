@@ -1,0 +1,14 @@
+{{!
+    This template generates individual license files for each crate.
+    Each file is named {crate-name}-LICENSE.txt and contains the license text.
+
+    The output uses a special separator that the Gradle task will use to split
+    into individual files.
+}}
+{{#each licenses}}
+{{#each used_by}}
+---LICENSE_FILE_START:{{crate.name}}-LICENSE.txt---
+{{{../text}}}
+---LICENSE_FILE_END---
+{{/each}}
+{{/each}}

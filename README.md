@@ -79,6 +79,33 @@ To run the end-to-end tests, use the following command:
 
 It executes the end-to-end tests, ensuring that the entire system works as expected.
 
+### License File Generation
+
+The project automatically generates and validates license files for all runtime dependencies. This ensures compliance and transparency regarding third-party licenses bundled with the plugin.
+
+#### Java Dependencies
+
+License files for Java runtime dependencies are managed in the `sonar-rust-plugin` module:
+
+- **Generate licenses**: `./gradlew :sonar-rust-plugin:generateLicenseResources`
+- **Validate licenses**: `./gradlew :sonar-rust-plugin:validateLicenseFiles` (runs automatically with `check`)
+
+Generated files are stored in `sonar-rust-plugin/src/main/resources/licenses/`.
+
+#### Rust Dependencies
+
+License files for Rust runtime dependencies are managed in the `analyzer` module using [cargo-about](https://github.com/EmbarkStudios/cargo-about):
+
+- **Prerequisite**: Install cargo-about with `cargo install cargo-about`
+- **Generate licenses**: `./gradlew :analyzer:generateRustLicenseResources`
+- **Validate licenses**: `./gradlew :analyzer:validateRustLicenseFiles` (runs automatically with `check`)
+
+Generated files are stored in `analyzer/licenses/` and copied to each platform-specific folder during packaging.
+
+#### Validation
+
+Both Java and Rust license validations run as part of the `check` task. If dependencies change and license files become outdated, the build will fail with instructions to regenerate them.
+
 # License
 
 Copyright 2025 SonarSource.
