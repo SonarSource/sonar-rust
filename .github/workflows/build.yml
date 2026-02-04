@@ -308,6 +308,25 @@ jobs:
           name: e2e-test-reports-linux-arm64
           path: e2e/build/reports/tests/**
 
+  notify_slack:
+    needs: [build, e2e, e2e_win, e2e_linux_arm64]
+    if: >-
+      !cancelled() && failure() &&
+      (github.ref_name == 'master' ||
+      startsWith(github.ref_name, 'branch-') ||
+      startsWith(github.ref_name, 'dogfood-'))
+    permissions:
+      id-token: write
+    runs-on: github-ubuntu-latest-s
+    steps:
+      # https://github.com/SonarSource/release-github-actions/tree/master/notify-slack
+      - uses: SonarSource/release-github-actions/notify-slack@v1
+        with:
+          project-name: "Sonar-Rust"
+          icon: ":cyber-radish:"
+          slack-channel: "squad-rad"
+          jobs: ${{ toJSON(needs) }}
+
   promote:
     needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64]
     if: |
