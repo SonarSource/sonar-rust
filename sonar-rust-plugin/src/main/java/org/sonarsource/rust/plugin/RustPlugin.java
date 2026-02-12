@@ -49,7 +49,7 @@ public class RustPlugin implements Plugin {
       RustSensor.class
     );
 
-    ////////////////////////// ANALYSIS SCOPE //////////////////////////
+    // -------------------- ANALYSIS SCOPE --------------------
 
     // Rust file suffixes
     context.addExtension(
@@ -76,7 +76,7 @@ public class RustPlugin implements Plugin {
         .multiValues(true)
         .build());
 
-    ////////////////////////// CLIPPY //////////////////////////
+    // -------------------- CLIPPY --------------------
 
     // Clippy report paths
     context.addExtension(
@@ -114,7 +114,7 @@ public class RustPlugin implements Plugin {
         .defaultValue("false")
         .build());
 
-    ////////////////////////// COVERAGE //////////////////////////
+    // -------------------- COVERAGE --------------------
 
     // LCOV report paths
     context.addExtension(
