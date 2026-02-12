@@ -14,8 +14,8 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
-const fs = require('fs');
-const path = require('path');
+const fs = require('node:fs');
+const path = require('node:path');
 const { Command } = require('commander');
 const Parser = require('tree-sitter');
 const Rust = require('tree-sitter-rust');
