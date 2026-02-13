@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: github-ubuntu-latest-s
+    runs-on: github-ubuntu-latest-m
     name: Build for Shadow Scan
     permissions:
       id-token: write
@@ -20,89 +20,42 @@ jobs:
       - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
         with:
           version: 2025.7.12
+      - name: Setup Rust toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install rustup musl-tools
+          sudo apt-get clean
+
+          # Setup Rust toolchain (default target only)
+          rustup default ${{ env.RUST_VERSION }}
+          rustup component add llvm-tools rustfmt clippy
+          rustup target add x86_64-unknown-linux-musl
+          cargo install cargo-llvm-cov cargo-about
       - uses: SonarSource/ci-github-actions/build-gradle@v1
         with:
-          gradle-args: "--info --stacktrace"
-
-  sonar_shadow_scan_sqc_eu:
-    needs: [build]
-    runs-on: sonar-xs
-    name: SonarCloud EU Shadow Scan
-    permissions:
-      id-token: write
-      contents: write
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
-        with:
-          version: 2025.7.12
-      - name: Vault
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/kv/data/sonarcloud token | SONAR_TOKEN;
-      - name: SonarCloud Shadow Scan
-        env:
-          SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
-          PROJECT_KEY: "SonarSource_sonar-rust"
-          SONAR_HOST_URL: "https://sonarcloud.io"
-        run: |
-          source .cirrus/shadow-scan.sh
-
-  sonar_shadow_scan_sqc_us:
-    needs: [build]
-    runs-on: sonar-xs
-    name: SonarQube US Shadow Scan
-    permissions:
-      id-token: write
-      contents: write
-    steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
-        with:
-          version: 2025.7.12
-      - name: Vault
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/kv/data/sonarqube-us token | SONAR_TOKEN;
-      - name: SonarQube US Shadow Scan
-        env:
-          SONAR_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_TOKEN }}
-          PROJECT_KEY: "SonarSource_sonar-rust"
-          SONAR_HOST_URL: "https://sonarqube.us"
-        run: |
-          source .cirrus/shadow-scan.sh
+          deploy: false
+          deploy-pull-request: false
+          run-shadow-scans: true
+          gradle-args: "-PskipCrossCompile --info --stacktrace"
 
   run_iris:
-    needs: [sonar_shadow_scan_sqc_eu, sonar_shadow_scan_sqc_us]
+    needs: [ build ]
+    if: ${{ !cancelled() && needs.build.result == 'success' }}
+    concurrency:
+      group: iris-${{ github.ref }}
+      cancel-in-progress: false
     runs-on: sonar-xs
     name: Run IRIS
     permissions:
       id-token: write
       contents: write
     steps:
-      - uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
-      - uses: jdx/mise-action@5ac50f778e26fac95da98d50503682459e86d566 # v3.2.0
+      - name: Run IRIS Analysis
+        uses: SonarSource/unified-dogfooding-actions/run-iris@v1
         with:
-          version: 2025.7.12
-      - name: Vault
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/kv/data/iris sqc-eu | SONAR_IRIS_SQC_EU_TOKEN;
-            development/kv/data/iris sqc-us | SONAR_IRIS_SQC_US_TOKEN;
-            development/kv/data/iris next | SONAR_IRIS_NEXT_TOKEN;
-      - name: Run IRIS
-        env:
-          SONAR_SQC_EU_URL: "https://sonarcloud.io"
-          SONAR_IRIS_SQC_EU_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_SQC_EU_TOKEN }}
-          SONAR_SQC_US_URL: "https://sonarqube.us"
-          SONAR_IRIS_SQC_US_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_SQC_US_TOKEN }}
-          SONAR_NEXT_URL: "https://next.sonarqube.com/sonarqube"
-          SONAR_IRIS_NEXT_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).SONAR_IRIS_NEXT_TOKEN }}
-        run: |
-          source .cirrus/run-iris.sh
+          primary_project_key: "SonarSource_sonar-rust"
+          primary_platform: "Next" # Platform of the primary platform (Next, SQC-EU, SQC-US)
+          shadow1_project_key: "SonarSource_sonar-rust"
+          shadow1_platform: "SQC-EU" # Platform of the first shadow platform (Next, SQC-EU, SQC-US)
+          shadow2_project_key: "SonarSource_sonar-rust"
+          shadow2_platform: "SQC-US" # Platform of the second shadow platform (Next, SQC-EU, SQC-US)
