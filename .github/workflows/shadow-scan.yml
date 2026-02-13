@@ -31,12 +31,23 @@ jobs:
           rustup component add llvm-tools rustfmt clippy
           rustup target add x86_64-unknown-linux-musl
           cargo install cargo-llvm-cov cargo-about
-      - uses: SonarSource/ci-github-actions/build-gradle@v1
+      # artificially runs shadow scans on both SQC platforms rather than using the "run-shadow-scans" option, since it fails with OutOfMemory errors
+      - name: SQC-US Scan
+        uses: SonarSource/ci-github-actions/build-gradle@v1
         with:
           deploy: false
           deploy-pull-request: false
-          run-shadow-scans: true
-          gradle-args: "-PskipCrossCompile --info --stacktrace"
+          run-shadow-scans: false
+          sonar-platform: "sqc-us"
+          gradle-args: "-PskipCrossCompile --info --stacktrace  --no-daemon"
+      - name: SQC-EU Scan
+        uses: SonarSource/ci-github-actions/build-gradle@v1
+        with:
+          deploy: false
+          deploy-pull-request: false
+          run-shadow-scans: false
+          sonar-platform: "sqc-eu"
+          gradle-args: "-PskipCrossCompile --info --stacktrace  --no-daemon"
 
   run_iris:
     needs: [ build ]
