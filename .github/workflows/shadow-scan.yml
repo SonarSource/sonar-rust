@@ -45,7 +45,7 @@ jobs:
     concurrency:
       group: iris-${{ github.ref }}
       cancel-in-progress: false
-    runs-on: sonar-xs
+    runs-on: github-ubuntu-latest-s
     name: Run IRIS
     permissions:
       id-token: write
