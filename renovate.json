@@ -49,6 +49,20 @@
     },
     {
       "matchManagers": [
+        "cargo",
+        "npm"
+      ],
+      "matchPackageNames": [
+        "tree-sitter",
+        "tree-sitter-rust"
+      ],
+      "groupName": "all tree-sitter dependencies",
+      "groupSlug": "all-tree-sitter",
+      "separateMajorMinor": false,
+      "separateMinorPatch": false
+    },
+    {
+      "matchManagers": [
         "mise"
       ],
       "matchDepNames": [
