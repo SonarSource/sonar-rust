@@ -36,7 +36,7 @@ dependencies {
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
   testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
-  testImplementation(platform("org.junit:junit-bom:5.14.3"))
+  testImplementation(platform("org.junit:junit-bom:6.0.3"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.27.7")
   testImplementation("org.mockito:mockito-core:5.22.0")
