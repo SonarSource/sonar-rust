@@ -6,7 +6,7 @@ plugins {
   id("jacoco")
   `maven-publish`
   signing
-  id("com.diffplug.spotless") version "7.2.1"
+  id("com.diffplug.spotless") version "8.2.1"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
   id("com.gradleup.shadow") version "8.3.10"
