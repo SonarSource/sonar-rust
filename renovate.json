@@ -48,6 +48,15 @@
       "groupSlug": "all-npm-minor-patch"
     },
     {
+      "matchManagers": [
+        "mise"
+      ],
+      "matchDepNames": [
+        "java"
+      ],
+      "allowedVersions": "/^21(\\.|$)/"
+    },
+    {
       "matchPackageNames": [
         "/sonar-plugin-api/",
         "/org.sonarsource.sonarqube.*/"
