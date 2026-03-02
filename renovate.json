@@ -18,9 +18,6 @@
       "matchManagers": [
         "gradle"
       ],
-      "matchPackageNames": [
-        "*"
-      ],
       "matchUpdateTypes": [
         "minor",
         "patch"
@@ -32,9 +29,6 @@
       "matchManagers": [
         "cargo"
       ],
-      "matchPackageNames": [
-        "*"
-      ],
       "matchUpdateTypes": [
         "minor",
         "patch"
@@ -45,9 +39,6 @@
     {
       "matchManagers": [
         "npm"
-      ],
-      "matchPackageNames": [
-        "*"
       ],
       "matchUpdateTypes": [
         "minor",
@@ -76,6 +67,7 @@
       "matchManagers": [
         "github-actions"
       ],
+      "rollbackPrs": false,
       "matchPackageNames": [
         "SonarSource/*",
         "sonarsource/*"
@@ -88,20 +80,13 @@
       "matchManagers": [
         "github-actions"
       ],
+      "rollbackPrs": false,
       "matchPackageNames": [
         "!SonarSource/*",
         "!sonarsource/*"
       ],
-      "pinDigests": true,
       "groupName": "all third-party GitHub Actions",
       "groupSlug": "all-3rd-party-github-actions"
-    },
-    {
-      "matchDepTypes": [
-        "action"
-      ],
-      "rollbackPrs": false,
-      "pinDigests": false
     }
   ]
 }
