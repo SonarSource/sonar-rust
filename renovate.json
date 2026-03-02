@@ -1,0 +1,107 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "local>SonarSource/renovate-config"
+  ],
+  "enabledManagers": [
+    "github-actions",
+    "gradle",
+    "cargo",
+    "npm",
+    "mise"
+  ],
+  "ignorePaths": [
+    "e2e/src/test/resources/**"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": [
+        "gradle"
+      ],
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all Gradle non-major dependencies",
+      "groupSlug": "all-gradle-minor-patch"
+    },
+    {
+      "matchManagers": [
+        "cargo"
+      ],
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all Rust non-major dependencies",
+      "groupSlug": "all-rust-minor-patch"
+    },
+    {
+      "matchManagers": [
+        "npm"
+      ],
+      "matchPackageNames": [
+        "*"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "groupName": "all npm non-major dependencies",
+      "groupSlug": "all-npm-minor-patch"
+    },
+    {
+      "matchPackageNames": [
+        "/sonar-plugin-api/",
+        "/org.sonarsource.sonarqube.*/"
+      ],
+      "groupName": "sonarqube",
+      "groupSlug": "sq"
+    },
+    {
+      "matchPackageNames": [
+        "org.sonarsource.parent:parent",
+        "com.sonarsource.parent:parent"
+      ],
+      "groupName": "parent",
+      "groupSlug": "parent"
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "SonarSource/*",
+        "sonarsource/*"
+      ],
+      "pinDigests": false,
+      "groupName": "all Sonar GitHub Actions",
+      "groupSlug": "all-sonar-github-actions"
+    },
+    {
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "!SonarSource/*",
+        "!sonarsource/*"
+      ],
+      "pinDigests": true,
+      "groupName": "all third-party GitHub Actions",
+      "groupSlug": "all-3rd-party-github-actions"
+    },
+    {
+      "matchDepTypes": [
+        "action"
+      ],
+      "rollbackPrs": false,
+      "pinDigests": false
+    }
+  ]
+}
