@@ -6,10 +6,10 @@ plugins {
   id("jacoco")
   `maven-publish`
   signing
-  id("com.diffplug.spotless") version "7.0.2"
+  id("com.diffplug.spotless") version "7.2.1"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
-  id("com.gradleup.shadow") version "8.3.5"
+  id("com.gradleup.shadow") version "8.3.10"
   id("license-file-generator")
 }
 
@@ -25,27 +25,27 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 
 val sonarApiVersion = "13.2.0.3137"
 val sonarApiImplVersion = "25.11.0.114957"
-val analyzerCommonsVersion = "2.17.0.3322"
+val analyzerCommonsVersion = "2.21.0.4626"
 
 dependencies {
-  implementation("com.google.code.gson:gson:2.13.1")
+  implementation("com.google.code.gson:gson:2.13.2")
   implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:$analyzerCommonsVersion")
   implementation("org.sonarsource.analyzer-commons:sonar-xml-parsing:$analyzerCommonsVersion")
-  implementation("org.tukaani:xz:1.10")
+  implementation("org.tukaani:xz:1.12")
   compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
   testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
-  testImplementation(platform("org.junit:junit-bom:5.12.2"))
+  testImplementation(platform("org.junit:junit-bom:5.14.3"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.27.7")
-  testImplementation("org.mockito:mockito-core:5.18.0")
-  testImplementation("org.awaitility:awaitility:4.2.0")
+  testImplementation("org.mockito:mockito-core:5.22.0")
+  testImplementation("org.awaitility:awaitility:4.3.0")
   testRuntimeOnly("org.junit.platform:junit-platform-launcher")
   
   // Force specific versions of transitive dependencies
   constraints {
-    implementation("ch.qos.logback:logback-classic:1.5.18") {
+    implementation("ch.qos.logback:logback-classic:1.5.32") {
       because("CVE-2023-6378 - Deserialization of Untrusted Data")
     }
   }
