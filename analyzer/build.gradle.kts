@@ -24,7 +24,7 @@ buildscript {
   }
 
   dependencies {
-    classpath("org.tukaani:xz:1.10")
+    classpath("org.tukaani:xz:1.12")
   }
 }
 

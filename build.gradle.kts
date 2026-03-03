@@ -1,8 +1,8 @@
 import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
 plugins {
-  id("org.sonarqube") version "6.0.1.5171"
-  id("com.jfrog.artifactory") version "5.2.5"
+  id("org.sonarqube") version "7.2.2.6593"
+  id("com.jfrog.artifactory") version "6.0.4"
 }
 
 // Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
