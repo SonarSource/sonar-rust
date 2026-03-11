@@ -1,0 +1,40 @@
+/*
+ * SonarQube Rust Plugin
+ * Copyright (C) 2025-2026 SonarSource Sàrl
+ * mailto:info AT sonarsource DOT com
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the Sonar Source-Available License Version 1, as published by SonarSource Sàrl.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ * See the Sonar Source-Available License for more details.
+ *
+ * You should have received a copy of the Sonar Source-Available License
+ * along with this program; if not, see https://sonarsource.com/license/ssal/
+ */
+package org.sonarsource.rust.plugin;
+
+import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
+import org.sonarsource.analyzer.commons.BuiltInQualityProfileJsonLoader;
+
+/**
+ * Agent Quality Profile - Built-in profile focused on security, reliability, and code complexity
+ *
+ * This profile activates rules that help maintain code quality for AI agents by focusing on:
+ * - Security vulnerabilities and security hotspots
+ * - Reliability issues (bugs)
+ * - Code complexity metrics (cognitive complexity, cyclomatic complexity, etc.)
+ */
+public class RustAgentQualityProfile implements BuiltInQualityProfilesDefinition {
+
+  private static final String AGENT_PROFILE_PATH = "/org/sonar/l10n/rust/rules/rust/Agent_quality_profile.json";
+
+  @Override
+  public void define(Context context) {
+    var builtInQualityProfile = context.createBuiltInQualityProfile("Agent Quality Profile", RustLanguage.KEY);
+    BuiltInQualityProfileJsonLoader.load(builtInQualityProfile, RustLanguage.KEY, AGENT_PROFILE_PATH);
+    builtInQualityProfile.done();
+  }
+}

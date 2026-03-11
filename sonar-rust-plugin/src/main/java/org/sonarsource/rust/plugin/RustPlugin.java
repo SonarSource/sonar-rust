@@ -45,6 +45,7 @@ public class RustPlugin implements Plugin {
       LcovSensor.class,
       RustLanguage.class,
       RustProfile.class,
+      RustAgentQualityProfile.class,
       RustRulesDefinition.class,
       RustSensor.class
     );
