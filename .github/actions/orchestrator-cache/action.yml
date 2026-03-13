@@ -1,0 +1,26 @@
+name: Setup Orchestrator Cache
+description: Setup rolling orchestrator cache with monthly restore keys
+
+inputs:
+  key-prefix:
+    description: Prefix for the cache key
+    required: false
+    default: orchestrator
+
+runs:
+  using: composite
+  steps:
+    - name: Set orchestrator cache variables
+      # We need to specify bash so it works on both Windows and Linux runners.
+      shell: bash
+      run: |
+        echo "ORCHESTRATOR_CACHE_MONTH=$(date +'%Y-%m')" >> "$GITHUB_ENV"
+        echo "ORCHESTRATOR_HOME=${{ github.workspace }}/orchestrator" >> "$GITHUB_ENV"
+        mkdir -p "${{ github.workspace }}/orchestrator"
+
+    - name: Restore and save orchestrator cache
+      uses: SonarSource/gh-action_cache@v1
+      with:
+        path: ${{ env.ORCHESTRATOR_HOME }}
+        key: ${{ inputs.key-prefix }}-${{ env.ORCHESTRATOR_CACHE_MONTH }}-${{ github.run_id }}
+        restore-keys: ${{ inputs.key-prefix }}-${{ env.ORCHESTRATOR_CACHE_MONTH }}-
