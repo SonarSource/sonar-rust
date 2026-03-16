@@ -216,4 +216,55 @@ class ClippyReportSensorTest {
 
     Files.delete(tempFile);
   }
+
+  @Test
+  void testSaveIssueWithWorkspaceRelativeDiagnostic() throws IOException {
+    var manifestPath = baseDir.resolve("workspace/crates/core/Cargo.toml");
+    var json = """
+      {"manifest_path": "%s",
+       "message": {
+        "code": {
+          "code": "clippy::approx_constant"
+        },
+        "message": "approximate value of `f{32, 64}::consts::PI` found",
+        "spans": [
+          {
+            "file_name": "crates/core/src/main.rs",
+            "column_end": 17,
+            "column_start": 13,
+            "line_end": 2,
+            "line_start": 2
+          }
+        ]
+      }}
+      """.formatted(manifestPath.toString()).replaceAll(System.lineSeparator(), "");
+    var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
+    Files.writeString(tempFile, json);
+
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+
+    var sourceCode = """
+      fn main() {
+          let x = 3.14;
+      }
+      """;
+    context.fileSystem().add(
+      new TestInputFileBuilder("moduleKey", "workspace/crates/core/src/main.rs")
+        .setLanguage(RustLanguage.KEY)
+        .setContents(sourceCode)
+        .build());
+
+    var sensor = new ClippyReportSensor();
+    sensor.execute(context);
+
+    var issues = context.allExternalIssues();
+    assertThat(issues).hasSize(1);
+
+    var issue = issues.iterator().next();
+    assertThat(issue.ruleId()).isEqualTo("approx_constant");
+    assertThat(issue.primaryLocation().message()).isEqualTo("approximate value of `f{32, 64}::consts::PI` found");
+
+    Files.delete(tempFile);
+  }
 }

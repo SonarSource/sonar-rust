@@ -22,9 +22,11 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
+import org.sonar.api.batch.fs.InputFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonar.api.batch.sensor.SensorContext;
@@ -77,24 +79,14 @@ class ClippyUtils {
       && diagnostic.message().code().code().startsWith("clippy");
   }
 
-  static NewIssueLocation diagnosticToLocation(NewIssueLocation location, ClippyDiagnostic diagnostic, SensorContext context, Path workDir) {
+  static NewIssueLocation diagnosticToLocation(NewIssueLocation location, ClippyDiagnostic diagnostic, SensorContext context) {
     var spans = diagnostic.message().spans();
     if (spans.isEmpty()) {
       throw new IllegalStateException("Empty spans");
     }
 
     var span = spans.get(0);
-    var fileName = span.file_name();
-
-    // Clippy diagnostics are relative to the Cargo manifest directory, which might not be the same as the SonarQube project base directory.
-    // Therefore, we need to adjust the file path to make it relative to the SonarQube project base directory using the working directory.
-    var baseDir = context.fileSystem().baseDir().toPath();
-    if (!baseDir.equals(workDir)) {
-      fileName = workDir.resolve(fileName).toString();
-    }
-
-    var predicates = context.fileSystem().predicates().hasPath(fileName);
-    var inputFile = context.fileSystem().inputFile(predicates);
+    var inputFile = resolveInputFile(diagnostic, context);
     if (inputFile == null) {
       return null;
     }
@@ -104,5 +96,70 @@ class ClippyUtils {
       .at(inputFile.newRange(span.line_start(), span.column_start() - 1, span.line_end(), span.column_end() - 1));
 
     return location;
+  }
+
+  @Nullable
+  static InputFile resolveInputFile(ClippyDiagnostic diagnostic, SensorContext context) {
+    var spans = diagnostic.message().spans();
+    if (spans.isEmpty()) {
+      throw new IllegalStateException("Empty spans");
+    }
+
+    for (var candidate : candidatePaths(diagnostic, context)) {
+      var predicates = context.fileSystem().predicates().hasPath(candidate.toString());
+      var inputFile = context.fileSystem().inputFile(predicates);
+      if (inputFile != null) {
+        return inputFile;
+      }
+    }
+
+    return null;
+  }
+
+  private static List<Path> candidatePaths(ClippyDiagnostic diagnostic, SensorContext context) {
+    var spanPath = Path.of(diagnostic.message().spans().get(0).file_name()).normalize();
+    var candidates = new ArrayList<Path>();
+    addCandidate(candidates, spanPath);
+
+    if (spanPath.isAbsolute()) {
+      return candidates;
+    }
+
+    var baseDir = context.fileSystem().baseDir().toPath().toAbsolutePath().normalize();
+    var manifestPath = Path.of(diagnostic.manifest_path());
+    if (!manifestPath.isAbsolute()) {
+      manifestPath = baseDir.resolve(manifestPath);
+    }
+    manifestPath = manifestPath.normalize();
+
+    var manifestDir = manifestPath.getFileName() != null && "Cargo.toml".equals(manifestPath.getFileName().toString())
+      ? manifestPath.getParent()
+      : manifestPath;
+    if (manifestDir == null) {
+      return candidates;
+    }
+
+    if (!manifestDir.startsWith(baseDir)) {
+      addCandidate(candidates, manifestDir.resolve(spanPath).normalize());
+      return candidates;
+    }
+
+    // Try the crate directory first, then each parent up to the analysis base directory.
+    var currentDir = manifestDir;
+    while (currentDir != null) {
+      addCandidate(candidates, currentDir.resolve(spanPath).normalize());
+      if (currentDir.equals(baseDir)) {
+        break;
+      }
+      currentDir = currentDir.getParent();
+    }
+
+    return candidates;
+  }
+
+  private static void addCandidate(List<Path> candidates, Path candidate) {
+    if (!candidates.contains(candidate)) {
+      candidates.add(candidate);
+    }
   }
 }
