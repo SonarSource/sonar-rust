@@ -145,7 +145,7 @@ class ClippyUtilsTest {
     var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
 
     assertThat(inputFile).isNotNull();
-    assertThat(inputFile.relativePath()).isEqualTo("subproj/src/main.rs");
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
   }
 
   @Test
@@ -159,7 +159,7 @@ class ClippyUtilsTest {
     var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
 
     assertThat(inputFile).isNotNull();
-    assertThat(inputFile.relativePath()).isEqualTo("workspace/crates/core/src/main.rs");
+    assertThat(inputFile.uri().getPath()).endsWith("/workspace/crates/core/src/main.rs");
   }
 
   @Test
@@ -174,7 +174,7 @@ class ClippyUtilsTest {
     var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
 
     assertThat(inputFile).isNotNull();
-    assertThat(inputFile.relativePath()).isEqualTo("subproj/src/main.rs");
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
   }
 
   private static InputFile inputFile(Path baseDir, String relativePath, String contents) {
