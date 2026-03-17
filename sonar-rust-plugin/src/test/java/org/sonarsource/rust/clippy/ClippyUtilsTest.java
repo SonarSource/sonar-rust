@@ -149,12 +149,40 @@ class ClippyUtilsTest {
   }
 
   @Test
+  void resolveInputFileWithAbsoluteSpanPath() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "subproj/src/main.rs", "fn main() {}\n"));
+
+    var diagnostic = diagnostic(baseDir.resolve("subproj/Cargo.toml"), baseDir.resolve("subproj/src/main.rs").toString());
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
+  }
+
+  @Test
   void resolveInputFileRelativeToWorkspaceRootAncestor() throws IOException {
     var baseDir = Files.createDirectories(temp.resolve("project"));
     var context = SensorContextTester.create(baseDir);
     context.fileSystem().add(inputFile(baseDir, "workspace/crates/core/src/main.rs", "fn main() {}\n"));
 
     var diagnostic = diagnostic(baseDir.resolve("workspace/crates/core/Cargo.toml"), "crates/core/src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/workspace/crates/core/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFileWithRelativeManifestPath() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "workspace/crates/core/src/main.rs", "fn main() {}\n"));
+
+    var diagnostic = diagnostic("workspace/crates/core/Cargo.toml", "crates/core/src/main.rs");
 
     var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
 
@@ -186,8 +214,12 @@ class ClippyUtilsTest {
   }
 
   private static ClippyDiagnostic diagnostic(Path manifestPath, String fileName) {
+    return diagnostic(manifestPath.toString(), fileName);
+  }
+
+  private static ClippyDiagnostic diagnostic(String manifestPath, String fileName) {
     return new ClippyDiagnostic(
-      manifestPath.toString(),
+      manifestPath,
       new ClippyMessage(
         new ClippyCode("clippy::some_lint"),
         "message",

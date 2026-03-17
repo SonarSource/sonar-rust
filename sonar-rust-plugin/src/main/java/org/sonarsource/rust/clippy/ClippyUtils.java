@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Stream;
 import javax.annotation.Nullable;
@@ -118,11 +119,11 @@ class ClippyUtils {
 
   private static List<Path> candidatePaths(ClippyDiagnostic diagnostic, SensorContext context) {
     var spanPath = Path.of(diagnostic.message().spans().get(0).file_name()).normalize();
-    var candidates = new ArrayList<Path>();
-    addCandidate(candidates, spanPath);
+    var candidates = new LinkedHashSet<Path>();
+    candidates.add(spanPath);
 
     if (spanPath.isAbsolute()) {
-      return candidates;
+      return new ArrayList<>(candidates);
     }
 
     var baseDir = context.fileSystem().baseDir().toPath().toAbsolutePath().normalize();
@@ -132,32 +133,23 @@ class ClippyUtils {
     }
     manifestPath = manifestPath.normalize();
 
-    var manifestDir = manifestPath.getFileName() != null && "Cargo.toml".equals(manifestPath.getFileName().toString())
+    var manifestDir = manifestPath.endsWith("Cargo.toml")
       ? manifestPath.getParent()
       : manifestPath;
-    if (manifestDir == null) {
-      return candidates;
-    }
 
     if (!manifestDir.startsWith(baseDir)) {
-      addCandidate(candidates, manifestDir.resolve(spanPath).normalize());
-      return candidates;
+      candidates.add(manifestDir.resolve(spanPath).normalize());
+      return new ArrayList<>(candidates);
     }
 
     // Try the crate directory first, then each parent up to the analysis base directory.
     for (var currentDir = manifestDir; ; currentDir = currentDir.getParent()) {
-      addCandidate(candidates, currentDir.resolve(spanPath).normalize());
+      candidates.add(currentDir.resolve(spanPath).normalize());
       if (currentDir.equals(baseDir)) {
         break;
       }
     }
 
-    return candidates;
-  }
-
-  private static void addCandidate(List<Path> candidates, Path candidate) {
-    if (!candidates.contains(candidate)) {
-      candidates.add(candidate);
-    }
+    return new ArrayList<>(candidates);
   }
 }
