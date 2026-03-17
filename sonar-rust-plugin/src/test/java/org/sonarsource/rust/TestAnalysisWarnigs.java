@@ -26,6 +26,8 @@ public class TestAnalysisWarnigs implements AnalysisWarnings {
 
   @Override
   public void addUnique(String text) {
-    warnings.add(text);
+    if (!warnings.contains(text)) {
+      warnings.add(text);
+    }
   }
 }

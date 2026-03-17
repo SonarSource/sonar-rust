@@ -16,6 +16,8 @@
  */
 package org.sonarsource.rust.clippy;
 
+import org.sonarsource.rust.TestAnalysisWarnigs;
+import org.sonarsource.rust.plugin.AnalysisWarningsWrapper;
 import org.sonarsource.rust.plugin.RustLanguage;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -33,6 +35,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class ClippyReportSensorTest {
 
+  private static final String MISSING_REPORT_WARNING = "No Clippy report files found. Check sonar.rust.clippyReport.reportPaths.";
+  private static final String INVALID_REPORT_WARNING = "At least one Clippy report could not be read or parsed. See logs for details.";
+  private static final String UNKNOWN_FILE_WARNING = "Some Clippy diagnostics refer to files that are not part of the analyzed project.";
+  private static final String GENERIC_IMPORT_WARNING = "Some Clippy diagnostics could not be imported; see logs for details.";
+
   @RegisterExtension
   final LogTesterJUnit5 logTester = new LogTesterJUnit5().setLevel(Level.WARN);
 
@@ -41,7 +48,7 @@ class ClippyReportSensorTest {
 
   @Test
   void testDescribe() {
-    var sensor = new ClippyReportSensor();
+    var sensor = new ClippyReportSensor(new AnalysisWarningsWrapper());
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 
@@ -52,11 +59,14 @@ class ClippyReportSensorTest {
 
   @Test
   void testExecuteWithNoReportsFound() {
+    var warnings = new TestAnalysisWarnigs();
     var context = SensorContextTester.create(baseDir);
-    var sensor = new ClippyReportSensor();
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, "missing-report.json");
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("No Clippy report files found");
+    assertThat(warnings.warnings).containsExactly(MISSING_REPORT_WARNING);
   }
 
   @Test
@@ -64,22 +74,25 @@ class ClippyReportSensorTest {
     var json = """
       {"message": {
       """;
+    var warnings = new TestAnalysisWarnigs();
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
     Files.writeString(tempFile, json);
 
     var context = SensorContextTester.create(baseDir);
     context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to parse Clippy report");
+    assertThat(warnings.warnings).containsExactly(INVALID_REPORT_WARNING);
 
     Files.delete(tempFile);
   }
 
   @Test
   void testSaveIssueWithDiagnosticEmptySpans() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
     var json = """
       {"manifest_path": "/dir/Cargo.toml",
        "message": {
@@ -95,16 +108,18 @@ class ClippyReportSensorTest {
     var context = SensorContextTester.create(baseDir);
     context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Clippy diagnostic 'clippy::approx_constant' has no location spans");
+    assertThat(warnings.warnings).containsExactly(GENERIC_IMPORT_WARNING);
 
     Files.delete(tempFile);
   }
 
   @Test
   void testSaveIssueWithUnknownFile() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
     var json = """
       {"manifest_path": "/dir/Cargo.toml",
        "message": {
@@ -124,16 +139,18 @@ class ClippyReportSensorTest {
     var context = SensorContextTester.create(baseDir);
     context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Unknown file: src/main.rs");
+    assertThat(warnings.warnings).containsExactly(UNKNOWN_FILE_WARNING);
 
     Files.delete(tempFile);
   }
 
   @Test
   void testSaveIssueWithUnknownRule() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
     var json = """
       {"manifest_path": "/dir/Cargo.toml",
        "message": {
@@ -154,16 +171,93 @@ class ClippyReportSensorTest {
     context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
     context.fileSystem().add(new TestInputFileBuilder("moduleKey", "src/main.rs").build());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Unknown rule: unknown_rule");
+    assertThat(warnings.warnings).isEmpty();
+
+    Files.delete(tempFile);
+  }
+
+  @Test
+  void testSaveIssueWithInvalidManifestPath() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
+    var json = """
+      {"manifest_path": "\\u0000",
+       "message": {
+        "code": {
+          "code": "clippy::approx_constant"
+        },
+        "spans": [
+          {
+            "file_name": "src/main.rs"
+          }
+        ]
+      }}
+      """.replaceAll(System.lineSeparator(), "");
+    var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
+    Files.writeString(tempFile, json);
+
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+
+    var sensor = sensor(warnings);
+    sensor.execute(context);
+
+    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Invalid manifest path: \u0000");
+    assertThat(warnings.warnings).containsExactly(GENERIC_IMPORT_WARNING);
+
+    Files.delete(tempFile);
+  }
+
+  @Test
+  void testWarningsAreDeduplicatedPerCategory() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
+    var json = String.join(System.lineSeparator(),
+      """
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
+        "code": {
+          "code": "clippy::approx_constant"
+        },
+        "spans": [
+          {
+            "file_name": "src/first.rs"
+          }
+        ]
+      }}
+      """.replaceAll(System.lineSeparator(), ""),
+      """
+      {"manifest_path": "/dir/Cargo.toml",
+       "message": {
+        "code": {
+          "code": "clippy::approx_constant"
+        },
+        "spans": [
+          {
+            "file_name": "src/second.rs"
+          }
+        ]
+      }}
+      """.replaceAll(System.lineSeparator(), ""));
+    var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
+    Files.writeString(tempFile, json);
+
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+
+    var sensor = sensor(warnings);
+    sensor.execute(context);
+
+    assertThat(warnings.warnings).containsExactly(UNKNOWN_FILE_WARNING);
 
     Files.delete(tempFile);
   }
 
   @Test
   void testSaveIssueWithValidDiagnostic() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
     var manifestPath = baseDir.resolve("Cargo.toml");
     var json = """
       {"manifest_path": "%s",
@@ -200,11 +294,12 @@ class ClippyReportSensorTest {
       .setContents(sourceCode)
       .build());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     var issues = context.allExternalIssues();
     assertThat(issues).hasSize(1);
+    assertThat(warnings.warnings).isEmpty();
 
     var issue = issues.iterator().next();
     assertThat(issue.ruleId()).isEqualTo("approx_constant");
@@ -219,6 +314,7 @@ class ClippyReportSensorTest {
 
   @Test
   void testSaveIssueWithWorkspaceRelativeDiagnostic() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
     var manifestPath = baseDir.resolve("workspace/crates/core/Cargo.toml");
     var json = """
       {"manifest_path": "%s",
@@ -255,11 +351,12 @@ class ClippyReportSensorTest {
         .setContents(sourceCode)
         .build());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     var issues = context.allExternalIssues();
     assertThat(issues).hasSize(1);
+    assertThat(warnings.warnings).isEmpty();
 
     var issue = issues.iterator().next();
     assertThat(issue.ruleId()).isEqualTo("approx_constant");
@@ -270,6 +367,7 @@ class ClippyReportSensorTest {
 
   @Test
   void testExecuteContinuesAfterDiagnosticResolutionFailure() throws IOException {
+    var warnings = new TestAnalysisWarnigs();
     var manifestPath = baseDir.resolve("Cargo.toml");
     var json = """
       {"manifest_path":"%s","message":{"code":{"code":"clippy::approx_constant"},"message":"invalid path","spans":[]}}
@@ -292,14 +390,19 @@ class ClippyReportSensorTest {
         .setContents(sourceCode)
         .build());
 
-    var sensor = new ClippyReportSensor();
+    var sensor = sensor(warnings);
     sensor.execute(context);
 
     assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Clippy diagnostic 'clippy::approx_constant' has no location spans");
+    assertThat(warnings.warnings).containsExactly(GENERIC_IMPORT_WARNING);
     var issues = context.allExternalIssues();
     assertThat(issues).hasSize(1);
     assertThat(issues.iterator().next().primaryLocation().message()).isEqualTo("approximate value of `f{32, 64}::consts::PI` found");
 
     Files.delete(tempFile);
+  }
+
+  private static ClippyReportSensor sensor(TestAnalysisWarnigs warnings) {
+    return new ClippyReportSensor(new AnalysisWarningsWrapper(warnings));
   }
 }
