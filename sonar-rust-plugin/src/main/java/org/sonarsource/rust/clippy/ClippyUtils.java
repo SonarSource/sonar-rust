@@ -81,12 +81,7 @@ class ClippyUtils {
   }
 
   static NewIssueLocation diagnosticToLocation(NewIssueLocation location, ClippyDiagnostic diagnostic, SensorContext context) {
-    var spans = diagnostic.message().spans();
-    if (spans.isEmpty()) {
-      throw new IllegalStateException("Empty spans");
-    }
-
-    var span = spans.get(0);
+    var span = firstSpan(diagnostic);
     var inputFile = resolveInputFile(diagnostic, context);
     if (inputFile == null) {
       return null;
@@ -101,10 +96,7 @@ class ClippyUtils {
 
   @Nullable
   static InputFile resolveInputFile(ClippyDiagnostic diagnostic, SensorContext context) {
-    var spans = diagnostic.message().spans();
-    if (spans.isEmpty()) {
-      throw new IllegalStateException("Empty spans");
-    }
+    firstSpan(diagnostic);
 
     for (var candidate : candidatePaths(diagnostic, context)) {
       var predicates = context.fileSystem().predicates().hasPath(candidate.toString());
@@ -118,12 +110,9 @@ class ClippyUtils {
   }
 
   private static List<Path> candidatePaths(ClippyDiagnostic diagnostic, SensorContext context) {
-    var spanPath = Path.of(diagnostic.message().spans().get(0).file_name()).normalize();
-    var candidates = new LinkedHashSet<Path>();
-    candidates.add(spanPath);
-
+    var spanPath = Path.of(firstSpan(diagnostic).file_name()).normalize();
     if (spanPath.isAbsolute()) {
-      return new ArrayList<>(candidates);
+      return List.of(spanPath);
     }
 
     var baseDir = context.fileSystem().baseDir().toPath().toAbsolutePath().normalize();
@@ -137,7 +126,9 @@ class ClippyUtils {
       ? manifestPath.getParent()
       : manifestPath;
 
+    var candidates = new LinkedHashSet<Path>();
     if (!manifestDir.startsWith(baseDir)) {
+      candidates.add(spanPath);
       candidates.add(manifestDir.resolve(spanPath).normalize());
       return new ArrayList<>(candidates);
     }
@@ -151,5 +142,13 @@ class ClippyUtils {
     }
 
     return new ArrayList<>(candidates);
+  }
+
+  private static ClippySpan firstSpan(ClippyDiagnostic diagnostic) {
+    var spans = diagnostic.message().spans();
+    if (spans.isEmpty()) {
+      throw new IllegalStateException("Clippy diagnostic '%s' has no location spans".formatted(diagnostic.lintId()));
+    }
+    return spans.get(0);
   }
 }

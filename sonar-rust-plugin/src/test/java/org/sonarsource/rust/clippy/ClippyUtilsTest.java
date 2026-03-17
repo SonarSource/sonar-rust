@@ -149,6 +149,21 @@ class ClippyUtilsTest {
   }
 
   @Test
+  void resolveInputFilePrefersManifestRelativePathOverRepositoryRelativePath() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "src/main.rs", "fn main() { println!(\"root\"); }\n"));
+    context.fileSystem().add(inputFile(baseDir, "subproj/src/main.rs", "fn main() { println!(\"subproj\"); }\n"));
+
+    var diagnostic = diagnostic(baseDir.resolve("subproj/Cargo.toml"), "src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
+  }
+
+  @Test
   void resolveInputFileWithAbsoluteSpanPath() throws IOException {
     var baseDir = Files.createDirectories(temp.resolve("project"));
     var context = SensorContextTester.create(baseDir);

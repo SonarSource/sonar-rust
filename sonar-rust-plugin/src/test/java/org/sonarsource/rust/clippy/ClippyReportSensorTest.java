@@ -98,7 +98,7 @@ class ClippyReportSensorTest {
     var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
-    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Empty spans");
+    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Clippy diagnostic 'clippy::approx_constant' has no location spans");
 
     Files.delete(tempFile);
   }
@@ -295,7 +295,7 @@ class ClippyReportSensorTest {
     var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
-    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Empty spans");
+    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Clippy diagnostic 'clippy::approx_constant' has no location spans");
     var issues = context.allExternalIssues();
     assertThat(issues).hasSize(1);
     assertThat(issues.iterator().next().primaryLocation().message()).isEqualTo("approximate value of `f{32, 64}::consts::PI` found");
