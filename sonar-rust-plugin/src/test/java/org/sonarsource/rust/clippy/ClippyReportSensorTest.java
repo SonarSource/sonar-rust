@@ -98,7 +98,7 @@ class ClippyReportSensorTest {
     var sensor = new ClippyReportSensor();
     sensor.execute(context);
 
-    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Empty spans");
+    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Clippy diagnostic 'clippy::approx_constant' has no location spans");
 
     Files.delete(tempFile);
   }
@@ -213,6 +213,92 @@ class ClippyReportSensorTest {
     assertThat(issue.primaryLocation().textRange().start().lineOffset()).isEqualTo(12);
     assertThat(issue.primaryLocation().textRange().end().line()).isEqualTo(2);
     assertThat(issue.primaryLocation().textRange().end().lineOffset()).isEqualTo(16);
+
+    Files.delete(tempFile);
+  }
+
+  @Test
+  void testSaveIssueWithWorkspaceRelativeDiagnostic() throws IOException {
+    var manifestPath = baseDir.resolve("workspace/crates/core/Cargo.toml");
+    var json = """
+      {"manifest_path": "%s",
+       "message": {
+        "code": {
+          "code": "clippy::approx_constant"
+        },
+        "message": "approximate value of `f{32, 64}::consts::PI` found",
+        "spans": [
+          {
+            "file_name": "crates/core/src/main.rs",
+            "column_end": 17,
+            "column_start": 13,
+            "line_end": 2,
+            "line_start": 2
+          }
+        ]
+      }}
+      """.formatted(manifestPath.toString()).replaceAll(System.lineSeparator(), "");
+    var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
+    Files.writeString(tempFile, json);
+
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+
+    var sourceCode = """
+      fn main() {
+          let x = 3.14;
+      }
+      """;
+    context.fileSystem().add(
+      new TestInputFileBuilder("moduleKey", "workspace/crates/core/src/main.rs")
+        .setLanguage(RustLanguage.KEY)
+        .setContents(sourceCode)
+        .build());
+
+    var sensor = new ClippyReportSensor();
+    sensor.execute(context);
+
+    var issues = context.allExternalIssues();
+    assertThat(issues).hasSize(1);
+
+    var issue = issues.iterator().next();
+    assertThat(issue.ruleId()).isEqualTo("approx_constant");
+    assertThat(issue.primaryLocation().message()).isEqualTo("approximate value of `f{32, 64}::consts::PI` found");
+
+    Files.delete(tempFile);
+  }
+
+  @Test
+  void testExecuteContinuesAfterDiagnosticResolutionFailure() throws IOException {
+    var manifestPath = baseDir.resolve("Cargo.toml");
+    var json = """
+      {"manifest_path":"%s","message":{"code":{"code":"clippy::approx_constant"},"message":"invalid path","spans":[]}}
+      {"manifest_path":"%s","message":{"code":{"code":"clippy::approx_constant"},"message":"approximate value of `f{32, 64}::consts::PI` found","spans":[{"file_name":"src/main.rs","column_end":17,"column_start":13,"line_end":2,"line_start":2}]}}
+      """.formatted(manifestPath, manifestPath);
+    var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
+    Files.writeString(tempFile, json);
+
+    var context = SensorContextTester.create(baseDir);
+    context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
+
+    var sourceCode = """
+      fn main() {
+          let x = 3.14;
+      }
+      """;
+    context.fileSystem().add(
+      new TestInputFileBuilder("moduleKey", "src/main.rs")
+        .setLanguage(RustLanguage.KEY)
+        .setContents(sourceCode)
+        .build());
+
+    var sensor = new ClippyReportSensor();
+    sensor.execute(context);
+
+    assertThat(logTester.logs()).contains("Failed to save Clippy diagnostic. Clippy diagnostic 'clippy::approx_constant' has no location spans");
+    var issues = context.allExternalIssues();
+    assertThat(issues).hasSize(1);
+    assertThat(issues.iterator().next().primaryLocation().message()).isEqualTo("approximate value of `f{32, 64}::consts::PI` found");
 
     Files.delete(tempFile);
   }
