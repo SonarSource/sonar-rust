@@ -145,13 +145,11 @@ class ClippyUtils {
     }
 
     // Try the crate directory first, then each parent up to the analysis base directory.
-    var currentDir = manifestDir;
-    while (currentDir != null) {
+    for (var currentDir = manifestDir; ; currentDir = currentDir.getParent()) {
       addCandidate(candidates, currentDir.resolve(spanPath).normalize());
       if (currentDir.equals(baseDir)) {
         break;
       }
-      currentDir = currentDir.getParent();
     }
 
     return candidates;
