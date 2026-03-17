@@ -1,43 +1,53 @@
 # Clippy Metadata
 
-The `clippy-metadata` tool parses Clippy lint definitions and generates a JSON file containing metadata for each lint. This metadata includes the lint key and url, and a generic description.
+The `clippy-metadata` tool maintains the checked-in Clippy resources used by the plugin:
 
-## Prerequisites
+- `metadata.json`: the full upstream Clippy lint catalog used by the external rules repository
+- `rules.json`: the curated Sonar subset used for rule-key and message mapping at analysis time
+- `upstream.json`: the last Rust release processed by the updater
 
-- A recent version of Node.js installed.
-- A local copy of the [rust-clippy](https://github.com/rust-lang/rust-clippy) repository.
+The tool is implemented in Python and intentionally has no Node.js dependency.
 
-## Usage
+## Commands
 
-1. Install dependencies:
-    ```sh
-    npm install
-    ```
-
-2. Run the script:
-    ```sh
-    node index.js <path-to-clippy-lints> <output-file>
-    ```
-
-    - `<path-to-clippy-lints>`: Path to the directory containing Clippy lint source files.
-    - `<output-file>`: Path to the output JSON file.
-
-## Example
+Run the tool with:
 
 ```sh
-node index.js /path/to/rust-clippy/clippy_lints/src metadata.json
+python3 tools/clippy-metadata/clippy_metadata.py <command> [options]
 ```
 
-This command will parse the Clippy lint files in the `/path/to/rust-clippy/clippy_lints/src` directory and generate a `metadata.json` file with the lint metadata.
+Available commands:
 
-## How It Works
+- `check-release`: compare the latest Rust GitHub release with the checked-in `upstream.json`
+- `generate-metadata`: parse Clippy lint declarations from a Rust checkout and write `metadata.json`
+- `generate-rules`: regenerate `rules.json` from local Sonar rule specs, curated messages, and rule-key overrides
+- `update`: run the full refresh and update `upstream.json`
 
-Here is how Clippy metadata are extracted and produced:
+## Typical Local Flow
 
-1. Recursively iterates over the Rust files in the folder where the Clippy lint implementations are stored.
-2. Parses each Rust file using Tree-sitter.
-3. Traverses the AST to find invocations of the macro `declare_clippy_lint`, which introduces a new Clippy lint.
-4. Parses the Clippy lint declaration metadata to extract the relevant information:
-    - Clippy rule key
-    - URL to the rule description
-5. Saves the extracted metadata into a JSON file.
+```sh
+python3 tools/clippy-metadata/clippy_metadata.py update \
+  --clippy-source-dir /path/to/rust/src/tools/clippy/clippy_lints/src
+```
+
+This rewrites:
+
+- `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json`
+- `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json`
+- `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json`
+
+## Rule Generation Inputs
+
+`rules.json` is generated from three repo-local sources:
+
+- `messages.json`: the canonical short issue messages keyed by `lintId`
+- `rule-key-overrides.json`: exceptions where the runtime lint id should not be inferred directly from the RSPEC HTML link
+- `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/rust/S*.json` and matching `.html` files
+
+The generator fails if a Clippy-tagged Sonar rule is malformed or if it has no curated message.
+
+## Tests
+
+```sh
+python3 -m unittest discover -s tools/clippy-metadata/tests -p 'test_*.py'
+```
