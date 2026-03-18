@@ -49,7 +49,7 @@ class ClippyReportSensorTest {
 
   @Test
   void testDescribe() {
-    var sensor = new ClippyReportSensor();
+    var sensor = new ClippyReportSensor(new AnalysisWarningsWrapper());
     var descriptor = new DefaultSensorDescriptor();
     sensor.describe(descriptor);
 

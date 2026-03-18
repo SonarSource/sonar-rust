@@ -41,10 +41,6 @@ public class ClippyReportSensor implements Sensor {
 
   private final AnalysisWarningsWrapper analysisWarnings;
 
-  public ClippyReportSensor() {
-    this(new AnalysisWarningsWrapper());
-  }
-
   public ClippyReportSensor(AnalysisWarningsWrapper analysisWarnings) {
     this.analysisWarnings = analysisWarnings;
   }
