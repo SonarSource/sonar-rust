@@ -87,9 +87,13 @@ class ClippyUtils {
       return null;
     }
 
-    location
-      .on(inputFile)
-      .at(inputFile.newRange(span.line_start(), span.column_start() - 1, span.line_end(), span.column_end() - 1));
+    try {
+      location
+        .on(inputFile)
+        .at(inputFile.newRange(span.line_start(), span.column_start() - 1, span.line_end(), span.column_end() - 1));
+    } catch (RuntimeException e) {
+      throw ClippyImportException.invalidDiagnostic("Invalid location for file: " + span.file_name(), e);
+    }
 
     return location;
   }
@@ -110,21 +114,20 @@ class ClippyUtils {
   }
 
   private static List<Path> candidatePaths(ClippyDiagnostic diagnostic, SensorContext context) {
-    var spanPath = Path.of(firstSpan(diagnostic).file_name()).normalize();
+    var spanPath = spanPath(diagnostic);
     if (spanPath.isAbsolute()) {
       return List.of(spanPath);
     }
 
     var baseDir = context.fileSystem().baseDir().toPath().toAbsolutePath().normalize();
-    var manifestPath = Path.of(diagnostic.manifest_path());
-    if (!manifestPath.isAbsolute()) {
-      manifestPath = baseDir.resolve(manifestPath);
-    }
-    manifestPath = manifestPath.normalize();
+    var manifestPath = manifestPath(diagnostic, baseDir);
 
     var manifestDir = manifestPath.endsWith("Cargo.toml")
       ? manifestPath.getParent()
       : manifestPath;
+    if (manifestDir == null) {
+      throw ClippyImportException.invalidDiagnostic("Invalid manifest path: " + diagnostic.manifest_path());
+    }
 
     var candidates = new LinkedHashSet<Path>();
     if (!manifestDir.startsWith(baseDir)) {
@@ -144,10 +147,35 @@ class ClippyUtils {
     return new ArrayList<>(candidates);
   }
 
+  private static Path spanPath(ClippyDiagnostic diagnostic) {
+    var fileName = firstSpan(diagnostic).file_name();
+    if (fileName == null || fileName.isBlank()) {
+      throw ClippyImportException.invalidDiagnostic("Clippy diagnostic '%s' has no file path".formatted(diagnostic.lintId()));
+    }
+
+    try {
+      return Path.of(fileName).normalize();
+    } catch (RuntimeException e) {
+      throw ClippyImportException.invalidDiagnostic("Invalid file path: " + fileName, e);
+    }
+  }
+
+  private static Path manifestPath(ClippyDiagnostic diagnostic, Path baseDir) {
+    try {
+      var manifestPath = Path.of(diagnostic.manifest_path());
+      if (!manifestPath.isAbsolute()) {
+        manifestPath = baseDir.resolve(manifestPath);
+      }
+      return manifestPath.normalize();
+    } catch (RuntimeException e) {
+      throw ClippyImportException.invalidDiagnostic("Invalid manifest path: " + diagnostic.manifest_path(), e);
+    }
+  }
+
   private static ClippySpan firstSpan(ClippyDiagnostic diagnostic) {
     var spans = diagnostic.message().spans();
-    if (spans.isEmpty()) {
-      throw new IllegalStateException("Clippy diagnostic '%s' has no location spans".formatted(diagnostic.lintId()));
+    if (spans == null || spans.isEmpty()) {
+      throw ClippyImportException.invalidDiagnostic("Clippy diagnostic '%s' has no location spans".formatted(diagnostic.lintId()));
     }
     return spans.get(0);
   }

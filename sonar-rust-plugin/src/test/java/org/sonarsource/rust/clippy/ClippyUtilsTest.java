@@ -29,8 +29,10 @@ import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
+import org.sonar.api.batch.sensor.SensorContext;
 import org.sonar.api.batch.sensor.internal.SensorContextTester;
 import org.sonarsource.rust.plugin.RustLanguage;
 
@@ -220,6 +222,68 @@ class ClippyUtilsTest {
     assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
   }
 
+  @Test
+  void resolveInputFileWithManifestPathWithoutParentThrows() {
+    var baseDir = Mockito.mock(Path.class);
+    var manifestPath = Mockito.mock(Path.class);
+    var fileSystem = Mockito.mock(org.sonar.api.batch.fs.FileSystem.class);
+    var context = Mockito.mock(SensorContext.class);
+    var baseDirFile = new File("ignored") {
+      @Override
+      public Path toPath() {
+        return baseDir;
+      }
+    };
+
+    Mockito.when(context.fileSystem()).thenReturn(fileSystem);
+    Mockito.when(fileSystem.baseDir()).thenReturn(baseDirFile);
+    Mockito.when(baseDir.toAbsolutePath()).thenReturn(baseDir);
+    Mockito.when(baseDir.normalize()).thenReturn(baseDir);
+    Mockito.when(baseDir.resolve(Mockito.any(Path.class))).thenReturn(manifestPath);
+    Mockito.when(manifestPath.normalize()).thenReturn(manifestPath);
+    Mockito.when(manifestPath.endsWith("Cargo.toml")).thenReturn(true);
+    Mockito.when(manifestPath.getParent()).thenReturn(null);
+
+    var diagnostic = diagnostic("Cargo.toml", "src/main.rs");
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Invalid manifest path: Cargo.toml");
+  }
+
+  @Test
+  void resolveInputFileWithNullFilePathThrows() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    var diagnostic = diagnosticWithSpans(baseDir.resolve("Cargo.toml").toString(), List.of(new ClippySpan(null, 1, 1, 1, 2)));
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Clippy diagnostic 'clippy::some_lint' has no file path");
+  }
+
+  @Test
+  void resolveInputFileWithBlankFilePathThrows() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    var diagnostic = diagnosticWithSpans(baseDir.resolve("Cargo.toml").toString(), List.of(new ClippySpan("   ", 1, 1, 1, 2)));
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Clippy diagnostic 'clippy::some_lint' has no file path");
+  }
+
+  @Test
+  void resolveInputFileWithNullSpansThrows() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    var diagnostic = diagnosticWithSpans(baseDir.resolve("Cargo.toml").toString(), null);
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Clippy diagnostic 'clippy::some_lint' has no location spans");
+  }
+
   private static InputFile inputFile(Path baseDir, String relativePath, String contents) {
     return TestInputFileBuilder.create("module", relativePath)
       .setModuleBaseDir(baseDir)
@@ -233,11 +297,15 @@ class ClippyUtilsTest {
   }
 
   private static ClippyDiagnostic diagnostic(String manifestPath, String fileName) {
+    return diagnosticWithSpans(manifestPath, List.of(new ClippySpan(fileName, 1, 1, 1, 2)));
+  }
+
+  private static ClippyDiagnostic diagnosticWithSpans(String manifestPath, List<ClippySpan> spans) {
     return new ClippyDiagnostic(
       manifestPath,
       new ClippyMessage(
         new ClippyCode("clippy::some_lint"),
         "message",
-        List.of(new ClippySpan(fileName, 1, 1, 1, 2))));
+        spans));
   }
 }
