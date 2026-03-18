@@ -8,6 +8,19 @@ The `clippy-metadata` tool maintains the checked-in Clippy resources used by the
 
 The tool is implemented in Python and intentionally has no Node.js dependency.
 
+## Scheduled Update
+
+The repository includes a scheduled GitHub Actions workflow at `.github/workflows/update-clippy-metadata.yml`.
+
+That workflow:
+
+- checks whether a newer published Rust release exists
+- sparsely checks out the Clippy lint sources for that release
+- regenerates `metadata.json`, `rules.json`, and `upstream.json`
+- opens or updates a draft PR against `master` when the generated files change
+
+The local CLI documented below is the implementation used by that scheduled job.
+
 ## Commands
 
 Run the tool with:
