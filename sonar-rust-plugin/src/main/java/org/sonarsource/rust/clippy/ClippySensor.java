@@ -111,7 +111,7 @@ public class ClippySensor implements Sensor {
         var workDir = manifestPath.getParent();
         clippy.run(workDir, lints, diagnostic -> {
           try {
-            saveIssue(context, diagnostic, workDir);
+            saveIssue(context, diagnostic);
           } catch (Exception e) {
             LOG.warn("Failed to save Clippy issue: {}", diagnostic, e);
           }
@@ -130,7 +130,7 @@ public class ClippySensor implements Sensor {
     }
   }
 
-  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic, Path workDir) {
+  private static void saveIssue(SensorContext context, ClippyDiagnostic diagnostic) {
     LOG.debug("Saving Clippy diagnostic: {}", diagnostic);
 
     String lintId = diagnostic.lintId();
@@ -143,7 +143,7 @@ public class ClippySensor implements Sensor {
     var issue = context.newIssue()
       .forRule(RuleKey.of(RustLanguage.KEY, ruleKey));
 
-    var location = diagnosticToLocation(issue.newLocation(), diagnostic, context, workDir);
+    var location = diagnosticToLocation(issue.newLocation(), diagnostic, context);
     if (location == null) {
       LOG.debug("No InputFile found for Clippy diagnostic: {}", diagnostic);
       return;

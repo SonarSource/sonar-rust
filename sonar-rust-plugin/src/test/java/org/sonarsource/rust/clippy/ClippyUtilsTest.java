@@ -25,9 +25,16 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Stream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.Mockito;
+import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
+import org.sonar.api.batch.sensor.SensorContext;
+import org.sonar.api.batch.sensor.internal.SensorContextTester;
+import org.sonarsource.rust.plugin.RustLanguage;
 
 class ClippyUtilsTest {
 
@@ -127,5 +134,178 @@ class ClippyUtilsTest {
     assertThat(diagnostics).hasSize(1);
     var empty = ClippyUtils.parse(Stream.of(""));
     assertThat(empty).isEmpty();
+  }
+
+  @Test
+  void resolveInputFileRelativeToManifestDirectory() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "subproj/src/main.rs", "fn main() {}\n"));
+
+    var diagnostic = diagnostic(baseDir.resolve("subproj/Cargo.toml"), "src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFilePrefersManifestRelativePathOverRepositoryRelativePath() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "src/main.rs", "fn main() { println!(\"root\"); }\n"));
+    context.fileSystem().add(inputFile(baseDir, "subproj/src/main.rs", "fn main() { println!(\"subproj\"); }\n"));
+
+    var diagnostic = diagnostic(baseDir.resolve("subproj/Cargo.toml"), "src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFileWithAbsoluteSpanPath() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "subproj/src/main.rs", "fn main() {}\n"));
+
+    var diagnostic = diagnostic(baseDir.resolve("subproj/Cargo.toml"), baseDir.resolve("subproj/src/main.rs").toString());
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFileRelativeToWorkspaceRootAncestor() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "workspace/crates/core/src/main.rs", "fn main() {}\n"));
+
+    var diagnostic = diagnostic(baseDir.resolve("workspace/crates/core/Cargo.toml"), "crates/core/src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/workspace/crates/core/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFileWithRelativeManifestPath() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    context.fileSystem().add(inputFile(baseDir, "workspace/crates/core/src/main.rs", "fn main() {}\n"));
+
+    var diagnostic = diagnostic("workspace/crates/core/Cargo.toml", "crates/core/src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/workspace/crates/core/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFileUsingRepositoryRelativePathFirst() throws IOException {
+    var analysisBaseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(analysisBaseDir);
+    context.fileSystem().add(inputFile(analysisBaseDir, "subproj/src/main.rs", "fn main() {}\n"));
+
+    var manifestBaseDir = Files.createDirectories(temp.resolve("other-project"));
+    var diagnostic = diagnostic(manifestBaseDir.resolve("crate/Cargo.toml"), "subproj/src/main.rs");
+
+    var inputFile = ClippyUtils.resolveInputFile(diagnostic, context);
+
+    assertThat(inputFile).isNotNull();
+    assertThat(inputFile.uri().getPath()).endsWith("/subproj/src/main.rs");
+  }
+
+  @Test
+  void resolveInputFileWithManifestPathWithoutParentThrows() {
+    var baseDir = Mockito.mock(Path.class);
+    var manifestPath = Mockito.mock(Path.class);
+    var fileSystem = Mockito.mock(org.sonar.api.batch.fs.FileSystem.class);
+    var context = Mockito.mock(SensorContext.class);
+    var baseDirFile = new File("ignored") {
+      @Override
+      public Path toPath() {
+        return baseDir;
+      }
+    };
+
+    Mockito.when(context.fileSystem()).thenReturn(fileSystem);
+    Mockito.when(fileSystem.baseDir()).thenReturn(baseDirFile);
+    Mockito.when(baseDir.toAbsolutePath()).thenReturn(baseDir);
+    Mockito.when(baseDir.normalize()).thenReturn(baseDir);
+    Mockito.when(baseDir.resolve(Mockito.any(Path.class))).thenReturn(manifestPath);
+    Mockito.when(manifestPath.normalize()).thenReturn(manifestPath);
+    Mockito.when(manifestPath.endsWith("Cargo.toml")).thenReturn(true);
+    Mockito.when(manifestPath.getParent()).thenReturn(null);
+
+    var diagnostic = diagnostic("Cargo.toml", "src/main.rs");
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Invalid manifest path: Cargo.toml");
+  }
+
+  @Test
+  void resolveInputFileWithNullFilePathThrows() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    var diagnostic = diagnosticWithSpans(baseDir.resolve("Cargo.toml").toString(), List.of(new ClippySpan(null, 1, 1, 1, 2)));
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Clippy diagnostic 'clippy::some_lint' has no file path");
+  }
+
+  @Test
+  void resolveInputFileWithBlankFilePathThrows() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    var diagnostic = diagnosticWithSpans(baseDir.resolve("Cargo.toml").toString(), List.of(new ClippySpan("   ", 1, 1, 1, 2)));
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Clippy diagnostic 'clippy::some_lint' has no file path");
+  }
+
+  @Test
+  void resolveInputFileWithNullSpansThrows() throws IOException {
+    var baseDir = Files.createDirectories(temp.resolve("project"));
+    var context = SensorContextTester.create(baseDir);
+    var diagnostic = diagnosticWithSpans(baseDir.resolve("Cargo.toml").toString(), null);
+
+    assertThatThrownBy(() -> ClippyUtils.resolveInputFile(diagnostic, context))
+      .isInstanceOf(ClippyImportException.class)
+      .hasMessage("Clippy diagnostic 'clippy::some_lint' has no location spans");
+  }
+
+  private static InputFile inputFile(Path baseDir, String relativePath, String contents) {
+    return TestInputFileBuilder.create("module", relativePath)
+      .setModuleBaseDir(baseDir)
+      .setLanguage(RustLanguage.KEY)
+      .setContents(contents)
+      .build();
+  }
+
+  private static ClippyDiagnostic diagnostic(Path manifestPath, String fileName) {
+    return diagnostic(manifestPath.toString(), fileName);
+  }
+
+  private static ClippyDiagnostic diagnostic(String manifestPath, String fileName) {
+    return diagnosticWithSpans(manifestPath, List.of(new ClippySpan(fileName, 1, 1, 1, 2)));
+  }
+
+  private static ClippyDiagnostic diagnosticWithSpans(String manifestPath, List<ClippySpan> spans) {
+    return new ClippyDiagnostic(
+      manifestPath,
+      new ClippyMessage(
+        new ClippyCode("clippy::some_lint"),
+        "message",
+        spans));
   }
 }
