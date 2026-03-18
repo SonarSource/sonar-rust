@@ -1,0 +1,199 @@
+name: Update Clippy Metadata
+
+on:
+  workflow_dispatch:
+    inputs:
+      rust_release_tag:
+        description: Optional Rust release tag override for manual runs
+        required: false
+        type: string
+      rust_release_published_at:
+        description: Optional release timestamp override paired with rust_release_tag
+        required: false
+        type: string
+      dry_run:
+        description: Generate files and summary but skip branch and PR creation
+        required: false
+        type: boolean
+        default: false
+  schedule:
+    - cron: "17 3 * * 1"
+
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  update:
+    runs-on: github-ubuntu-latest-s
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5.0.1
+        with:
+          ref: master
+
+      - name: Check whether Rust has a newer release
+        id: release_check
+        env:
+          RELEASE_TAG_OVERRIDE: ${{ inputs.rust_release_tag }}
+          RELEASE_PUBLISHED_AT_OVERRIDE: ${{ inputs.rust_release_published_at }}
+        run: |
+          args=(
+            check-release
+            --upstream-state sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json
+            --github-output "$GITHUB_OUTPUT"
+          )
+          if [ -n "$RELEASE_TAG_OVERRIDE" ]; then
+            args+=(--release-tag-override "$RELEASE_TAG_OVERRIDE")
+          fi
+          if [ -n "$RELEASE_PUBLISHED_AT_OVERRIDE" ]; then
+            args+=(--release-published-at-override "$RELEASE_PUBLISHED_AT_OVERRIDE")
+          fi
+          python3 tools/clippy-metadata/clippy_metadata.py "${args[@]}" | tee /tmp/clippy-release-check.json
+
+      - name: Stop when no update is required
+        if: steps.release_check.outputs.needs_update != 'true'
+        run: |
+          {
+            echo "## Clippy metadata update"
+            echo
+            echo "No newer Rust release was detected."
+            echo
+            echo '```json'
+            cat /tmp/clippy-release-check.json
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Checkout Rust source sparsely at the requested release
+        if: steps.release_check.outputs.needs_update == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
+        run: |
+          rm -rf /tmp/rust-source
+          git clone --depth 1 --filter=blob:none --branch "$RELEASE_TAG" https://github.com/rust-lang/rust.git /tmp/rust-source
+          git -C /tmp/rust-source sparse-checkout init --cone
+          git -C /tmp/rust-source sparse-checkout set src/tools/clippy/clippy_lints/src
+
+      - name: Regenerate metadata artifacts
+        if: steps.release_check.outputs.needs_update == 'true'
+        env:
+          RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
+          RELEASE_PUBLISHED_AT: ${{ steps.release_check.outputs.release_published_at }}
+        run: |
+          python3 tools/clippy-metadata/clippy_metadata.py update \
+            --clippy-source-dir /tmp/rust-source/src/tools/clippy/clippy_lints/src \
+            --metadata-output sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json \
+            --rules-output sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json \
+            --upstream-state sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json \
+            --messages-file tools/clippy-metadata/messages.json \
+            --rule-key-overrides-file tools/clippy-metadata/rule-key-overrides.json \
+            --rule-specs-dir sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/rust \
+            --summary-file /tmp/clippy-update-summary.json \
+            --rust-release-tag "$RELEASE_TAG" \
+            --rust-release-published-at "$RELEASE_PUBLISHED_AT"
+
+      - name: Check whether generated files changed
+        if: steps.release_check.outputs.needs_update == 'true'
+        id: git_diff
+        run: |
+          if git diff --quiet -- \
+            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json \
+            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json \
+            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json
+          then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Write workflow summary
+        if: steps.release_check.outputs.needs_update == 'true'
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          summary = json.loads(Path("/tmp/clippy-update-summary.json").read_text())
+          lines = [
+              "## Clippy metadata update",
+              "",
+              f"- Rust release: `{summary['rust_release_tag']}`",
+              f"- Published at: `{summary['rust_release_published_at']}`",
+              f"- metadata.json entries: `{summary['metadata_count_before']}` -> `{summary['metadata_count_after']}`",
+              f"- rules.json entries: `{summary['rules_count_before']}` -> `{summary['rules_count_after']}`",
+              f"- rules without rule key: `{len(summary['rules_without_rule_key'])}`",
+          ]
+
+          if summary["new_upstream_lints_without_mapping"]:
+              lines.extend(
+                  [
+                      "",
+                      "### New upstream lints without Sonar mapping",
+                      "",
+                  ]
+              )
+              lines.extend(f"- `{lint}`" for lint in summary["new_upstream_lints_without_mapping"])
+
+          if summary["new_upstream_lints"]:
+              lines.extend(
+                  [
+                      "",
+                      "### New upstream lints",
+                      "",
+                  ]
+              )
+              lines.extend(f"- `{lint}`" for lint in summary["new_upstream_lints"])
+
+          Path("/tmp/clippy-step-summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
+          PY
+          cat /tmp/clippy-step-summary.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Fetch GitHub token for PR creation
+        if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
+        id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/{REPO_OWNER_NAME_DASH}-jira token | GITHUB_TOKEN;
+
+      - name: Commit and push update branch
+        if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
+        env:
+          GH_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
+        run: |
+          BRANCH_NAME="automation/update-clippy-metadata-${RELEASE_TAG//[^A-Za-z0-9._-]/-}"
+          git config user.name "sonarsource-bot"
+          git config user.email "infra@sonarsource.com"
+          git checkout -B "$BRANCH_NAME"
+          git add \
+            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json \
+            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json \
+            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json
+          git commit -m "Update Clippy metadata for Rust ${RELEASE_TAG}"
+          git push --force-with-lease "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:${BRANCH_NAME}"
+
+      - name: Create or update draft PR
+        if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
+        env:
+          GH_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+          RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
+        run: |
+          BRANCH_NAME="automation/update-clippy-metadata-${RELEASE_TAG//[^A-Za-z0-9._-]/-}"
+          TITLE="Draft: Update Clippy metadata for Rust ${RELEASE_TAG}"
+          cp /tmp/clippy-step-summary.md /tmp/clippy-pr-body.md
+
+          PR_NUMBER="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
+          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
+            gh pr edit "$PR_NUMBER" --title "$TITLE" --body-file /tmp/clippy-pr-body.md
+          else
+            gh pr create \
+              --base master \
+              --head "$BRANCH_NAME" \
+              --title "$TITLE" \
+              --body-file /tmp/clippy-pr-body.md \
+              --draft
+          fi
