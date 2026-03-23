@@ -4,6 +4,21 @@ on:
   release:
     types:
       - published
+  workflow_dispatch:
+    inputs:
+      version:
+        type: string
+        description: "Release version tag (e.g., 1.2.3). Used when triggering manually instead of via release event."
+        required: true
+      releaseId:
+        type: string
+        description: "GitHub release ID. Used when triggering manually instead of via release event."
+        required: true
+      dryRun:
+        type: boolean
+        description: Flag to enable the dry-run execution
+        default: false
+        required: false
 
 env:
   PYTHONUNBUFFERED: 1
@@ -18,3 +33,6 @@ jobs:
       publishToBinaries: true
       mavenCentralSync: true
       slackChannel: squad-rust
+      version: ${{ inputs.version || github.event.release.tag_name }}
+      releaseId: ${{ inputs.releaseId || github.event.release.id }}
+      dryRun: ${{ inputs.dryRun == true }}
