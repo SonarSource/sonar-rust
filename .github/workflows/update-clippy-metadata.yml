@@ -110,44 +110,9 @@ jobs:
       - name: Write workflow summary
         if: steps.release_check.outputs.needs_update == 'true'
         run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          summary = json.loads(Path("/tmp/clippy-update-summary.json").read_text())
-          lines = [
-              "## Clippy metadata update",
-              "",
-              f"- Rust release: `{summary['rust_release_tag']}`",
-              f"- Published at: `{summary['rust_release_published_at']}`",
-              f"- metadata.json entries: `{summary['metadata_count_before']}` -> `{summary['metadata_count_after']}`",
-              f"- rules.json entries: `{summary['rules_count_before']}` -> `{summary['rules_count_after']}`",
-              f"- rules without rule key: `{len(summary['rules_without_rule_key'])}`",
-          ]
-
-          if summary["new_upstream_lints_without_mapping"]:
-              lines.extend(
-                  [
-                      "",
-                      "### New upstream lints without Sonar mapping",
-                      "",
-                  ]
-              )
-              lines.extend(f"- `{lint}`" for lint in summary["new_upstream_lints_without_mapping"])
-
-          if summary["new_upstream_lints"]:
-              lines.extend(
-                  [
-                      "",
-                      "### New upstream lints",
-                      "",
-                  ]
-              )
-              lines.extend(f"- `{lint}`" for lint in summary["new_upstream_lints"])
-
-          Path("/tmp/clippy-step-summary.md").write_text("\n".join(lines) + "\n", encoding="utf-8")
-          PY
-          cat /tmp/clippy-step-summary.md >> "$GITHUB_STEP_SUMMARY"
+          python3 tools/clippy-metadata/workflow_summary.py \
+            --summary-file /tmp/clippy-update-summary.json \
+            | tee /tmp/clippy-step-summary.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Create or update draft PR
         if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
