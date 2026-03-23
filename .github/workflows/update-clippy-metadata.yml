@@ -149,53 +149,13 @@ jobs:
           PY
           cat /tmp/clippy-step-summary.md >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Fetch GitHub token for PR creation
-        if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/github/token/{REPO_OWNER_NAME_DASH}-jira token | GITHUB_TOKEN;
-
-      - name: Commit and push update branch
-        if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
-        env:
-          RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
-          VAULT_OUTPUT: ${{ steps.secrets.outputs.vault }}
-        run: |
-          GH_TOKEN="$(python3 -c 'import json, os; print(json.loads(os.environ["VAULT_OUTPUT"])["GITHUB_TOKEN"])')"
-          BRANCH_NAME="automation/update-clippy-metadata-${RELEASE_TAG//[^A-Za-z0-9._-]/-}"
-          git config user.name "sonarsource-bot"
-          git config user.email "infra@sonarsource.com"
-          git checkout -B "$BRANCH_NAME"
-          git fetch origin "refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}" || true
-          git add \
-            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json \
-            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json \
-            sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json
-          git commit -m "Update Clippy metadata for Rust ${RELEASE_TAG}"
-          git remote set-url origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
-          git push --force-with-lease origin "HEAD:${BRANCH_NAME}"
-
       - name: Create or update draft PR
         if: steps.release_check.outputs.needs_update == 'true' && steps.git_diff.outputs.has_changes == 'true' && inputs.dry_run != true
-        env:
-          RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
-          VAULT_OUTPUT: ${{ steps.secrets.outputs.vault }}
-        run: |
-          export GH_TOKEN="$(python3 -c 'import json, os; print(json.loads(os.environ["VAULT_OUTPUT"])["GITHUB_TOKEN"])')"
-          BRANCH_NAME="automation/update-clippy-metadata-${RELEASE_TAG//[^A-Za-z0-9._-]/-}"
-          TITLE="Draft: Update Clippy metadata for Rust ${RELEASE_TAG}"
-          cp /tmp/clippy-step-summary.md /tmp/clippy-pr-body.md
-
-          PR_NUMBER="$(gh pr list --head "$BRANCH_NAME" --base master --json number --jq '.[0].number')"
-          if [ -n "$PR_NUMBER" ] && [ "$PR_NUMBER" != "null" ]; then
-            gh pr edit "$PR_NUMBER" --title "$TITLE" --body-file /tmp/clippy-pr-body.md
-          else
-            gh pr create \
-              --base master \
-              --head "$BRANCH_NAME" \
-              --title "$TITLE" \
-              --body-file /tmp/clippy-pr-body.md \
-              --draft
-          fi
+        uses: peter-evans/create-pull-request@c0f553fe549906ede9cf27b5156039d195d2ece0 # v8.1.0
+        with:
+          commit-message: Update Clippy metadata for Rust ${{ steps.release_check.outputs.release_tag }}
+          title: Update Clippy metadata for Rust ${{ steps.release_check.outputs.release_tag }}
+          branch: automation/update-clippy-metadata-${{ steps.release_check.outputs.release_tag }}
+          base: master
+          body-path: /tmp/clippy-step-summary.md
+          draft: true
