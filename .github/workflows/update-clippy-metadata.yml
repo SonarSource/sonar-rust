@@ -181,7 +181,7 @@ jobs:
           RELEASE_TAG: ${{ steps.release_check.outputs.release_tag }}
           VAULT_OUTPUT: ${{ steps.secrets.outputs.vault }}
         run: |
-          GH_TOKEN="$(python3 -c 'import json, os; print(json.loads(os.environ["VAULT_OUTPUT"])["GITHUB_TOKEN"])')"
+          export GH_TOKEN="$(python3 -c 'import json, os; print(json.loads(os.environ["VAULT_OUTPUT"])["GITHUB_TOKEN"])')"
           BRANCH_NAME="automation/update-clippy-metadata-${RELEASE_TAG//[^A-Za-z0-9._-]/-}"
           TITLE="Draft: Update Clippy metadata for Rust ${RELEASE_TAG}"
           cp /tmp/clippy-step-summary.md /tmp/clippy-pr-body.md
