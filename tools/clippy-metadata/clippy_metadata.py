@@ -160,6 +160,36 @@ def skip_block_comment(source: str, index: int) -> int:
     raise ValueError("unterminated block comment while parsing macro invocation")
 
 
+def strip_comments(source: str) -> str:
+    parts: list[str] = []
+    index = 0
+
+    while index < len(source):
+        if source.startswith("//", index):
+            index = skip_line_comment(source, index)
+            parts.append("\n")
+            continue
+        if source.startswith("/*", index):
+            index = skip_block_comment(source, index)
+            parts.append(" ")
+            continue
+        if source[index] == '"':
+            string_end = skip_string(source, index)
+            parts.append(source[index:string_end])
+            index = string_end
+            continue
+        raw_end = skip_raw_string(source, index)
+        if raw_end is not None:
+            parts.append(source[index:raw_end])
+            index = raw_end
+            continue
+
+        parts.append(source[index])
+        index += 1
+
+    return "".join(parts)
+
+
 def find_balanced_token_tree(source: str, start_index: int) -> int:
     opener = source[start_index]
     closer = OPEN_TO_CLOSE[opener]
@@ -207,7 +237,7 @@ def collect_macro_bodies(source: str) -> list[str]:
 
 
 def parse_declared_lint(body: str) -> dict[str, str] | None:
-    match = PUB_LINT_RE.search(body)
+    match = PUB_LINT_RE.search(strip_comments(body))
     if match is None:
         raise ValueError("could not find `pub <LINT>, <category>,` in declare_clippy_lint! body")
 

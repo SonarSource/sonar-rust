@@ -128,6 +128,39 @@ class ClippyMetadataTest(unittest.TestCase):
 
             self.assertIn('"needs_update": true', stdout.getvalue())
 
+    def test_generate_metadata_allows_comments_between_lint_name_and_category(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            clippy_dir = Path(temp_dir)
+            (clippy_dir / "returns.rs").write_text(
+                """
+                declare_clippy_lint! {
+                    /// lint docs
+                    pub NEEDLESS_RETURN,
+                    // This lint requires some special handling in `check_final_expr` for `#[expect]`.
+                    // This handling needs to be updated if the group gets changed. This should also
+                    // be caught by tests.
+                    style,
+                    "message"
+                }
+                """,
+                encoding="utf-8",
+            )
+
+            metadata = clippy_metadata.generate_metadata(clippy_dir)
+
+            self.assertEqual(
+                clippy_metadata.json_text(metadata),
+                """[
+  {
+    "key": "needless_return",
+    "name": "needless_return",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#needless_return",
+    "description": "Clippy lint <code>needless_return</code>."
+  }
+]
+""",
+            )
+
 
 if __name__ == "__main__":
     unittest.main()
