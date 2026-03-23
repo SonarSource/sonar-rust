@@ -168,6 +168,7 @@ jobs:
           git config user.name "sonarsource-bot"
           git config user.email "infra@sonarsource.com"
           git checkout -B "$BRANCH_NAME"
+          git fetch origin "refs/heads/${BRANCH_NAME}:refs/remotes/origin/${BRANCH_NAME}" || true
           git add \
             sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json \
             sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json \
