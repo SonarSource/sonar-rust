@@ -16,7 +16,7 @@ That workflow:
 
 - checks whether a newer published Rust release exists
 - sparsely checks out the Clippy lint sources for that release
-- regenerates `metadata.json`, `rules.json`, and `upstream.json`
+- regenerates `metadata.json`, `rules.json`, `upstream.json`, and the checked-in rule-count assertion in `ClippyRulesDefinitionTest`
 - opens or updates a draft PR against `master` when the generated files change
 
 The local CLI documented below is the implementation used by that scheduled job.
@@ -48,6 +48,7 @@ This rewrites:
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json`
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json`
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json`
+- `sonar-rust-plugin/src/test/java/org/sonarsource/rust/clippy/ClippyRulesDefinitionTest.java`
 
 ## Rule Generation Inputs
 

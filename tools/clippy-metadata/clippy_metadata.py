@@ -34,12 +34,14 @@ REPO_ROOT = SCRIPT_DIR.parent.parent
 DEFAULT_METADATA_OUTPUT = REPO_ROOT / "sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/metadata.json"
 DEFAULT_RULES_OUTPUT = REPO_ROOT / "sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/rules.json"
 DEFAULT_UPSTREAM_STATE = REPO_ROOT / "sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json"
+DEFAULT_RULES_DEFINITION_TEST = REPO_ROOT / "sonar-rust-plugin/src/test/java/org/sonarsource/rust/clippy/ClippyRulesDefinitionTest.java"
 DEFAULT_MESSAGES = SCRIPT_DIR / "messages.json"
 DEFAULT_RULE_KEY_OVERRIDES = SCRIPT_DIR / "rule-key-overrides.json"
 DEFAULT_RULE_SPECS_DIR = REPO_ROOT / "sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/rust"
 DEFAULT_SOURCE_REPO = "rust-lang/rust"
 DEFAULT_SOURCE_PATH = "src/tools/clippy/clippy_lints/src"
 GENERATOR_VERSION = "python-v1"
+RULES_SIZE_ASSERTION_RE = re.compile(r"assertThat\(rules\)\.hasSize\((\d+)\);")
 
 
 def json_text(data: object) -> str:
@@ -61,6 +63,18 @@ def write_github_output(path: Path | None, outputs: dict[str, str]) -> None:
     with path.open("a", encoding="utf-8") as handle:
         for key, value in outputs.items():
             handle.write(f"{key}={value}\n")
+
+
+def update_rules_definition_test(path: Path, rule_count: int) -> None:
+    content = path.read_text(encoding="utf-8")
+    updated_content, replacements = RULES_SIZE_ASSERTION_RE.subn(
+        f"assertThat(rules).hasSize({rule_count});",
+        content,
+        count=1,
+    )
+    if replacements != 1:
+        raise ValueError(f"expected exactly one rules size assertion in {path}")
+    path.write_text(updated_content, encoding="utf-8")
 
 
 def load_upstream_state(path: Path) -> dict[str, object]:
@@ -438,6 +452,7 @@ def command_update(args: argparse.Namespace) -> int:
 
     write_json(args.metadata_output, metadata)
     write_json(args.rules_output, rules)
+    update_rules_definition_test(args.rules_definition_test, len(metadata))
 
     current_state = load_upstream_state(args.upstream_state)
     new_state = {
@@ -509,6 +524,7 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("--messages-file", type=Path, default=DEFAULT_MESSAGES)
     update.add_argument("--rule-key-overrides-file", type=Path, default=DEFAULT_RULE_KEY_OVERRIDES)
     update.add_argument("--rule-specs-dir", type=Path, default=DEFAULT_RULE_SPECS_DIR)
+    update.add_argument("--rules-definition-test", type=Path, default=DEFAULT_RULES_DEFINITION_TEST)
     update.add_argument("--summary-file", type=Path)
     update.add_argument("--rust-release-tag")
     update.add_argument("--rust-release-published-at")
