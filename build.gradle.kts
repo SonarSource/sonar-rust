@@ -1,6 +1,7 @@
 import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
 plugins {
+  base
   id("org.sonarqube") version "7.2.3.7755"
   id("com.jfrog.artifactory") version "6.0.4"
 }
@@ -27,6 +28,48 @@ repositories {
     }
   mavenLocal()
   mavenCentral()
+}
+
+val checkLicenseHeaders = tasks.register("checkLicenseHeaders") {
+  description = "Checks repo-authored source file license headers."
+  group = "Verification"
+
+  val licenseHeaderFile = rootProject.file("license-header.txt")
+  val sourceFiles = files(
+    fileTree("analyzer/src") {
+      include("**/*.rs")
+    },
+    fileTree("sonar-rust-plugin/src") {
+      include("**/*.java")
+    },
+    fileTree("e2e/src") {
+      include("**/*.java")
+    },
+    fileTree("buildSrc/src/main/kotlin") {
+      include("**/*.kt", "**/*.kts")
+    }
+  )
+
+  inputs.file(licenseHeaderFile)
+  inputs.files(sourceFiles)
+
+  doLast {
+    val expectedHeader = licenseHeaderFile.readText().trim()
+    val headerMismatches = sourceFiles.files.filter { file ->
+      !file.readText().trimStart().startsWith(expectedHeader)
+    }
+
+    if (headerMismatches.isNotEmpty()) {
+      headerMismatches.forEach { println("Missing or incorrect license header in: ${it.path}") }
+      throw GradleException("Some source files are missing the correct license header.")
+    }
+  }
+}
+
+subprojects {
+  tasks.matching { it.name == "check" }.configureEach {
+    dependsOn(checkLicenseHeaders)
+  }
 }
 
 sonar {
