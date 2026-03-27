@@ -62,6 +62,7 @@ jobs:
       create-sli-ticket: false
       branch: ${{ github.event.inputs.branch }}
       pm-email: ${{ github.event.inputs.pm_email }}
+      runner-environment: "github-ubuntu-latest-s"
       slack-channel: "squad-rust"
       verbose: true
       use-jira-sandbox: ${{ github.event.inputs.dry-run == 'true' }}
