@@ -32,6 +32,35 @@ SPEC.loader.exec_module(clippy_metadata)
 
 
 class ClippyMetadataTest(unittest.TestCase):
+    def test_update_rules_definition_test_rewrites_expected_rule_count(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            test_file = Path(temp_dir) / "ClippyRulesDefinitionTest.java"
+            test_file.write_text(
+                """
+                class ClippyRulesDefinitionTest {
+                  void test() {
+                    assertThat(rules).hasSize(770);
+                  }
+                }
+                """.strip()
+                + "\n",
+                encoding="utf-8",
+            )
+
+            clippy_metadata.update_rules_definition_test(test_file, 801)
+
+            self.assertEqual(
+                test_file.read_text(encoding="utf-8"),
+                """
+                class ClippyRulesDefinitionTest {
+                  void test() {
+                    assertThat(rules).hasSize(801);
+                  }
+                }
+                """.strip()
+                + "\n",
+            )
+
     def test_generate_metadata_filters_internal_and_sorts_output(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir:
             clippy_dir = Path(temp_dir)
