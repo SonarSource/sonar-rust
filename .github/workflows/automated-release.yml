@@ -56,6 +56,7 @@ jobs:
       new-version: ${{ github.event.inputs.new-version }}
       sqc-integration: ${{ github.event.inputs.sqc-integration == 'true' }}
       sqs-integration: ${{ github.event.inputs.sqs-integration == 'true' }}
+      require-rule-metadata-update: true
       create-slvs-ticket: false
       create-slvscode-ticket: false
       create-sle-ticket: false
