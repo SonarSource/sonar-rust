@@ -65,13 +65,13 @@ jobs:
       runner-environment: "github-ubuntu-latest-s"
       slack-channel: "squad-rust"
       verbose: true
-      freeze-branch: false
       use-jira-sandbox: ${{ github.event.inputs.dry-run == 'true' }}
       is-draft-release: ${{ github.event.inputs.dry-run == 'true' }}
 
   bump_versions:
     name: Bump versions
     needs: release
+    if: ${{ needs.release.outputs.new-version != '' }}
     uses: ./.github/workflows/bump-version.yml
     permissions:
       contents: write
