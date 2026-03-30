@@ -6,7 +6,7 @@ on:
 jobs:
   lock-branch:
     name: Toggle lock branch
-    runs-on: sonar-xs
+    runs-on: github-ubuntu-latest-s
     permissions:
       id-token: write
     steps:
