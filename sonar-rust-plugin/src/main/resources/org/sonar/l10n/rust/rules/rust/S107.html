@@ -8,7 +8,7 @@ fn set_coordinates(x1: i32, y1: i32, z1: i32, x2: i32, y2: i32, z2: i32) { // No
 </pre>
 <p>The solution can be to:</p>
 <ul>
-  <li> Split the function into smaller ones </li>
+  <li>Split the function into smaller ones</li>
 </ul>
 <pre>
 // Each function does a part of what the original setCoordinates function was doing, so confusion risks are lower
@@ -21,7 +21,7 @@ fn set_size(width: i32, height: i32, depth: i32) {
 }
 </pre>
 <ul>
-  <li> Find a better data structure for the parameters that group data in a way that makes sense for the specific application domain </li>
+  <li>Find a better data structure for the parameters that group data in a way that makes sense for the specific application domain</li>
 </ul>
 <pre>
 struct Point {
@@ -43,7 +43,7 @@ fn set_coordinates(p1: &amp;mut Point, p2: &amp;Point) {
 <h2>Resources</h2>
 <h3>Documentation</h3>
 <ul>
-  <li> Clippy Lints - <a
-  href="https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments">https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments</a> </li>
+  <li>Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments">https://rust-lang.github.io/rust-clippy/master/index.html#too_many_arguments</a></li>
 </ul>
 

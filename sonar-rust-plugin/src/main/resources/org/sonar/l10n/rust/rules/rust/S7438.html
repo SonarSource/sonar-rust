@@ -5,16 +5,16 @@ time on redundant checks.</p>
 <h2>How to fix it</h2>
 <p>Ensuring valid bitwise operations in comparisons requires:</p>
 <ul>
-  <li> For <code>&amp;</code> (AND) operations:
+  <li>For <code>&amp;</code> (AND) operations:
     <ul>
-      <li> <code>x &amp; mask == value</code> is valid if all bits set in <code>value</code> are also set in <code>mask</code> </li>
-      <li> <code>x &amp; mask &lt; value</code> is valid if <code>mask &lt; value</code> </li>
-      <li> <code>x &amp; mask &gt; value</code> is valid if <code>mask &gt; value</code> </li>
-    </ul>  </li>
-  <li> For <code>|</code> (OR) operations:
+      <li><code>x &amp; mask == value</code> is valid if all bits set in <code>value</code> are also set in <code>mask</code></li>
+      <li><code>x &amp; mask &lt; value</code> is valid if <code>mask &lt; value</code></li>
+      <li><code>x &amp; mask &gt; value</code> is valid if <code>mask &gt; value</code></li>
+    </ul></li>
+  <li>For <code>|</code> (OR) operations:
     <ul>
-      <li> <code>x | mask == value</code> is valid if all bits set in <code>mask</code> are also set in <code>value</code> </li>
-    </ul>  </li>
+      <li><code>x | mask == value</code> is valid if all bits set in <code>mask</code> are also set in <code>value</code></li>
+    </ul></li>
 </ul>
 <p>Correct the bit mask or comparison value to create a valid logical expression that can be both true and false depending on input. This ensures the
 bitwise operations in the comparisons result in meaningful code execution.</p>
@@ -36,7 +36,7 @@ if (x &amp; 2 == 2) {
 <h2>Resources</h2>
 <h3>Documentation</h3>
 <ul>
-  <li> Clippy Lints - <a
-  href="https://rust-lang.github.io/rust-clippy/master/index.html#bad_bit_mask">https://rust-lang.github.io/rust-clippy/master/index.html#bad_bit_mask</a> </li>
+  <li>Clippy Lints - <a
+  href="https://rust-lang.github.io/rust-clippy/master/index.html#bad_bit_mask">https://rust-lang.github.io/rust-clippy/master/index.html#bad_bit_mask</a></li>
 </ul>
 
