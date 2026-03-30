@@ -27,6 +27,14 @@ jobs:
           mise_toml: |
             [tools]
             rust = "1.91.1"
+      - name: Validate version input
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          if [ -z "$VERSION" ]; then
+            echo "::error::Input 'version' is empty. The release workflow did not produce a next iteration version."
+            exit 1
+          fi
       - name: Update version files
         env:
           VERSION: ${{ inputs.version }}
