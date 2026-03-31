@@ -37,4 +37,4 @@ checksum = "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147"
 license = "MIT"
 [[tree-sitter-language.clarify.git]]
 path = "LICENSE"
-checksum = "5f9cf9fb6acb1972b35ae29119ce563bb60ec097656bc4b69b9bac2d04c7a147"
+checksum = "c5cfb43042b6b72045f4ba997834d0a7786d2793d91680868b5815b39f14fc78"
