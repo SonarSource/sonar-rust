@@ -46,12 +46,12 @@ jobs:
           source $HOME/.cargo/env
           ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --info --stacktrace
       - name: Upload Darwin ARM64 artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: analyzer-aarch64-apple-darwin
           path: analyzer/target/aarch64-apple-darwin/release/analyzer.xz
       - name: Upload Darwin x86_64 artifact
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: analyzer-x86_64-apple-darwin
           path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
@@ -114,17 +114,17 @@ jobs:
         run: |
           ./gradlew :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --info --stacktrace
       - name: Upload Linux x86_64 analyzer
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: analyzer-x86_64-unknown-linux-musl
           path: analyzer/target/x86_64-unknown-linux-musl/release/analyzer.xz
       - name: Upload Linux ARM64 analyzer
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: analyzer-aarch64-unknown-linux-musl
           path: analyzer/target/aarch64-unknown-linux-musl/release/analyzer.xz
       - name: Upload Windows analyzer
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: analyzer-x86_64-pc-windows-gnu
           path: analyzer/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz
@@ -277,7 +277,7 @@ jobs:
           ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: e2e-test-reports-windows
           path: e2e/build/reports/tests/**
@@ -315,7 +315,7 @@ jobs:
             ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
       - name: Upload test reports
         if: always()
-        uses: actions/upload-artifact@bbbca2ddaa5d8feaa63e36b76fdaad77386f024f # v7.0.0
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: e2e-test-reports-linux-arm64
           path: e2e/build/reports/tests/**
