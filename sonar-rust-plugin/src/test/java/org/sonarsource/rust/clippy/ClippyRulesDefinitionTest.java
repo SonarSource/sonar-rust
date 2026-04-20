@@ -39,7 +39,7 @@ class ClippyRulesDefinitionTest {
     assertThat(repository.isExternal()).isTrue();
 
     var rules = repository.rules();
-    assertThat(rules).hasSize(801);
+    assertThat(rules).hasSize(806);
 
     var rule = repository.rule("unit_cmp");
     assertThat(rule).isNotNull();
