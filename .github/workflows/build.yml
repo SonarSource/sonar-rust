@@ -28,7 +28,7 @@ jobs:
     steps:
       # see https://xtranet-sonarsource.atlassian.net/wiki/spaces/Platform/pages/4412309510/MacOS+Runners+-+GitHub
       - name: Setup Cloudflare WARP
-        uses: SonarSource/gh-action_setup-cloudflare-warp@v1
+        uses: SonarSource/gh-action_setup-cloudflare-warp@v1.0.7
         id: warp
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
@@ -150,7 +150,7 @@ jobs:
           rustup component add llvm-tools rustfmt clippy
           rustup target add x86_64-unknown-linux-musl
           cargo install cargo-llvm-cov cargo-about
-      - uses: SonarSource/ci-github-actions/build-gradle@v1
+      - uses: SonarSource/ci-github-actions/build-gradle@1.3.34
         with:
           deploy: false
           deploy-pull-request: false
@@ -201,7 +201,7 @@ jobs:
         with:
           name: analyzer-x86_64-pc-windows-gnu
           path: analyzer/target/x86_64-pc-windows-gnu/release/      
-      - uses: SonarSource/ci-github-actions/build-gradle@v1
+      - uses: SonarSource/ci-github-actions/build-gradle@1.3.34
         with:
           deploy-pull-request: true
           gradle-args: "-PskipAnalyzerBuild --info --stacktrace"
@@ -226,11 +226,11 @@ jobs:
           version: 2025.7.12
       - name: Vault
         id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
+        uses: SonarSource/vault-action-wrapper@3.4.0
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - uses: SonarSource/ci-github-actions/config-gradle@1.3.34
       - name: Run E2E tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
@@ -256,7 +256,7 @@ jobs:
           version: 2025.7.12
       - name: Vault
         id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
+        uses: SonarSource/vault-action-wrapper@3.4.0
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
@@ -266,7 +266,7 @@ jobs:
           ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
           $env:PATH += ";$env:USERPROFILE\.cargo\bin"
           rustup component add clippy
-      - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - uses: SonarSource/ci-github-actions/config-gradle@1.3.34
       - name: Run E2E tests
         shell: bash
         env:
@@ -300,11 +300,11 @@ jobs:
           version: 2025.7.12
       - name: Vault
         id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
+        uses: SonarSource/vault-action-wrapper@3.4.0
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - uses: SonarSource/ci-github-actions/config-gradle@1.3.34
       - name: Run E2E tests in ARM64 container
         shell: bash
         env:
@@ -332,7 +332,7 @@ jobs:
     runs-on: github-ubuntu-latest-s
     steps:
       # https://github.com/SonarSource/release-github-actions/tree/master/notify-slack
-      - uses: SonarSource/release-github-actions/notify-slack@v1
+      - uses: SonarSource/release-github-actions/notify-slack@1.5.4
         with:
           project-name: "Sonar-Rust"
           icon: ":cyber-radish:"
@@ -353,6 +353,6 @@ jobs:
     permissions:
       id-token: write
     steps:      
-      - uses: SonarSource/ci-github-actions/promote@v1
+      - uses: SonarSource/ci-github-actions/promote@1.3.34
         with:
           promote-pull-request: true
