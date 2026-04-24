@@ -19,7 +19,7 @@ runs:
         mkdir -p "${{ github.workspace }}/orchestrator"
 
     - name: Restore and save orchestrator cache
-      uses: SonarSource/gh-action_cache@v1.4.4
+      uses: SonarSource/gh-action_cache@v1
       with:
         path: ${{ env.ORCHESTRATOR_HOME }}
         key: ${{ inputs.key-prefix }}-${{ env.ORCHESTRATOR_CACHE_MONTH }}-${{ github.run_id }}
