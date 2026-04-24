@@ -17,7 +17,7 @@ jobs:
         && github.event.pull_request.user.login != 'renovate[bot]'
     steps:
       - id: secrets
-        uses: SonarSource/vault-action-wrapper@3.4.0
+        uses: SonarSource/vault-action-wrapper@v3
         with:
           secrets: |
             development/github/token/{REPO_OWNER_NAME_DASH}-jira token | GITHUB_TOKEN;
