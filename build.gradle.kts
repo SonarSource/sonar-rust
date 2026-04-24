@@ -6,6 +6,12 @@ plugins {
   id("com.jfrog.artifactory") version "6.0.4"
 }
 
+allprojects {
+  dependencyLocking {
+    lockAllConfigurations()
+  }
+}
+
 // Replaces the version defined in sources, usually x.y-SNAPSHOT, by a version identifying the build.
 val buildNumber: String? = System.getProperty("buildNumber")
 project.ext["buildNumber"] = buildNumber
