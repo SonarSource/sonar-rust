@@ -624,6 +624,12 @@
     "description": "Clippy lint <code>derived_hash_with_manual_eq</code>."
   },
   {
+    "key": "disallowed_fields",
+    "name": "disallowed_fields",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_fields",
+    "description": "Clippy lint <code>disallowed_fields</code>."
+  },
+  {
     "key": "disallowed_macros",
     "name": "disallowed_macros",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#disallowed_macros",
@@ -778,6 +784,12 @@
     "name": "duplicated_attributes",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#duplicated_attributes",
     "description": "Clippy lint <code>duplicated_attributes</code>."
+  },
+  {
+    "key": "duration_suboptimal_units",
+    "name": "duration_suboptimal_units",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#duration_suboptimal_units",
+    "description": "Clippy lint <code>duration_suboptimal_units</code>."
   },
   {
     "key": "duration_subsec",
@@ -1836,6 +1848,12 @@
     "description": "Clippy lint <code>manual_c_str_literals</code>."
   },
   {
+    "key": "manual_checked_ops",
+    "name": "manual_checked_ops",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_checked_ops",
+    "description": "Clippy lint <code>manual_checked_ops</code>."
+  },
+  {
     "key": "manual_clamp",
     "name": "manual_clamp",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_clamp",
@@ -2104,6 +2122,12 @@
     "name": "manual_swap",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_swap",
     "description": "Clippy lint <code>manual_swap</code>."
+  },
+  {
+    "key": "manual_take",
+    "name": "manual_take",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_take",
+    "description": "Clippy lint <code>manual_take</code>."
   },
   {
     "key": "manual_try_fold",
@@ -4402,6 +4426,12 @@
     "name": "unnecessary_to_owned",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_to_owned",
     "description": "Clippy lint <code>unnecessary_to_owned</code>."
+  },
+  {
+    "key": "unnecessary_trailing_comma",
+    "name": "unnecessary_trailing_comma",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_trailing_comma",
+    "description": "Clippy lint <code>unnecessary_trailing_comma</code>."
   },
   {
     "key": "unnecessary_unwrap",
