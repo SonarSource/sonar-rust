@@ -20,6 +20,7 @@ pluginManagement {
                 }
             }
         }
+        gradlePluginPortal()
     }
 }
 
