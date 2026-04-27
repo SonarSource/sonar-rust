@@ -22,7 +22,7 @@ jobs:
   macos_analyzers:
     runs-on: macos-latest
     name: macOS Analyzers Build
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-') || github.event_name == 'workflow_dispatch'
     permissions:
       id-token: write
     steps:
