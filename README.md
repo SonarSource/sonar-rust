@@ -96,7 +96,7 @@ Generated files are stored in `sonar-rust-plugin/src/main/resources/licenses/`.
 
 License files for Rust runtime dependencies are managed in the `analyzer` module using [cargo-about](https://github.com/EmbarkStudios/cargo-about):
 
-- **Prerequisite**: Install cargo-about with `cargo install cargo-about`
+- **Prerequisite**: Run `mise install` to install the pinned `cargo-about` tool version
 - **Generate licenses**: `./gradlew :analyzer:generateRustLicenseResources`
 - **Validate licenses**: `./gradlew :analyzer:validateRustLicenseFiles` (runs automatically with `check`)
 
