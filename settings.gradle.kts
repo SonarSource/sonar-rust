@@ -6,9 +6,19 @@
  */
 
 pluginManagement {
+    val artifactoryUsername: String? = System.getenv("ARTIFACTORY_PRIVATE_USERNAME")
+        ?: providers.gradleProperty("artifactoryUsername").orNull
+    val artifactoryPassword: String? = System.getenv("ARTIFACTORY_PRIVATE_PASSWORD")
+        ?: providers.gradleProperty("artifactoryPassword").orNull
     repositories {
         maven {
             url = uri("https://repox.jfrog.io/repox/sonarsource")
+            if (artifactoryUsername != null && artifactoryPassword != null) {
+                credentials {
+                    username = artifactoryUsername
+                    password = artifactoryPassword
+                }
+            }
         }
     }
 }
