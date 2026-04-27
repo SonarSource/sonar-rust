@@ -10,6 +10,7 @@ pluginManagement {
         maven {
             url = uri("https://repox.jfrog.io/repox/sonarsource")
         }
+        gradlePluginPortal()
     }
 }
 
