@@ -53,6 +53,14 @@ fun resolveRuleApiJar(): File {
   }
 }
 
+fun buildRuleApiEnvironment(githubToken: String): Map<String, String> {
+  val cacheRoot = layout.buildDirectory.dir("rule-api-cache").get().asFile
+  return mapOf(
+    "GITHUB_TOKEN" to githubToken,
+    "SONAR_USER_HOME" to cacheRoot.absolutePath,
+  )
+}
+
 fun runProcess(command: List<String>, workingDir: File, env: Map<String, String>): Pair<Int, String> {
   val process = ProcessBuilder(command)
     .directory(workingDir)
@@ -72,8 +80,6 @@ tasks.register("generateRuleMetadata") {
   description = "Generate rule metadata using rule-api for specified rule keys."
 
   doLast {
-    val githubToken = resolveGithubToken()
-
     val ruleKeysProperty = (findProperty("ruleKeys") as String?)?.trim()
     if (ruleKeysProperty.isNullOrEmpty()) {
       throw GradleException("Missing -PruleKeys. Example: -PruleKeys=S1234,S5678")
@@ -104,16 +110,13 @@ tasks.register("generateRuleMetadata") {
       else -> defaultRspecBranches
     }.distinct()
 
+    val githubToken = resolveGithubToken()
     val ruleApiJar = resolveRuleApiJar()
 
     println("Generating rule metadata for ${ruleKeys.size} rule(s).")
     println("Using rule-api: ${ruleApiJar.name}")
 
-    val cacheRoot = layout.buildDirectory.dir("rule-api-cache").get().asFile
-    val environment = mapOf(
-      "GITHUB_TOKEN" to githubToken,
-      "SONAR_USER_HOME" to cacheRoot.absolutePath,
-    )
+    val environment = buildRuleApiEnvironment(githubToken)
 
     var lastOutput = ""
     var lastExitCode = 0
@@ -154,11 +157,7 @@ tasks.register("updateRuleMetadata") {
     println("Updating rule metadata.")
     println("Using rule-api: ${ruleApiJar.name}")
 
-    val cacheRoot = layout.buildDirectory.dir("rule-api-cache").get().asFile
-    val environment = mapOf(
-      "GITHUB_TOKEN" to githubToken,
-      "SONAR_USER_HOME" to cacheRoot.absolutePath,
-    )
+    val environment = buildRuleApiEnvironment(githubToken)
 
     val (exitCode, output) = runProcess(listOf("java", "-jar", ruleApiJar.absolutePath, "update"), rootDir, environment)
     if (exitCode != 0) {
