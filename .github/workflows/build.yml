@@ -22,7 +22,7 @@ jobs:
   macos_analyzers:
     runs-on: macos-latest
     name: macOS Analyzers Build
-    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-')
+    if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-') || github.event_name == 'workflow_dispatch'
     permissions:
       id-token: write
     steps:
@@ -39,6 +39,7 @@ jobs:
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
           source $HOME/.cargo/env
           rustup target add x86_64-apple-darwin
+      - uses: SonarSource/ci-github-actions/config-gradle@v1
       - name: Build Rust analyzers
         run: |
           echo "org.gradle.daemon=false" >> "gradle.properties"
@@ -110,6 +111,7 @@ jobs:
           rustup target add x86_64-unknown-linux-musl
           rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-unknown-linux-musl
+      - uses: SonarSource/ci-github-actions/config-gradle@v1
       - name: Build Rust analyzers
         run: |
           ./gradlew :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --info --stacktrace
