@@ -100,6 +100,21 @@
       "groupSlug": "all-sonar-github-actions"
     },
     {
+      "description": "SonarSource GitHub actions do not need version pinning",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "SonarSource/*",
+        "sonarsource/*"
+      ],
+      "matchUpdateTypes": [
+        "pin",
+        "rollback"
+      ],
+      "enabled": false
+    },
+    {
       "matchManagers": [
         "github-actions"
       ],
