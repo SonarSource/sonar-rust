@@ -6,6 +6,8 @@ plugins {
   id("com.jfrog.artifactory") version "6.0.4"
 }
 
+apply(from = "gradle/rule-metadata.gradle.kts")
+
 allprojects {
   dependencyLocking {
     lockAllConfigurations()
