@@ -20,6 +20,7 @@ val ruleApiVersion = (findProperty("ruleApiVersion") as String?) ?: "2.17.0.5605
 val ruleApiConfiguration = configurations.create("ruleApi") {
   isCanBeConsumed = false
   isCanBeResolved = true
+  resolutionStrategy.deactivateDependencyLocking()
 }
 
 dependencies {
@@ -54,11 +55,7 @@ fun resolveRuleApiJar(): File {
 }
 
 fun buildRuleApiEnvironment(githubToken: String): Map<String, String> {
-  val cacheRoot = layout.buildDirectory.dir("rule-api-cache").get().asFile
-  return mapOf(
-    "GITHUB_TOKEN" to githubToken,
-    "SONAR_USER_HOME" to cacheRoot.absolutePath,
-  )
+  return mapOf("GITHUB_TOKEN" to githubToken)
 }
 
 fun runProcess(command: List<String>, workingDir: File, env: Map<String, String>): Pair<Int, String> {
