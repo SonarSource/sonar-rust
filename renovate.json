@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>SonarSource/renovate-config"
+    "github>SonarSource/renovate-config:languages-team"
   ],
   "enabledManagers": [
     "github-actions",
@@ -98,6 +98,21 @@
       "pinDigests": false,
       "groupName": "all Sonar GitHub Actions",
       "groupSlug": "all-sonar-github-actions"
+    },
+    {
+      "description": "SonarSource GitHub actions do not need version pinning",
+      "matchManagers": [
+        "github-actions"
+      ],
+      "matchPackageNames": [
+        "SonarSource/*",
+        "sonarsource/*"
+      ],
+      "matchUpdateTypes": [
+        "pin",
+        "rollback"
+      ],
+      "enabled": false
     },
     {
       "matchManagers": [
