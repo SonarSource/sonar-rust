@@ -58,7 +58,7 @@ jobs:
           path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
 
   cross_platform_analyzers:
-    runs-on: github-ubuntu-latest-m
+    runs-on: warp-custom-ubuntu-24-04
     name: Cross-Platform Analyzers Build
     env:
       MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
@@ -132,7 +132,7 @@ jobs:
           path: analyzer/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz
 
   unit_test_and_analysis:
-    runs-on: github-ubuntu-latest-m
+    runs-on: warp-custom-ubuntu-24-04
     name: Unit Tests and Analysis
     permissions:
       id-token: write
@@ -164,7 +164,7 @@ jobs:
       !cancelled() &&
       (needs.macos_analyzers.result == 'success' || needs.macos_analyzers.result == 'skipped') &&
       needs.cross_platform_analyzers.result == 'success'
-    runs-on: github-ubuntu-latest-m
+    runs-on: warp-custom-ubuntu-24-04
     name: Build
     permissions:
       id-token: write
@@ -213,7 +213,7 @@ jobs:
   e2e:
     needs: [build]
     if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: github-ubuntu-latest-m
+    runs-on: warp-custom-ubuntu-24-04
     name: E2E Tests
     permissions:
       id-token: write
@@ -331,7 +331,7 @@ jobs:
       startsWith(github.ref_name, 'dogfood-'))
     permissions:
       id-token: write
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     steps:
       # https://github.com/SonarSource/release-github-actions/tree/master/notify-slack
       - uses: SonarSource/release-github-actions/notify-slack@v1
@@ -350,7 +350,7 @@ jobs:
       needs.e2e.result == 'success' &&
       needs.e2e_win.result == 'success' &&
       needs.e2e_linux_arm64.result == 'success'
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     name: Promote
     permissions:
       id-token: write
