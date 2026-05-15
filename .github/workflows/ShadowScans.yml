@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: github-ubuntu-latest-m
+    runs-on: warp-custom-ubuntu-24-04
     name: Build for Shadow Scan
     permissions:
       id-token: write
@@ -45,7 +45,7 @@ jobs:
     concurrency:
       group: iris-${{ github.ref }}
       cancel-in-progress: false
-    runs-on: github-ubuntu-latest-s
+    runs-on: warp-custom-ubuntu-24-04
     name: Run IRIS
     permissions:
       id-token: write
