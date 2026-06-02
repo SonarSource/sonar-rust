@@ -6,10 +6,10 @@ plugins {
   id("jacoco")
   `maven-publish`
   signing
-  id("com.diffplug.spotless") version "8.4.0"
+  id("com.diffplug.spotless") version "8.6.0"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
-  id("com.gradleup.shadow") version "9.4.0"
+  id("com.gradleup.shadow") version "9.4.2"
   id("license-file-generator")
 }
 
@@ -25,10 +25,10 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 
 val sonarApiVersion = "13.2.0.3137"
 val sonarApiImplVersion = "25.11.0.114957"
-val analyzerCommonsVersion = "2.21.0.4626"
+val analyzerCommonsVersion = "2.22.0.4796"
 
 dependencies {
-  implementation("com.google.code.gson:gson:2.13.2")
+  implementation("com.google.code.gson:gson:2.14.0")
   implementation("org.sonarsource.analyzer-commons:sonar-analyzer-commons:$analyzerCommonsVersion")
   implementation("org.sonarsource.analyzer-commons:sonar-xml-parsing:$analyzerCommonsVersion")
   implementation("org.tukaani:xz:1.12")
@@ -36,7 +36,7 @@ dependencies {
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
   testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
-  testImplementation(platform("org.junit:junit-bom:6.0.3"))
+  testImplementation(platform("org.junit:junit-bom:6.1.0"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.27.7")
   testImplementation("org.mockito:mockito-core:5.23.0")
@@ -45,7 +45,7 @@ dependencies {
   
   // Force specific versions of transitive dependencies
   constraints {
-    implementation("ch.qos.logback:logback-classic:1.5.32") {
+    implementation("ch.qos.logback:logback-classic:1.5.33") {
       because("CVE-2023-6378 - Deserialization of Untrusted Data")
     }
   }
