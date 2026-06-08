@@ -2016,6 +2016,12 @@
     "description": "Clippy lint <code>manual_non_exhaustive</code>."
   },
   {
+    "key": "manual_noop_waker",
+    "name": "manual_noop_waker",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_noop_waker",
+    "description": "Clippy lint <code>manual_noop_waker</code>."
+  },
+  {
     "key": "manual_ok_err",
     "name": "manual_ok_err",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_ok_err",
@@ -2034,10 +2040,22 @@
     "description": "Clippy lint <code>manual_option_as_slice</code>."
   },
   {
+    "key": "manual_option_zip",
+    "name": "manual_option_zip",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_option_zip",
+    "description": "Clippy lint <code>manual_option_zip</code>."
+  },
+  {
     "key": "manual_pattern_char_comparison",
     "name": "manual_pattern_char_comparison",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_pattern_char_comparison",
     "description": "Clippy lint <code>manual_pattern_char_comparison</code>."
+  },
+  {
+    "key": "manual_pop_if",
+    "name": "manual_pop_if",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_pop_if",
+    "description": "Clippy lint <code>manual_pop_if</code>."
   },
   {
     "key": "manual_range_contains",
