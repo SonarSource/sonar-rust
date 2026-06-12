@@ -169,6 +169,8 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    outputs:
+      BUILD_NUMBER: ${{ steps.build.outputs.BUILD_NUMBER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1
@@ -204,6 +206,7 @@ jobs:
           name: analyzer-x86_64-pc-windows-gnu
           path: analyzer/target/x86_64-pc-windows-gnu/release/      
       - uses: SonarSource/ci-github-actions/build-gradle@v1
+        id: build
         with:
           deploy-pull-request: true
           gradle-args: "-PskipAnalyzerBuild --info --stacktrace"
@@ -217,6 +220,8 @@ jobs:
     name: E2E Tests
     permissions:
       id-token: write
+    env:
+      BUILD_NUMBER: ${{ needs.build.outputs.BUILD_NUMBER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup orchestrator cache
@@ -247,6 +252,8 @@ jobs:
     permissions:
       id-token: write
       contents: write
+    env:
+      BUILD_NUMBER: ${{ needs.build.outputs.BUILD_NUMBER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup orchestrator cache
@@ -275,7 +282,7 @@ jobs:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
         run: |
           echo "org.gradle.daemon=false" >> "gradle.properties"
-          export PATH=$PATH:$HOME/.cargo/bin          
+          export PATH=$PATH:$HOME/.cargo/bin
           ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
       - name: Upload test reports
         if: always()
@@ -291,6 +298,8 @@ jobs:
     name: E2E Tests Linux ARM64
     permissions:
       id-token: write
+    env:
+      BUILD_NUMBER: ${{ needs.build.outputs.BUILD_NUMBER }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - name: Setup orchestrator cache
@@ -311,7 +320,7 @@ jobs:
         shell: bash
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-        run: |   
+        run: |
             echo 'org.gradle.daemon=false' >> gradle.properties
             export PATH=$PATH:$HOME/.cargo/bin
             ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
