@@ -1,2 +1,2 @@
 # https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
-* @SonarSource/code-quality-ai-rules-issue-detection-squad
+.github/CODEOWNERS @SonarSource/code-quality-core-languages-parsers-squad
