@@ -347,7 +347,7 @@ jobs:
         with:
           project-name: "Sonar-Rust"
           icon: ":cyber-radish:"
-          slack-channel: "squad-rad"
+          slack-channel: "squad-corelang-notifs"
           jobs: ${{ toJSON(needs) }}
 
   promote:

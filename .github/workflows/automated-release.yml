@@ -63,7 +63,7 @@ jobs:
       branch: ${{ github.event.inputs.branch }}
       pm-email: ${{ github.event.inputs.pm_email }}
       runner-environment: "github-ubuntu-latest-s"
-      slack-channel: "squad-rust"
+      slack-channel: "squad-corelang-releases"
       verbose: true
       use-jira-sandbox: ${{ github.event.inputs.dry-run == 'true' }}
       is-draft-release: ${{ github.event.inputs.dry-run == 'true' }}
