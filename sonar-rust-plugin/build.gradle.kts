@@ -6,10 +6,10 @@ plugins {
   id("jacoco")
   `maven-publish`
   signing
-  id("com.diffplug.spotless") version "8.6.0"
+  id("com.diffplug.spotless") version "8.7.0"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
-  id("com.gradleup.shadow") version "9.4.2"
+  id("com.gradleup.shadow") version "9.4.3"
   id("license-file-generator")
 }
 
@@ -25,7 +25,7 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 
 val sonarApiVersion = "13.2.0.3137"
 val sonarApiImplVersion = "25.11.0.114957"
-val analyzerCommonsVersion = "2.22.0.4796"
+val analyzerCommonsVersion = "2.25.0.4954"
 
 dependencies {
   implementation("com.google.code.gson:gson:2.14.0")
@@ -45,7 +45,7 @@ dependencies {
   
   // Force specific versions of transitive dependencies
   constraints {
-    implementation("ch.qos.logback:logback-classic:1.5.33") {
+    implementation("ch.qos.logback:logback-classic:1.5.37") {
       because("CVE-2023-6378 - Deserialization of Untrusted Data")
     }
   }
