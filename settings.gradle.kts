@@ -29,3 +29,4 @@ rootProject.name = "sonar-rust-plugin"
 include("sonar-rust-plugin")
 include("analyzer")
 include("e2e")
+include("custom-rules-plugin")
