@@ -19,6 +19,7 @@ package org.sonarsource.rust.plugin;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.never;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -61,7 +62,7 @@ class TelemetryTest {
     if (expected != null) {
       verify(sct).addTelemetryProperty("rust.language.edition", expected);
     } else {
-      verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+      verify(sct, never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
     }
   }
 
@@ -72,7 +73,7 @@ class TelemetryTest {
 
     Telemetry.reportManifestInfo(sct, manifest);
 
-    verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+    verify(sct, never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
   }
 
   @ParameterizedTest
@@ -91,7 +92,7 @@ class TelemetryTest {
     if (expected != null) {
       verify(sct).addTelemetryProperty("rust.clippy.version", expected);
     } else {
-      verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+      verify(sct, never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
     }
   }
 
@@ -174,7 +175,7 @@ class TelemetryTest {
       verify(sct).addTelemetryProperty("rust.dependencies", expectedList);
       verify(sct).addTelemetryProperty("rust.dependencies.count", expectedCount);
     } else {
-      verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+      verify(sct, never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
     }
   }
 
@@ -210,7 +211,7 @@ class TelemetryTest {
 
     Telemetry.reportDependencies(sct, List.of(manifest));
 
-    verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+    verify(sct, never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
   }
 
   @Test

@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import org.sonar.api.batch.sensor.SensorContext;
 
 public class Telemetry {
@@ -60,7 +61,7 @@ public class Telemetry {
    * Classification of the Cargo.toml table currently being read. {@code subtableCrate} is the crate
    * named by a `[dependencies.&lt;crate&gt;]` sub-table, and is {@code null} for the other kinds.
    */
-  private record Section(SectionKind kind, String subtableCrate) {
+  private record Section(SectionKind kind, @Nullable String subtableCrate) {
     static final Section OTHER = new Section(SectionKind.OTHER, null);
   }
 
@@ -239,7 +240,7 @@ public class Telemetry {
   private static String formatToken(Dependency dependency) {
     // Commas would corrupt the joined list; strip them from the (rare) versions that contain them.
     String version = dependency.version().replace(",", "");
-    return version.isEmpty() ? dependency.name() : dependency.name() + ":" + version;
+    return version.isEmpty() ? dependency.name() : ( dependency.name() + ":" + version );
   }
 
   private static String truncate(String value) {
