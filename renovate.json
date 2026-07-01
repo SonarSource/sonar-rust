@@ -1,8 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "github>SonarSource/renovate-config:languages-team"
+    "local>SonarSource/core-languages-tooling-public:renovate-config"
   ],
+  "addLabels": [
+    "dependencies"
+  ],
+  "rebaseWhen": "conflicted",
+  "minimumReleaseAgeBehaviour": "timestamp-required",
   "enabledManagers": [
     "github-actions",
     "gradle",
@@ -14,6 +19,31 @@
     "e2e/src/test/resources/**"
   ],
   "packageRules": [
+    {
+      "description": "Group Gradle updates",
+      "matchManagers": [
+        "gradle",
+        "gradle-wrapper"
+      ],
+      "groupName": "Gradle dependencies",
+      "groupSlug": "gradle-dependencies"
+    },
+    {
+      "description": "Group npm updates",
+      "matchManagers": [
+        "npm"
+      ],
+      "groupName": "npm dependencies",
+      "groupSlug": "npm-dependencies"
+    },
+    {
+      "description": "Group Mise tool updates",
+      "matchManagers": [
+        "mise"
+      ],
+      "groupName": "Mise tool dependencies",
+      "groupSlug": "mise-tool-dependencies"
+    },
     {
       "matchManagers": [
         "gradle"
