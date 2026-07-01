@@ -16,17 +16,63 @@
  */
 package org.sonarsource.rust.plugin;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
+import org.sonar.plugins.rust.api.RustRulesRepository;
 import org.sonarsource.analyzer.commons.BuiltInQualityProfileJsonLoader;
 
 public class RustProfile implements BuiltInQualityProfilesDefinition {
 
   private static final String SONAR_WAY_PATH = "/org/sonar/l10n/rust/rules/rust/Sonar_way_profile.json";
 
+  private final RustRulesRepository[] repositories;
+
+  public RustProfile() {
+    this(new RustRulesRepository[0]);
+  }
+
+  public RustProfile(RustRulesRepository[] repositories) {
+    this.repositories = repositories;
+  }
+
   @Override
   public void define(Context context) {
-    var builtInQualityProfile = context.createBuiltInQualityProfile("Sonar way", RustLanguage.KEY);
-    BuiltInQualityProfileJsonLoader.load(builtInQualityProfile, RustLanguage.KEY, SONAR_WAY_PATH);
-    builtInQualityProfile.done();
+    var profile = context.createBuiltInQualityProfile("Sonar way", RustLanguage.KEY);
+
+    // Rule ids reimplemented by a contributing plugin supersede the base "rust" rule with the same
+    // id: the contributed rule is activated instead of the base one below.
+    Set<String> overriddenRuleIds = Arrays.stream(repositories)
+      .flatMap(repository -> repository.ruleKeys().stream())
+      .map(RustProfile::ruleId)
+      .collect(Collectors.toSet());
+
+    for (String baseRuleKey : BuiltInQualityProfileJsonLoader.loadActiveKeysFromJsonProfile(SONAR_WAY_PATH)) {
+      if (!overriddenRuleIds.contains(baseRuleKey)) {
+        profile.activateRule(RustLanguage.KEY, baseRuleKey);
+      }
+    }
+
+    Set<String> activated = new HashSet<>();
+    for (RustRulesRepository repository : repositories) {
+      for (String ruleKey : repository.ruleKeys()) {
+        // Guard against the same rule being contributed by more than one repository.
+        if (activated.add(ruleKey)) {
+          profile.activateRule(repositoryKey(ruleKey), ruleId(ruleKey));
+        }
+      }
+    }
+
+    profile.done();
+  }
+
+  private static String repositoryKey(String ruleKey) {
+    return ruleKey.substring(0, ruleKey.indexOf(':'));
+  }
+
+  private static String ruleId(String ruleKey) {
+    return ruleKey.substring(ruleKey.indexOf(':') + 1);
   }
 }
