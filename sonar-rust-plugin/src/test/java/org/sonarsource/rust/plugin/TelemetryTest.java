@@ -17,6 +17,8 @@
 package org.sonarsource.rust.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -52,25 +54,25 @@ class TelemetryTest {
     var manifest = tmpDir.resolve("Cargo.toml");
     Files.writeString(manifest, manifestContent);
 
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
     Telemetry.reportManifestInfo(sct, manifest);
 
     if (expected != null) {
-      Mockito.verify(sct).addTelemetryProperty("rust.language.edition", expected);
+      verify(sct).addTelemetryProperty("rust.language.edition", expected);
     } else {
-      Mockito.verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+      verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
     }
   }
 
   @Test
   void report_manifest_info_io_error() {
     var manifest = tmpDir.resolve("noSuchCargo.toml");
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
     Telemetry.reportManifestInfo(sct, manifest);
 
-    Mockito.verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+    verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
   }
 
   @ParameterizedTest
@@ -83,13 +85,13 @@ class TelemetryTest {
     "\"\";null"
   })
   void report_clippy_version(String versionString, @Nullable String expected) {
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
     Telemetry.reportClippyVersion(sct, versionString);
 
     if (expected != null) {
-      Mockito.verify(sct).addTelemetryProperty("rust.clippy.version", expected);
+      verify(sct).addTelemetryProperty("rust.clippy.version", expected);
     } else {
-      Mockito.verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+      verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
     }
   }
 
@@ -164,15 +166,15 @@ class TelemetryTest {
     var manifest = tmpDir.resolve("Cargo.toml");
     Files.writeString(manifest, manifestContent);
 
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
     Telemetry.reportDependencies(sct, List.of(manifest));
 
     if (expectedList != null) {
-      Mockito.verify(sct).addTelemetryProperty("rust.dependencies", expectedList);
-      Mockito.verify(sct).addTelemetryProperty("rust.dependencies.count", expectedCount);
+      verify(sct).addTelemetryProperty("rust.dependencies", expectedList);
+      verify(sct).addTelemetryProperty("rust.dependencies.count", expectedCount);
     } else {
-      Mockito.verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+      verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
     }
   }
 
@@ -193,22 +195,22 @@ class TelemetryTest {
       tokio = "1.38"
       """);
 
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
     Telemetry.reportDependencies(sct, List.of(m1, m2));
 
-    Mockito.verify(sct).addTelemetryProperty("rust.dependencies", "rand:0.8,serde:1.0,tokio:1.38");
-    Mockito.verify(sct).addTelemetryProperty("rust.dependencies.count", "3");
+    verify(sct).addTelemetryProperty("rust.dependencies", "rand:0.8,serde:1.0,tokio:1.38");
+    verify(sct).addTelemetryProperty("rust.dependencies.count", "3");
   }
 
   @Test
   void report_dependencies_io_error() {
     var manifest = tmpDir.resolve("noSuchCargo.toml");
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
     Telemetry.reportDependencies(sct, List.of(manifest));
 
-    Mockito.verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+    verify(sct, Mockito.never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
   }
 
   @Test
@@ -220,15 +222,15 @@ class TelemetryTest {
     var manifest = tmpDir.resolve("Cargo.toml");
     Files.writeString(manifest, content.toString());
 
-    SensorContextTester sct = Mockito.spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
     Telemetry.reportDependencies(sct, List.of(manifest));
 
     var listCaptor = ArgumentCaptor.forClass(String.class);
-    Mockito.verify(sct).addTelemetryProperty(Mockito.eq("rust.dependencies"), listCaptor.capture());
+    verify(sct).addTelemetryProperty(Mockito.eq("rust.dependencies"), listCaptor.capture());
     assertThat(listCaptor.getValue()).hasSizeLessThanOrEqualTo(1000).endsWith(",...");
     // The count reflects the true total even though the list value is truncated.
-    Mockito.verify(sct).addTelemetryProperty("rust.dependencies.count", "500");
+    verify(sct).addTelemetryProperty("rust.dependencies.count", "500");
   }
 
   static Stream<Arguments> dependencyManifests() {

@@ -57,6 +57,14 @@ public class Telemetry {
   }
 
   /**
+   * Classification of the Cargo.toml table currently being read. {@code subtableCrate} is the crate
+   * named by a `[dependencies.&lt;crate&gt;]` sub-table, and is {@code null} for the other kinds.
+   */
+  private record Section(SectionKind kind, String subtableCrate) {
+    static final Section OTHER = new Section(SectionKind.OTHER, null);
+  }
+
+  /**
    * A direct dependency declared in a Cargo.toml manifest. {@code version} is empty when the
    * dependency has no version requirement (git, path or workspace-inherited dependencies).
    */
@@ -147,58 +155,55 @@ public class Telemetry {
   }
 
   static List<Dependency> parseDependencies(Path cargoManifest) throws IOException {
-    var lines = Files.readAllLines(cargoManifest);
-
     // Preserve declaration order; the value is the version ("" when versionless).
     var deps = new LinkedHashMap<String, String>();
-    SectionKind kind = SectionKind.OTHER;
-    String pendingSubtableCrate = null;
+    Section section = Section.OTHER;
 
-    for (var line : lines) {
+    for (var line : Files.readAllLines(cargoManifest)) {
       String trimmed = line.replaceAll("#.*", "").trim();
       if (trimmed.isEmpty()) {
         continue;
       }
 
       if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
-        String section = trimmed.substring(1, trimmed.length() - 1).trim();
-        pendingSubtableCrate = null;
-
-        if (isDependencyTable(section)) {
-          kind = SectionKind.DEP_TABLE;
-        } else {
-          var matcher = DEP_SUBTABLE_PATTERN.matcher(section);
-          if (matcher.matches()) {
-            kind = SectionKind.DEP_SUBTABLE;
-            pendingSubtableCrate = unquote(matcher.group(1).trim());
-            // A sub-table may declare no version; record the crate name up front.
-            deps.putIfAbsent(pendingSubtableCrate, "");
-          } else {
-            kind = SectionKind.OTHER;
-          }
-        }
-        continue;
-      }
-
-      int eq = trimmed.indexOf('=');
-      if (eq <= 0) {
-        continue;
-      }
-
-      if (kind == SectionKind.DEP_TABLE) {
-        String name = unquote(trimmed.substring(0, eq).trim());
-        if (!name.isEmpty()) {
-          deps.put(name, extractVersion(trimmed.substring(eq + 1).trim()));
-        }
-      } else if (kind == SectionKind.DEP_SUBTABLE && pendingSubtableCrate != null
-        && "version".equals(trimmed.substring(0, eq).trim())) {
-        deps.put(pendingSubtableCrate, extractVersion(trimmed.substring(eq + 1).trim()));
+        section = classifySection(trimmed.substring(1, trimmed.length() - 1).trim(), deps);
+      } else {
+        parseEntry(trimmed, section, deps);
       }
     }
 
     var result = new ArrayList<Dependency>();
     deps.forEach((name, version) -> result.add(new Dependency(name, version)));
     return result;
+  }
+
+  private static Section classifySection(String section, LinkedHashMap<String, String> deps) {
+    if (isDependencyTable(section)) {
+      return new Section(SectionKind.DEP_TABLE, null);
+    }
+    var matcher = DEP_SUBTABLE_PATTERN.matcher(section);
+    if (matcher.matches()) {
+      String crate = unquote(matcher.group(1).trim());
+      // A sub-table may declare no version; record the crate name up front.
+      deps.putIfAbsent(crate, "");
+      return new Section(SectionKind.DEP_SUBTABLE, crate);
+    }
+    return Section.OTHER;
+  }
+
+  private static void parseEntry(String trimmed, Section section, LinkedHashMap<String, String> deps) {
+    int eq = trimmed.indexOf('=');
+    if (eq <= 0) {
+      return;
+    }
+    String key = unquote(trimmed.substring(0, eq).trim());
+    String version = extractVersion(trimmed.substring(eq + 1).trim());
+
+    if (section.kind() == SectionKind.DEP_TABLE && !key.isEmpty()) {
+      deps.put(key, version);
+    } else if (section.kind() == SectionKind.DEP_SUBTABLE && "version".equals(key)) {
+      deps.put(section.subtableCrate(), version);
+    }
   }
 
   private static boolean isDependencyTable(String section) {
