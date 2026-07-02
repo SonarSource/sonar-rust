@@ -278,11 +278,11 @@ public class Telemetry {
     int budget = MAX_VALUE_LENGTH - TRUNCATION_MARKER.length();
     var sb = new StringBuilder();
     for (String token : shuffled) {
-      int extra = sb.length() == 0 ? token.length() : token.length() + 1;
+      int extra = sb.isEmpty() ? token.length() : ( token.length() + 1 );
       if (sb.length() + extra > budget) {
         break;
       }
-      if (sb.length() > 0) {
+      if (!sb.isEmpty()) {
         sb.append(',');
       }
       sb.append(token);
