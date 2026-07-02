@@ -40,11 +40,14 @@ public class Telemetry {
 
   private static final Pattern CLIPPY_VERSION_PATTERN = Pattern.compile("^clippy\\s+(\\d+\\.\\d+\\.\\d+)");
 
-  // Names of the Cargo.toml tables that declare direct dependencies.
-  private static final Set<String> DEP_SECTIONS = Set.of("dependencies", "dev-dependencies", "build-dependencies");
-  // Matches a dependency sub-table header, e.g. `dependencies.serde` or `target.'cfg(unix)'.dependencies.libc`.
+  // Names of the Cargo.toml tables that declare direct dependencies. `workspace.dependencies` covers
+  // virtual workspace roots, where dependencies are declared under `[workspace.dependencies]`.
+  private static final Set<String> DEP_SECTIONS =
+    Set.of("dependencies", "dev-dependencies", "build-dependencies", "workspace.dependencies");
+  // Matches a dependency sub-table header, e.g. `dependencies.serde`, `workspace.dependencies.serde`
+  // or `target.'cfg(unix)'.dependencies.libc`.
   private static final Pattern DEP_SUBTABLE_PATTERN =
-    Pattern.compile("^(?:target\\..+\\.)?(?:dependencies|dev-dependencies|build-dependencies)\\.(.+)$");
+    Pattern.compile("^(?:target\\..+\\.|workspace\\.)?(?:dependencies|dev-dependencies|build-dependencies)\\.(.+)$");
   // Matches `version = "1.0"` inside an inline table, e.g. `{ version = "1.0", features = [...] }`.
   private static final Pattern INLINE_VERSION_PATTERN = Pattern.compile("\\bversion\\s*=\\s*[\"']([^\"']*)[\"']");
 

@@ -282,6 +282,18 @@ class TelemetryTest {
         [target.'cfg(windows)'.dependencies.winapi]
         version = "0.3"
         """),
+      Arguments.of("workspace dependencies table", "serde:1.0,tokio:1.38", "2", """
+        [workspace]
+        members = ["a"]
+        [workspace.dependencies]
+        serde = "1.0"
+        tokio = { version = "1.38", features = ["full"] }
+        """),
+      Arguments.of("workspace dependency sub-table", "serde:1.0", "1", """
+        [workspace.dependencies.serde]
+        version = "1.0"
+        features = ["derive"]
+        """),
       Arguments.of("non-dependency sections ignored", null, null, """
         [package]
         name = "analyzer"
