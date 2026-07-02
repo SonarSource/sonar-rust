@@ -294,6 +294,11 @@ class TelemetryTest {
         version = "1.0"
         features = ["derive"]
         """),
+      Arguments.of("dotted key in dependency table", "serde:1.0", "1", """
+        [dependencies]
+        serde.version = "1.0"
+        serde.features = ["derive"]
+        """),
       Arguments.of("non-dependency sections ignored", null, null, """
         [package]
         name = "analyzer"

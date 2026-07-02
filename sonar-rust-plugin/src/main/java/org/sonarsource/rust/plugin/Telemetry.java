@@ -207,7 +207,18 @@ public class Telemetry {
     String version = extractVersion(trimmed.substring(eq + 1).trim());
 
     if (section.kind() == SectionKind.DEP_TABLE && !key.isEmpty()) {
-      deps.put(key, version);
+      // A dotted key inside a dependency table, e.g. `serde.version = "1.0"`, declares a field of the
+      // crate named before the dot, not a crate literally named `serde.version`.
+      int dot = key.indexOf('.');
+      if (dot > 0) {
+        String crate = key.substring(0, dot);
+        deps.putIfAbsent(crate, "");
+        if ("version".equals(key.substring(dot + 1))) {
+          deps.put(crate, version);
+        }
+      } else {
+        deps.put(key, version);
+      }
     } else if (section.kind() == SectionKind.DEP_SUBTABLE && "version".equals(key)) {
       deps.put(section.subtableCrate(), version);
     }
