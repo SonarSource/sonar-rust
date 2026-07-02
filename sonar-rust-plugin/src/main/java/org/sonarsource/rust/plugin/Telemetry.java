@@ -19,8 +19,14 @@ package org.sonarsource.rust.plugin;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Pattern;
 import javax.annotation.CheckForNull;
+import javax.annotation.Nullable;
 import org.sonar.api.batch.sensor.SensorContext;
 
 public class Telemetry {
@@ -29,8 +35,42 @@ public class Telemetry {
   private static final String RUST_CLIPPY_EDITION_VERSION_NAME = "rust.clippy.version";
   private static final String RUST_COVERAGE_FORMAT_NAME = "rust.coverage.format";
   private static final String RUST_CLIPPY_USAGE_NAME = "rust.clippy.usage";
+  private static final String RUST_DEPENDENCIES_COUNT_NAME = "rust.dependencies.count";
+  private static final String RUST_DEPENDENCIES_NAME = "rust.dependencies";
 
   private static final Pattern CLIPPY_VERSION_PATTERN = Pattern.compile("^clippy\\s+(\\d+\\.\\d+\\.\\d+)");
+
+  // Names of the Cargo.toml tables that declare direct dependencies.
+  private static final Set<String> DEP_SECTIONS = Set.of("dependencies", "dev-dependencies", "build-dependencies");
+  // Matches a dependency sub-table header, e.g. `dependencies.serde` or `target.'cfg(unix)'.dependencies.libc`.
+  private static final Pattern DEP_SUBTABLE_PATTERN =
+    Pattern.compile("^(?:target\\..+\\.)?(?:dependencies|dev-dependencies|build-dependencies)\\.(.+)$");
+  // Matches `version = "1.0"` inside an inline table, e.g. `{ version = "1.0", features = [...] }`.
+  private static final Pattern INLINE_VERSION_PATTERN = Pattern.compile("\\bversion\\s*=\\s*[\"']([^\"']*)[\"']");
+
+  // The telemetry channel has practical per-analysis limits on value length, so the joined
+  // dependency list is capped and truncated at a token boundary.
+  private static final int MAX_VALUE_LENGTH = 1000;
+  private static final String TRUNCATION_MARKER = ",...";
+
+  private enum SectionKind {
+    DEP_TABLE, DEP_SUBTABLE, OTHER
+  }
+
+  /**
+   * Classification of the Cargo.toml table currently being read. {@code subtableCrate} is the crate
+   * named by a `[dependencies.&lt;crate&gt;]` sub-table, and is {@code null} for the other kinds.
+   */
+  private record Section(SectionKind kind, @Nullable String subtableCrate) {
+    static final Section OTHER = new Section(SectionKind.OTHER, null);
+  }
+
+  /**
+   * A direct dependency declared in a Cargo.toml manifest. {@code version} is empty when the
+   * dependency has no version requirement (git, path or workspace-inherited dependencies).
+   */
+  record Dependency(String name, String version) {
+  }
 
   private Telemetry() {
 
@@ -88,6 +128,132 @@ public class Telemetry {
     }
 
     return null;
+  }
+
+  /**
+   * Reports the direct dependencies declared across all the given Cargo manifests. Dependencies are
+   * deduplicated, sorted and emitted as two aggregate properties: the distinct count and the (possibly
+   * truncated) comma-joined list of {@code name:version} tokens (or just {@code name} when versionless).
+   */
+  public static void reportDependencies(SensorContext context, List<Path> manifests) {
+    var distinct = new TreeSet<String>();
+    for (Path manifest : manifests) {
+      try {
+        for (Dependency dependency : parseDependencies(manifest)) {
+          distinct.add(formatToken(dependency));
+        }
+      } catch (IOException ex) {
+        // Ignore - skip this manifest and keep collecting from the others
+      }
+    }
+
+    if (distinct.isEmpty()) {
+      return;
+    }
+
+    saveTelemetry(context, RUST_DEPENDENCIES_COUNT_NAME, String.valueOf(distinct.size()));
+    saveTelemetry(context, RUST_DEPENDENCIES_NAME, truncate(String.join(",", distinct)));
+  }
+
+  static List<Dependency> parseDependencies(Path cargoManifest) throws IOException {
+    // Preserve declaration order; the value is the version ("" when versionless).
+    var deps = new LinkedHashMap<String, String>();
+    Section section = Section.OTHER;
+
+    for (var line : Files.readAllLines(cargoManifest)) {
+      String trimmed = line.replaceAll("#.*", "").trim();
+      if (trimmed.isEmpty()) {
+        continue;
+      }
+
+      if (trimmed.startsWith("[") && trimmed.endsWith("]")) {
+        section = classifySection(trimmed.substring(1, trimmed.length() - 1).trim(), deps);
+      } else {
+        parseEntry(trimmed, section, deps);
+      }
+    }
+
+    var result = new ArrayList<Dependency>();
+    deps.forEach((name, version) -> result.add(new Dependency(name, version)));
+    return result;
+  }
+
+  private static Section classifySection(String section, LinkedHashMap<String, String> deps) {
+    if (isDependencyTable(section)) {
+      return new Section(SectionKind.DEP_TABLE, null);
+    }
+    var matcher = DEP_SUBTABLE_PATTERN.matcher(section);
+    if (matcher.matches()) {
+      String crate = unquote(matcher.group(1).trim());
+      // A sub-table may declare no version; record the crate name up front.
+      deps.putIfAbsent(crate, "");
+      return new Section(SectionKind.DEP_SUBTABLE, crate);
+    }
+    return Section.OTHER;
+  }
+
+  private static void parseEntry(String trimmed, Section section, LinkedHashMap<String, String> deps) {
+    int eq = trimmed.indexOf('=');
+    if (eq <= 0) {
+      return;
+    }
+    String key = unquote(trimmed.substring(0, eq).trim());
+    String version = extractVersion(trimmed.substring(eq + 1).trim());
+
+    if (section.kind() == SectionKind.DEP_TABLE && !key.isEmpty()) {
+      deps.put(key, version);
+    } else if (section.kind() == SectionKind.DEP_SUBTABLE && "version".equals(key)) {
+      deps.put(section.subtableCrate(), version);
+    }
+  }
+
+  private static boolean isDependencyTable(String section) {
+    if (DEP_SECTIONS.contains(section)) {
+      return true;
+    }
+    // Target-specific dependencies, e.g. `target.'cfg(unix)'.dependencies`.
+    return section.startsWith("target.")
+      && (section.endsWith(".dependencies") || section.endsWith(".dev-dependencies") || section.endsWith(".build-dependencies"));
+  }
+
+  private static String extractVersion(String rhs) {
+    if (rhs.isEmpty()) {
+      return "";
+    }
+    char first = rhs.charAt(0);
+    if (first == '"' || first == '\'') {
+      return unquote(rhs);
+    }
+    if (first == '{') {
+      // Inline table: version is optional (absent for git/path/workspace dependencies).
+      var matcher = INLINE_VERSION_PATTERN.matcher(rhs);
+      return matcher.find() ? matcher.group(1) : "";
+    }
+    // Bare token (unusual, but tolerated best-effort).
+    return rhs;
+  }
+
+  private static String unquote(String value) {
+    return value.replaceAll("^[\"']", "").replaceAll("[\"']$", "");
+  }
+
+  private static String formatToken(Dependency dependency) {
+    // Commas would corrupt the joined list; strip them from the (rare) versions that contain them.
+    String version = dependency.version().replace(",", "");
+    return version.isEmpty() ? dependency.name() : ( dependency.name() + ":" + version );
+  }
+
+  private static String truncate(String value) {
+    if (value.length() <= MAX_VALUE_LENGTH) {
+      return value;
+    }
+    int limit = MAX_VALUE_LENGTH - TRUNCATION_MARKER.length();
+    int cut = value.lastIndexOf(',', limit);
+    if (cut < 0) {
+      // A single token longer than the limit; hard cut.
+      cut = limit;
+    }
+    return value.substring(0, cut) + TRUNCATION_MARKER;
   }
 
   private static void saveTelemetry(SensorContext context, String key, String value) {
