@@ -167,6 +167,8 @@ public class Telemetry {
     Section section = Section.OTHER;
 
     for (var line : Files.readAllLines(cargoManifest)) {
+      // Best-effort comment stripping: a '#' inside a quoted value (e.g. a git rev/URL fragment) is
+      // also stripped. Accepted for this best-effort telemetry parser.
       String trimmed = line.replaceAll("#.*", "").trim();
       if (trimmed.isEmpty()) {
         continue;
