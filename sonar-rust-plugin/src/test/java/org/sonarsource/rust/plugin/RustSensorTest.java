@@ -17,9 +17,12 @@
 package org.sonarsource.rust.plugin;
 
 import org.sonarsource.rust.TestAnalysisWarnigs;
+import org.sonarsource.rust.cargo.CargoManifestProvider;
 import org.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -38,6 +41,8 @@ import org.sonar.api.rule.RuleKey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -271,6 +276,24 @@ fn foo(c1: bool) {
     assertThat(parameters)
         .isNotNull()
         .containsEntry("S3776:threshold", "15"); // Should contain the default parameter from RustRulesDefinition.parameters()
+  }
+
+  @Test
+  void reports_dependency_telemetry() throws IOException {
+    var manifest = baseDir.toPath().resolve("Cargo.toml");
+    Files.writeString(manifest, """
+      [dependencies]
+      serde = "1.0"
+      """);
+
+    var spyContext = spy(context);
+    spyContext.settings().setProperty(CargoManifestProvider.CARGO_MANIFEST_PATHS, manifest.toString());
+    spyContext.fileSystem().add(inputFile("test.rs", "fn main() {}"));
+
+    sensor().execute(spyContext);
+
+    verify(spyContext).addTelemetryProperty("rust.dependencies", "serde:1.0");
+    verify(spyContext).addTelemetryProperty("rust.dependencies.count", "1");
   }
 
   private InputFile inputFile(String relativePath, String content) {
