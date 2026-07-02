@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -135,8 +136,10 @@ public class Telemetry {
 
   /**
    * Reports the direct dependencies declared across all the given Cargo manifests. Dependencies are
-   * deduplicated, sorted and emitted as two aggregate properties: the distinct count and the (possibly
-   * truncated) comma-joined list of {@code name:version} tokens (or just {@code name} when versionless).
+   * deduplicated and emitted as two aggregate properties: the distinct count and the comma-joined list
+   * of {@code name:version} tokens (or just {@code name} when versionless). When the list would exceed
+   * the channel length limit, a random sample of the dependencies is emitted instead, so the truncated
+   * view is not biased toward alphabetically-early crates.
    */
   public static void reportDependencies(SensorContext context, List<Path> manifests) {
     var distinct = new TreeSet<String>();
@@ -155,7 +158,7 @@ public class Telemetry {
     }
 
     saveTelemetry(context, RUST_DEPENDENCIES_COUNT_NAME, String.valueOf(distinct.size()));
-    saveTelemetry(context, RUST_DEPENDENCIES_NAME, truncate(String.join(",", distinct)));
+    saveTelemetry(context, RUST_DEPENDENCIES_NAME, sampleDependencies(distinct));
   }
 
   static List<Dependency> parseDependencies(Path cargoManifest) throws IOException {
@@ -246,17 +249,32 @@ public class Telemetry {
     return version.isEmpty() ? dependency.name() : ( dependency.name() + ":" + version );
   }
 
-  private static String truncate(String value) {
-    if (value.length() <= MAX_VALUE_LENGTH) {
-      return value;
+  /**
+   * Returns the comma-joined tokens, or, when they would exceed {@link #MAX_VALUE_LENGTH}, a random
+   * sample that fits within the limit (with a marker appended). Sampling shuffles first so the emitted
+   * subset is not biased toward alphabetically-early crates (the set is sorted). Collections.shuffle
+   * uses a shared source of randomness, so we do not instantiate a PRNG ourselves.
+   */
+  private static String sampleDependencies(Set<String> tokens) {
+    String joined = String.join(",", tokens);
+    if (joined.length() <= MAX_VALUE_LENGTH) {
+      return joined;
     }
-    int limit = MAX_VALUE_LENGTH - TRUNCATION_MARKER.length();
-    int cut = value.lastIndexOf(',', limit);
-    if (cut < 0) {
-      // A single token longer than the limit; hard cut.
-      cut = limit;
+    var shuffled = new ArrayList<>(tokens);
+    Collections.shuffle(shuffled);
+    int budget = MAX_VALUE_LENGTH - TRUNCATION_MARKER.length();
+    var sb = new StringBuilder();
+    for (String token : shuffled) {
+      int extra = sb.length() == 0 ? token.length() : token.length() + 1;
+      if (sb.length() + extra > budget) {
+        break;
+      }
+      if (sb.length() > 0) {
+        sb.append(',');
+      }
+      sb.append(token);
     }
-    return value.substring(0, cut) + TRUNCATION_MARKER;
+    return sb + TRUNCATION_MARKER;
   }
 
   private static void saveTelemetry(SensorContext context, String key, String value) {
