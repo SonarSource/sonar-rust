@@ -17,6 +17,8 @@
 package org.sonarsource.rust.plugin;
 
 import org.sonarsource.rust.plugin.PlatformDetection.Platform;
+import org.sonarsource.rust.cargo.CargoManifestProvider;
+import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +66,9 @@ public class RustSensor implements Sensor {
 
   @Override
   public void execute(SensorContext sensorContext) {
+    var manifests = CargoManifestProvider.getManifests(sensorContext);
+    Telemetry.reportDependencies(sensorContext, manifests.stream().map(File::toPath).toList());
+
     List<InputFile> inputFiles = inputFiles(sensorContext);
     var platform = platformDetection.detect();
     if (platform == Platform.UNSUPPORTED) {
