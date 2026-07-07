@@ -18,6 +18,8 @@ package org.sonarsource.rust.clippy;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import com.google.gson.JsonSyntaxException;
 import java.io.File;
@@ -224,10 +226,10 @@ class ClippyUtilsTest {
 
   @Test
   void resolveInputFileWithManifestPathWithoutParentThrows() {
-    var baseDir = Mockito.mock(Path.class);
-    var manifestPath = Mockito.mock(Path.class);
-    var fileSystem = Mockito.mock(org.sonar.api.batch.fs.FileSystem.class);
-    var context = Mockito.mock(SensorContext.class);
+    var baseDir = mock(Path.class);
+    var manifestPath = mock(Path.class);
+    var fileSystem = mock(org.sonar.api.batch.fs.FileSystem.class);
+    var context = mock(SensorContext.class);
     var baseDirFile = new File("ignored") {
       @Override
       public Path toPath() {
@@ -235,14 +237,14 @@ class ClippyUtilsTest {
       }
     };
 
-    Mockito.when(context.fileSystem()).thenReturn(fileSystem);
-    Mockito.when(fileSystem.baseDir()).thenReturn(baseDirFile);
-    Mockito.when(baseDir.toAbsolutePath()).thenReturn(baseDir);
-    Mockito.when(baseDir.normalize()).thenReturn(baseDir);
-    Mockito.when(baseDir.resolve(Mockito.any(Path.class))).thenReturn(manifestPath);
-    Mockito.when(manifestPath.normalize()).thenReturn(manifestPath);
-    Mockito.when(manifestPath.endsWith("Cargo.toml")).thenReturn(true);
-    Mockito.when(manifestPath.getParent()).thenReturn(null);
+    when(context.fileSystem()).thenReturn(fileSystem);
+    when(fileSystem.baseDir()).thenReturn(baseDirFile);
+    when(baseDir.toAbsolutePath()).thenReturn(baseDir);
+    when(baseDir.normalize()).thenReturn(baseDir);
+    when(baseDir.resolve(Mockito.any(Path.class))).thenReturn(manifestPath);
+    when(manifestPath.normalize()).thenReturn(manifestPath);
+    when(manifestPath.endsWith("Cargo.toml")).thenReturn(true);
+    when(manifestPath.getParent()).thenReturn(null);
 
     var diagnostic = diagnostic("Cargo.toml", "src/main.rs");
 
