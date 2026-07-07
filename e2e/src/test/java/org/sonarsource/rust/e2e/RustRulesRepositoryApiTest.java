@@ -23,6 +23,8 @@ import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import com.sonar.orchestrator.locator.FileLocation;
 import java.io.File;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -125,7 +127,10 @@ class RustRulesRepositoryApiTest {
 
   private static File customPluginJar() {
     var jars = new File("../custom-rules-plugin/build/libs")
-      .listFiles((dir, name) -> name.endsWith(".jar"));
-    return jars != null && jars.length > 0 ? jars[0] : null;
+      .listFiles((dir, name) -> name.startsWith("custom-rules-plugin-") && name.endsWith(".jar"));
+    if (jars == null || jars.length == 0) {
+      return null;
+    }
+    return Arrays.stream(jars).max(Comparator.comparingLong(File::lastModified)).orElseThrow();
   }
 }
