@@ -7,14 +7,12 @@ on:
 jobs:
   PullRequestCreated_job:
     name: Pull Request Created
-    runs-on: github-ubuntu-latest-s
+    runs-on: sonar-xs
     permissions:
       id-token: write
     # For external PR, ticket should be created manually
-    # Skip Renovate PRs to avoid automatic Jira ticket creation
     if: |
         github.event.pull_request.head.repo.full_name == github.repository
-        && github.event.pull_request.user.login != 'renovate[bot]'
     steps:
       - id: secrets
         uses: SonarSource/vault-action-wrapper@v3
