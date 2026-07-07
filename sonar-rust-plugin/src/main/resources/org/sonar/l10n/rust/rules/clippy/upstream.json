@@ -1,6 +1,6 @@
 {
-  "rust_release_tag": "1.95.0",
-  "rust_release_published_at": "2026-04-16T18:19:31Z",
+  "rust_release_tag": "1.96.1",
+  "rust_release_published_at": "2026-07-05T23:50:27Z",
   "source_repo": "rust-lang/rust",
   "source_path": "src/tools/clippy/clippy_lints/src",
   "generator_version": "python-v1"
