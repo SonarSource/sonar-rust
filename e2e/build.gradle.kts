@@ -50,4 +50,12 @@ tasks.test {
     }
     useJUnitPlatform()
     systemProperty("pluginVersion", System.getProperty("pluginVersion", null))
+    if (project.hasProperty("e2e")) {
+        // RustRulesRepositoryApiTest installs the fixture plugin from its build output. Build it (and,
+        // for local runs, the base plugin jar the OrchestratorHelper picks up) before the ITs run.
+        dependsOn(":custom-rules-plugin:shadowJar")
+        if (System.getProperty("pluginVersion").isNullOrEmpty()) {
+            dependsOn(":sonar-rust-plugin:shadowJar")
+        }
+    }
 }
