@@ -23,8 +23,12 @@ import java.util.stream.Collectors;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 import org.sonar.plugins.rust.api.RustRulesRepository;
 import org.sonarsource.analyzer.commons.BuiltInQualityProfileJsonLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RustProfile implements BuiltInQualityProfilesDefinition {
+
+  private static final Logger LOG = LoggerFactory.getLogger(RustProfile.class);
 
   private static final String SONAR_WAY_PATH = "/org/sonar/l10n/rust/rules/rust/Sonar_way_profile.json";
 
@@ -50,7 +54,9 @@ public class RustProfile implements BuiltInQualityProfilesDefinition {
       .collect(Collectors.toSet());
 
     for (String baseRuleKey : BuiltInQualityProfileJsonLoader.loadActiveKeysFromJsonProfile(SONAR_WAY_PATH)) {
-      if (!overriddenRuleIds.contains(baseRuleKey)) {
+      if (overriddenRuleIds.contains(baseRuleKey)) {
+        LOG.debug("Rule rust:{} is superseded by a contributed rule", baseRuleKey);
+      } else {
         profile.activateRule(RustLanguage.KEY, baseRuleKey);
       }
     }
@@ -69,10 +75,19 @@ public class RustProfile implements BuiltInQualityProfilesDefinition {
   }
 
   private static String repositoryKey(String ruleKey) {
-    return ruleKey.substring(0, ruleKey.indexOf(':'));
+    return ruleKey.substring(0, requireColonIndex(ruleKey));
   }
 
   private static String ruleId(String ruleKey) {
-    return ruleKey.substring(ruleKey.indexOf(':') + 1);
+    return ruleKey.substring(requireColonIndex(ruleKey) + 1);
+  }
+
+  private static int requireColonIndex(String ruleKey) {
+    int colonIndex = ruleKey.indexOf(':');
+    if (colonIndex <= 0 || colonIndex == ruleKey.length() - 1) {
+      throw new IllegalStateException("Rule key contributed by a RustRulesRepository must be in the "
+        + "\"repositoryKey:ruleId\" format, got: \"" + ruleKey + "\"");
+    }
+    return colonIndex;
   }
 }

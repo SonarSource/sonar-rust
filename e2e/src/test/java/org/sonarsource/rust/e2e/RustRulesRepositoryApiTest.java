@@ -17,21 +17,21 @@
 package org.sonarsource.rust.e2e;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import com.sonar.orchestrator.container.Edition;
 import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import com.sonar.orchestrator.locator.FileLocation;
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 import org.junit.jupiter.api.Test;
 import org.sonarqube.ws.Rules;
 import org.sonarqube.ws.client.HttpConnector;
 import org.sonarqube.ws.client.WsClient;
 import org.sonarqube.ws.client.WsClientFactories;
+import org.sonarqube.ws.client.rules.SearchRequest;
 
 /**
  * Exercises the {@code org.sonar.plugins.rust.api.RustRulesRepository} extension point on the
@@ -49,11 +49,15 @@ class RustRulesRepositoryApiTest {
   private static final String BASE_REPOSITORY = "rust";
   private static final String OVERRIDING_RULE = "S3776";
   private static final String NEW_RULE = "S9999";
+  private static final int PAGE_SIZE = 500;
 
   @Test
   void custom_plugin_rules_are_contributed_to_sonar_way_and_reconciled() {
     var customPluginJar = customPluginJar();
-    assumeTrue(customPluginJar != null, "custom-rules-plugin jar not built (run with -Pe2e)");
+    if (customPluginJar == null) {
+      throw new IllegalStateException("custom-rules-plugin jar not found in ../custom-rules-plugin/build/libs "
+        + "(run with -Pe2e to build it before executing this test)");
+    }
 
     var orchestrator = OrchestratorExtension.builderEnv()
       .setEdition(Edition.ENTERPRISE_LW)
@@ -100,15 +104,23 @@ class RustRulesRepositoryApiTest {
   }
 
   private static Set<String> activeRuleIds(WsClient wsClient, String profileKey, String repository) {
-    var response = wsClient.rules().search(new org.sonarqube.ws.client.rules.SearchRequest()
-      .setQprofile(profileKey)
-      .setActivation("true")
-      .setLanguages(List.of(BASE_REPOSITORY))
-      .setPs("500"));
-    return response.getRulesList().stream()
-      .filter(rule -> repository.equals(rule.getRepo()))
-      .map(rule -> rule.getKey().substring(rule.getKey().indexOf(':') + 1))
-      .collect(Collectors.toSet());
+    Set<String> ruleIds = new HashSet<>();
+    int page = 1;
+    Rules.SearchResponse response;
+    do {
+      response = wsClient.rules().search(new SearchRequest()
+        .setQprofile(profileKey)
+        .setActivation("true")
+        .setLanguages(List.of(BASE_REPOSITORY))
+        .setP(String.valueOf(page))
+        .setPs(String.valueOf(PAGE_SIZE)));
+      response.getRulesList().stream()
+        .filter(rule -> repository.equals(rule.getRepo()))
+        .map(rule -> rule.getKey().substring(rule.getKey().indexOf(':') + 1))
+        .forEach(ruleIds::add);
+      page++;
+    } while ((long) response.getPaging().getPageIndex() * response.getPaging().getPageSize() < response.getPaging().getTotal());
+    return ruleIds;
   }
 
   private static File customPluginJar() {

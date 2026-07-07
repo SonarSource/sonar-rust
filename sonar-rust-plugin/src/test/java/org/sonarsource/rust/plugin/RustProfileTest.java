@@ -23,6 +23,7 @@ import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition.BuiltInActi
 import org.sonar.plugins.rust.api.RustRulesRepository;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.tuple;
 
 class RustProfileTest {
@@ -75,6 +76,17 @@ class RustProfileTest {
     assertThat(profile.rules())
       .filteredOn(rule -> "rustenterprise".equals(rule.repoKey()) && "S8794".equals(rule.ruleKey()))
       .hasSize(1);
+  }
+
+  @Test
+  void shouldRejectContributedRuleKeyWithoutColon() {
+    var profile = new RustProfile(new RustRulesRepository[] {
+      () -> List.of("rustenterpriseS8794")
+    });
+
+    assertThatThrownBy(() -> defineProfile(profile))
+      .isInstanceOf(IllegalStateException.class)
+      .hasMessageContaining("rustenterpriseS8794");
   }
 
   private static BuiltInQualityProfilesDefinition.BuiltInQualityProfile defineProfile(RustProfile rustProfile) {
