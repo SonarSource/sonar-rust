@@ -1,14 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "local>SonarSource/core-languages-tooling-public:renovate-config"
-  ],
-  "enabledManagers": [
-    "github-actions",
-    "gradle",
-    "cargo",
-    "npm",
-    "mise"
+    "github>SonarSource/renovate-config:quality-corelang-squad"
   ],
   "ignorePaths": [
     "e2e/src/test/resources/**"
@@ -85,46 +78,6 @@
       ],
       "groupName": "parent",
       "groupSlug": "parent"
-    },
-    {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "rollbackPrs": false,
-      "matchPackageNames": [
-        "SonarSource/*",
-        "sonarsource/*"
-      ],
-      "pinDigests": false,
-      "groupName": "all Sonar GitHub Actions",
-      "groupSlug": "all-sonar-github-actions"
-    },
-    {
-      "description": "SonarSource GitHub actions do not need version pinning",
-      "matchManagers": [
-        "github-actions"
-      ],
-      "matchPackageNames": [
-        "SonarSource/*",
-        "sonarsource/*"
-      ],
-      "matchUpdateTypes": [
-        "pin",
-        "rollback"
-      ],
-      "enabled": false
-    },
-    {
-      "matchManagers": [
-        "github-actions"
-      ],
-      "rollbackPrs": false,
-      "matchPackageNames": [
-        "!SonarSource/*",
-        "!sonarsource/*"
-      ],
-      "groupName": "all third-party GitHub Actions",
-      "groupSlug": "all-3rd-party-github-actions"
     }
   ]
 }
