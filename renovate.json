@@ -3,13 +3,6 @@
   "extends": [
     "local>SonarSource/core-languages-tooling-public:renovate-config"
   ],
-  "enabledManagers": [
-    "github-actions",
-    "gradle",
-    "cargo",
-    "npm",
-    "mise"
-  ],
   "ignorePaths": [
     "e2e/src/test/resources/**"
   ],
