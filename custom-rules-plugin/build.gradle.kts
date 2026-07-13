@@ -7,7 +7,7 @@ plugins {
 // org.sonar.plugins.rust.api.RustRulesRepository extension point exposed by sonar-rust, used by the
 // e2e module to exercise that API independently of any other plugin. Not published or released.
 
-val sonarApiVersion = "13.2.0.3137"
+val sonarApiVersion = "13.8.0.4399"
 
 repositories {
   val artifactoryUsername = System.getenv("ARTIFACTORY_PRIVATE_USERNAME") ?: project.findProperty("artifactoryUsername")
@@ -33,8 +33,13 @@ dependencies {
 
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    // Build and run on Java 21, but keep compiling to Java 17 bytecode.
+    languageVersion = JavaLanguageVersion.of(21)
   }
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release.set(17)
 }
 
 sonarqube.isSkipProject = true

@@ -23,8 +23,8 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
-val sonarApiVersion = "13.2.0.3137"
-val sonarApiImplVersion = "25.11.0.114957"
+val sonarApiVersion = "13.8.0.4399"
+val sonarApiImplVersion = "25.12.0.117093"
 val analyzerCommonsVersion = "2.22.0.4796"
 
 dependencies {
@@ -54,10 +54,15 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    // Build and run on Java 21, but keep compiling to Java 17 bytecode.
+    languageVersion = JavaLanguageVersion.of(21)
   }
   withSourcesJar()
   withJavadocJar()
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release.set(17)
 }
 
 tasks.jacocoTestReport {
@@ -291,4 +296,3 @@ configure<ArtifactoryPluginConvention> {
     }
   }
 }
-
