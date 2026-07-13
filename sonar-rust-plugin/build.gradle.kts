@@ -54,10 +54,15 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    // Build and run on Java 21, but keep compiling to Java 17 bytecode.
+    languageVersion = JavaLanguageVersion.of(21)
   }
   withSourcesJar()
   withJavadocJar()
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release.set(17)
 }
 
 tasks.jacocoTestReport {
@@ -291,4 +296,3 @@ configure<ArtifactoryPluginConvention> {
     }
   }
 }
-
