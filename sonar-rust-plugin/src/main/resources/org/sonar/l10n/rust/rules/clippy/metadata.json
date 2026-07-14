@@ -1434,6 +1434,18 @@
     "description": "Clippy lint <code>inline_fn_without_body</code>."
   },
   {
+    "key": "inline_modules",
+    "name": "inline_modules",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inline_modules",
+    "description": "Clippy lint <code>inline_modules</code>."
+  },
+  {
+    "key": "inline_trait_bounds",
+    "name": "inline_trait_bounds",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inline_trait_bounds",
+    "description": "Clippy lint <code>inline_trait_bounds</code>."
+  },
+  {
     "key": "inspect_for_each",
     "name": "inspect_for_each",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#inspect_for_each",
@@ -1830,6 +1842,12 @@
     "description": "Clippy lint <code>manual_assert</code>."
   },
   {
+    "key": "manual_assert_eq",
+    "name": "manual_assert_eq",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_assert_eq",
+    "description": "Clippy lint <code>manual_assert_eq</code>."
+  },
+  {
     "key": "manual_async_fn",
     "name": "manual_async_fn",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_async_fn",
@@ -1858,6 +1876,12 @@
     "name": "manual_clamp",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_clamp",
     "description": "Clippy lint <code>manual_clamp</code>."
+  },
+  {
+    "key": "manual_clear",
+    "name": "manual_clear",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_clear",
+    "description": "Clippy lint <code>manual_clear</code>."
   },
   {
     "key": "manual_contains",
@@ -3816,6 +3840,12 @@
     "description": "Clippy lint <code>slow_vector_initialization</code>."
   },
   {
+    "key": "some_filter",
+    "name": "some_filter",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#some_filter",
+    "description": "Clippy lint <code>some_filter</code>."
+  },
+  {
     "key": "stable_sort_primitive",
     "name": "stable_sort_primitive",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#stable_sort_primitive",
@@ -4648,6 +4678,12 @@
     "name": "useless_attribute",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_attribute",
     "description": "Clippy lint <code>useless_attribute</code>."
+  },
+  {
+    "key": "useless_borrows_in_formatting",
+    "name": "useless_borrows_in_formatting",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#useless_borrows_in_formatting",
+    "description": "Clippy lint <code>useless_borrows_in_formatting</code>."
   },
   {
     "key": "useless_concat",
