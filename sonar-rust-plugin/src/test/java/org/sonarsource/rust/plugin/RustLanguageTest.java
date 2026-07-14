@@ -19,7 +19,7 @@ package org.sonarsource.rust.plugin;
 import static org.junit.jupiter.api.Assertions.*;
 
 import org.junit.jupiter.api.Test;
-import org.sonar.api.config.internal.MapSettings;
+import org.sonar.scanner.plugin.api.impl.config.MapSettings;
 
 class RustLanguageTest {
 

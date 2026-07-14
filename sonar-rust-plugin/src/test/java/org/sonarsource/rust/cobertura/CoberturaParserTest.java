@@ -33,8 +33,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
-import org.sonar.api.batch.sensor.internal.SensorContextTester;
+import com.sonarsource.scanner.engine.sensor.test.fixtures.SensorContextTester;
+import com.sonarsource.scanner.engine.sensor.test.fixtures.TestInputFileBuilder;
 import org.xml.sax.SAXException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -56,7 +56,7 @@ class CoberturaParserTest {
   @Test
   void parse_llvm_cov_with_branch_coverage() throws IOException, SAXException {
     Path reportFile = TEST_PROJECT_FILES_PATH.resolve("cobertura.xml");
-    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles()), reportFile.toString());
+    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles(sct.fileSystem().predicates().all())), reportFile.toString());
     var result = parser.parse(Files.readString(reportFile));
 
     assertThat(result.problems()).isEmpty();
@@ -127,7 +127,7 @@ class CoberturaParserTest {
   @Test
   void parse_llvm_cov_line_coverage() throws IOException {
     Path reportFile = TEST_PROJECT_FILES_PATH.resolve("cobertura-llvm-cov-line.xml");
-    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles()), reportFile.toString());
+    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles(sct.fileSystem().predicates().all())), reportFile.toString());
     var result = parser.parse(Files.readString(reportFile));
 
     assertThat(result.problems()).isEmpty();
@@ -147,7 +147,7 @@ class CoberturaParserTest {
   @Test
   void parse_tarpaulin() throws IOException {
     Path reportFile = TEST_PROJECT_FILES_PATH.resolve("cobertura-tarpaulin-line.xml");
-    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles()), reportFile.toString());
+    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles(sct.fileSystem().predicates().all())), reportFile.toString());
     var result = parser.parse(Files.readString(reportFile));
 
     assertThat(result.problems()).isEmpty();
@@ -279,7 +279,7 @@ class CoberturaParserTest {
   }
 
   private CoberturaParser.ParsingResult parse(String xml) {
-    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles()), "report.xml");
+    var parser = new CoberturaParser(sct, new FileLocator(sct.fileSystem().inputFiles(sct.fileSystem().predicates().all())), "report.xml");
     return parser.parse(xml);
   }
 
