@@ -9,7 +9,7 @@ plugins {
   id("com.diffplug.spotless") version "8.8.0"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
-  id("com.gradleup.shadow") version "9.5.1"
+  id("com.gradleup.shadow") version "9.4.2"
   id("license-file-generator")
 }
 
