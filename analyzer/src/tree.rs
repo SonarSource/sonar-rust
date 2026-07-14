@@ -216,7 +216,7 @@ impl<'a> Iterator for NodeIterator<'a> {
 /// Returns a child of a given kind of a node, if it exists.
 pub fn child_of_kind<'a>(node: Node<'a>, kind: &str) -> Option<Node<'a>> {
     for i in 0..node.child_count() {
-        match node.child(i) {
+        match node.child(u32::try_from(i).expect("Tree-sitter child index should fit in u32")) {
             Some(child) if child.kind() == kind => return Some(child),
             _ => {}
         }
