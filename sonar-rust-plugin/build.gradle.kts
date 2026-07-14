@@ -6,10 +6,10 @@ plugins {
   id("jacoco")
   `maven-publish`
   signing
-  id("com.diffplug.spotless") version "8.6.0"
+  id("com.diffplug.spotless") version "8.8.0"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
-  id("com.gradleup.shadow") version "9.4.2"
+  id("com.gradleup.shadow") version "9.5.1"
   id("license-file-generator")
 }
 
@@ -23,9 +23,9 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
-val sonarApiVersion = "13.2.0.3137"
-val sonarApiImplVersion = "25.11.0.114957"
-val analyzerCommonsVersion = "2.22.0.4796"
+val sonarApiVersion = "13.8.0.4399"
+val scannerEngineVersion = "13.4.0.3968"
+val analyzerCommonsVersion = "2.27.0.5007"
 
 dependencies {
   implementation("com.google.code.gson:gson:2.14.0")
@@ -35,8 +35,9 @@ dependencies {
   compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
-  testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
-  testImplementation(platform("org.junit:junit-bom:6.1.0"))
+  testImplementation("org.sonarsource.scanner.engine:plugin-api-scanner-impl:$scannerEngineVersion")
+  testImplementation("org.sonarsource.scanner.engine:sensor-test-fixtures:$scannerEngineVersion")
+  testImplementation(platform("org.junit:junit-bom:6.1.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.27.7")
   testImplementation("org.mockito:mockito-core:5.23.0")
@@ -45,7 +46,7 @@ dependencies {
   
   // Force specific versions of transitive dependencies
   constraints {
-    implementation("ch.qos.logback:logback-classic:1.5.33") {
+    implementation("ch.qos.logback:logback-classic:1.5.38") {
       because("CVE-2023-6378 - Deserialization of Untrusted Data")
     }
   }
@@ -54,10 +55,15 @@ dependencies {
 // Apply a specific Java toolchain to ease working on different environments.
 java {
   toolchain {
-    languageVersion = JavaLanguageVersion.of(17)
+    // Build and run on Java 21, but keep compiling to Java 17 bytecode.
+    languageVersion = JavaLanguageVersion.of(21)
   }
   withSourcesJar()
   withJavadocJar()
+}
+
+tasks.withType<JavaCompile>().configureEach {
+  options.release.set(17)
 }
 
 tasks.jacocoTestReport {
@@ -291,4 +297,3 @@ configure<ArtifactoryPluginConvention> {
     }
   }
 }
-

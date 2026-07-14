@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.sonar.api.Plugin;
 import org.sonar.api.SonarEdition;
 import org.sonar.api.SonarQubeSide;
-import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.scanner.plugin.api.impl.internal.SonarRuntimeImpl;
 import org.sonar.api.utils.Version;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

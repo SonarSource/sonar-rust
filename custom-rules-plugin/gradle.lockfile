@@ -1,6 +1,8 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
+# To regenerate this file, run: ./gradlew :custom-rules-plugin:dependencies --write-locks
+com.android.tools:r8:9.1.31=shadowR8
 org.slf4j:slf4j-api:1.7.30=compileClasspath
-org.sonarsource.api.plugin:sonar-plugin-api:13.2.0.3137=compileClasspath
-empty=annotationProcessor,runtimeClasspath,shadow
+org.sonarsource.api.plugin:sonar-plugin-api:13.8.0.4399=compileClasspath
+empty=annotationProcessor,runtimeClasspath,shadow,testAnnotationProcessor,testCompileClasspath,testRuntimeClasspath
