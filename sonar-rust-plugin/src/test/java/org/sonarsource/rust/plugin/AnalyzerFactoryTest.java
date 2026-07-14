@@ -20,7 +20,7 @@ import org.sonarsource.rust.plugin.PlatformDetection.Platform;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.sonar.api.impl.utils.DefaultTempFolder;
+import org.sonar.scanner.plugin.api.impl.utils.DefaultTempFolder;
 import org.sonar.api.utils.TempFolder;
 
 import static org.assertj.core.api.Assertions.assertThat;

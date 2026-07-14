@@ -24,7 +24,7 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 }
 
 val sonarApiVersion = "13.8.0.4399"
-val sonarApiImplVersion = "26.7.0.124771"
+val scannerEngineVersion = "13.4.0.3968"
 val analyzerCommonsVersion = "2.27.0.5007"
 
 dependencies {
@@ -35,7 +35,8 @@ dependencies {
   compileOnly("org.sonarsource.api.plugin:sonar-plugin-api:$sonarApiVersion")
   compileOnly("com.google.code.findbugs:jsr305:3.0.2")
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
-  testImplementation("org.sonarsource.sonarqube:sonar-plugin-api-impl:$sonarApiImplVersion")
+  testImplementation("org.sonarsource.scanner.engine:plugin-api-scanner-impl:$scannerEngineVersion")
+  testImplementation("org.sonarsource.scanner.engine:sensor-test-fixtures:$scannerEngineVersion")
   testImplementation(platform("org.junit:junit-bom:6.1.1"))
   testImplementation("org.junit.jupiter:junit-jupiter")
   testImplementation("org.assertj:assertj-core:3.27.7")
