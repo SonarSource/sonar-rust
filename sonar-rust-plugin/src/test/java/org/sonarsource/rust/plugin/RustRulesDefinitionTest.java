@@ -20,7 +20,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import org.sonar.api.SonarEdition;
 import org.sonar.api.SonarQubeSide;
-import org.sonar.api.internal.SonarRuntimeImpl;
+import org.sonar.scanner.plugin.api.impl.internal.SonarRuntimeImpl;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.utils.Version;

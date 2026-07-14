@@ -23,7 +23,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
-import org.sonar.api.batch.sensor.internal.SensorContextTester;
+import com.sonarsource.scanner.engine.sensor.test.fixtures.SensorContextTester;
 
 class CargoManifestProviderTest {
 
