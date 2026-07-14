@@ -1,7 +1,8 @@
 # This is a Gradle generated file for dependency locking.
 # Manual edits can break the build and are not advised.
 # This file is expected to be part of source control.
-com.github.jk1:gradle-license-report:3.1.2=buildScriptClasspath,compileClasspath,implementationDependenciesMetadata,runtimeClasspath,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
+com.github.jk1:gradle-license-report:3.1.2=implementationDependenciesMetadata,testCompileClasspath,testImplementationDependenciesMetadata,testRuntimeClasspath
+com.github.jk1:gradle-license-report:3.1.4=buildScriptClasspath,compileClasspath,runtimeClasspath
 org.jetbrains.intellij.deps:trove4j:1.0.20200330=kotlinBuildToolsApiClasspath,kotlinCompilerClasspath,kotlinKlibCommonizerClasspath
 org.jetbrains.kotlin:kotlin-assignment-compiler-plugin-embeddable:2.0.21=kotlinCompilerPluginClasspathMain,kotlinCompilerPluginClasspathTest
 org.jetbrains.kotlin:kotlin-build-common:2.0.21=kotlinBuildToolsApiClasspath

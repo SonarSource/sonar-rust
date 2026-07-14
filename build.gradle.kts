@@ -2,7 +2,7 @@ import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
 plugins {
   base
-  id("org.sonarqube") version "7.3.0.8198"
+  id("org.sonarqube") version "7.3.1.8318"
   id("com.jfrog.artifactory") version "6.0.4"
 }
 
