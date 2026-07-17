@@ -20,7 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.sonar.api.Plugin;
 import org.sonar.api.SonarEdition;
 import org.sonar.api.SonarQubeSide;
-import org.sonar.scanner.plugin.api.impl.internal.SonarRuntimeImpl;
+import com.sonarsource.scanner.engine.sensor.test.fixtures.TestSonarRuntime;
 import org.sonar.api.utils.Version;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,7 +29,7 @@ class RustPluginTest {
 
   @Test
   void test() {
-    var context = new Plugin.Context(SonarRuntimeImpl.forSonarQube(
+    var context = new Plugin.Context(TestSonarRuntime.forSonarQube(
         Version.create(25, 2),
         SonarQubeSide.SCANNER,
         SonarEdition.COMMUNITY));

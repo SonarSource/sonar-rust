@@ -39,7 +39,7 @@ import org.sonar.api.SonarEdition;
 import org.sonar.api.SonarQubeSide;
 import org.sonar.api.SonarRuntime;
 import com.sonarsource.scanner.engine.sensor.test.fixtures.SensorContextTester;
-import org.sonar.scanner.plugin.api.impl.internal.SonarRuntimeImpl;
+import com.sonarsource.scanner.engine.sensor.test.fixtures.TestSonarRuntime;
 import org.sonar.api.utils.Version;
 
 class TelemetryTest {
@@ -47,7 +47,7 @@ class TelemetryTest {
   @TempDir
   private Path tmpDir;
 
-  private static final SonarRuntime SONAR_RUNTIME = SonarRuntimeImpl.forSonarQube(Version.create(10, 14), SonarQubeSide.SCANNER, SonarEdition.SONARCLOUD);
+  private static final SonarRuntime SONAR_RUNTIME = TestSonarRuntime.forSonarQube(Version.create(10, 14), SonarQubeSide.SCANNER, SonarEdition.SONARCLOUD);
 
   @ParameterizedTest(name = "{0}")
   @MethodSource("manifestFiles")

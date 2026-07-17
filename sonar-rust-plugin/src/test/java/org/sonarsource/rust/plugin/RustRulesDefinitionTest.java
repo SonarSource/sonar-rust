@@ -20,7 +20,7 @@ import java.util.HashSet;
 import org.junit.jupiter.api.Test;
 import org.sonar.api.SonarEdition;
 import org.sonar.api.SonarQubeSide;
-import org.sonar.scanner.plugin.api.impl.internal.SonarRuntimeImpl;
+import com.sonarsource.scanner.engine.sensor.test.fixtures.TestSonarRuntime;
 import org.sonar.api.server.profile.BuiltInQualityProfilesDefinition;
 import org.sonar.api.server.rule.RulesDefinition;
 import org.sonar.api.utils.Version;
@@ -45,7 +45,7 @@ class RustRulesDefinitionTest {
 
   @Test
   void testRepository() {
-    var runtime = SonarRuntimeImpl.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
+    var runtime = TestSonarRuntime.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
     var definition = new RustRulesDefinition(runtime);
     var definitionContext = new RulesDefinition.Context();
     definition.define(definitionContext);
@@ -59,7 +59,7 @@ class RustRulesDefinitionTest {
 
   @Test
   void testSonarWay() {
-    var runtime = SonarRuntimeImpl.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
+    var runtime = TestSonarRuntime.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
     var definition = new RustRulesDefinition(runtime);
     var definitionContext = new RulesDefinition.Context();
     definition.define(definitionContext);
@@ -79,7 +79,7 @@ class RustRulesDefinitionTest {
   @Test
   void parameters() {
     // Make sure that parameters are defined only for known Sonar rules
-    var runtime = SonarRuntimeImpl.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
+    var runtime = TestSonarRuntime.forSonarQube(Version.create(9, 8), SonarQubeSide.SERVER, SonarEdition.DEVELOPER);
     var definition = new RustRulesDefinition(runtime);
     var definitionContext = new RulesDefinition.Context();
     definition.define(definitionContext);
