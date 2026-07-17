@@ -13,7 +13,7 @@ dependencies {
     testImplementation("org.sonarsource.sonarqube:sonar-ws:26.7.0.124771")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.1.1")
+    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.1.2")
 
 
     // Force specific versions of transitive dependencies
