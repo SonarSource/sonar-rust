@@ -87,6 +87,11 @@ class AnalyzerLicensingPackagingRenderer(
      */
     @Throws(IOException::class, URISyntaxException::class)
     private fun generateDependencyFile(data: ModuleData) {
+        // Dependencies without an artifact are not bundled and do not require a packaged license file.
+        if (!data.hasArtifactFile) {
+            return
+        }
+
         val copyIncludedLicenseFile = copyIncludedLicenseFromDependency(data)
         if (copyIncludedLicenseFile.success) {
             return
