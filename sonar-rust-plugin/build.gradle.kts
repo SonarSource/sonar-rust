@@ -37,12 +37,12 @@ dependencies {
   testImplementation("org.sonarsource.api.plugin:sonar-plugin-api-test-fixtures:$sonarApiVersion")
   testImplementation("org.sonarsource.scanner.engine:plugin-api-scanner-impl:$scannerEngineVersion")
   testImplementation("org.sonarsource.scanner.engine:sensor-test-fixtures:$scannerEngineVersion")
-  testImplementation(platform("org.junit:junit-bom:6.1.2"))
-  testImplementation("org.junit.jupiter:junit-jupiter")
+  testImplementation(platform(libs.junit.bom))
+  testImplementation(libs.junit.jupiter)
   testImplementation("org.assertj:assertj-core:3.27.7")
   testImplementation("org.mockito:mockito-core:5.23.0")
   testImplementation("org.awaitility:awaitility:4.3.0")
-  testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+  testRuntimeOnly(libs.junit.platform.launcher)
   
   // Force specific versions of transitive dependencies
   constraints {

@@ -6,14 +6,15 @@ val orchestratorVersion = "6.3.0.4464"
 
 dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator-junit5:$orchestratorVersion")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator:$orchestratorVersion")
-    testImplementation("org.junit.platform:junit-platform-suite-api:6.1.1")
+    testImplementation(libs.junit.platform.suite.api)
     testImplementation("org.sonarsource.sonarqube:sonar-ws:26.7.0.124771")
 
-    testRuntimeOnly("org.junit.platform:junit-platform-launcher")
-    testRuntimeOnly("org.junit.platform:junit-platform-suite-engine:6.1.1")
+    testRuntimeOnly(libs.junit.platform.launcher)
+    testRuntimeOnly(libs.junit.platform.suite.engine)
 
 
     // Force specific versions of transitive dependencies
