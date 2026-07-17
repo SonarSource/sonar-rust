@@ -2,7 +2,7 @@
 # https://docs.gradle.org/current/userguide/platforms.html#sub::toml-dependencies-format
 
 [versions]
-junit-jupiter = "6.1.1"
+junit-jupiter = "6.1.2"
 license-report = "3.1.4"
 
 [libraries]
