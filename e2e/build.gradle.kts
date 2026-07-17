@@ -9,7 +9,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator-junit5:$orchestratorVersion")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator:$orchestratorVersion")
-    testImplementation("org.junit.platform:junit-platform-suite-api:6.1.1")
+    testImplementation("org.junit.platform:junit-platform-suite-api:6.1.2")
     testImplementation("org.sonarsource.sonarqube:sonar-ws:26.7.0.124771")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
