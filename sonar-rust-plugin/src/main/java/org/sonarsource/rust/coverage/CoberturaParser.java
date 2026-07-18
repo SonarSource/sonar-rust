@@ -94,7 +94,7 @@ public class CoberturaParser {
   }
 
   @CheckForNull
-  private NodeList getLines(Node classNode) {
+  private static NodeList getLines(Node classNode) {
     var children = classNode.getChildNodes();
     for (int i = 0; i < children.getLength(); i++) {
       if (children.item(i).getNodeName().equals("lines")) {
