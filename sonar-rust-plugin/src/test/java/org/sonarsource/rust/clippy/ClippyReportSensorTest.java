@@ -25,7 +25,6 @@ import java.nio.file.Path;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.junit.jupiter.api.io.TempDir;
-import org.mockito.Mockito;
 import org.slf4j.event.Level;
 import com.sonarsource.scanner.engine.sensor.test.fixtures.SensorContextTester;
 import com.sonarsource.scanner.engine.sensor.test.fixtures.TestInputFileBuilder;
@@ -33,6 +32,8 @@ import org.sonar.scanner.plugin.api.impl.sensor.DefaultSensorDescriptor;
 import org.sonar.api.testfixtures.log.LogTesterJUnit5;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.spy;
 
 class ClippyReportSensorTest {
 
@@ -414,7 +415,7 @@ class ClippyReportSensorTest {
     var tempFile = Files.createTempFile(baseDir, "clippy_report", ".json");
     Files.writeString(tempFile, json);
 
-    var context = Mockito.spy(SensorContextTester.create(baseDir));
+    var context = spy(SensorContextTester.create(baseDir));
     context.settings().setProperty(ClippyReportSensor.CLIPPY_REPORT_PATHS, tempFile.toString());
 
     var sourceCode = """
@@ -427,7 +428,7 @@ class ClippyReportSensorTest {
         .setLanguage(RustLanguage.KEY)
         .setContents(sourceCode)
         .build());
-    Mockito.doThrow(new IllegalStateException("Unexpected failure"))
+    doThrow(new IllegalStateException("Unexpected failure"))
       .doCallRealMethod()
       .when(context)
       .newExternalIssue();
