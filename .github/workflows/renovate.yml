@@ -1,0 +1,40 @@
+---
+name: Renovate dry run
+
+on:
+  workflow_dispatch:
+
+jobs:
+  renovate:
+    runs-on: github-ubuntu-latest-s
+    permissions:
+      id-token: write
+      contents: read
+    steps:
+      - id: secrets
+        uses: SonarSource/vault-action-wrapper@v3
+        with:
+          secrets: |
+            development/github/token/{REPO_OWNER_NAME_DASH}-renovate token | renovate_token;
+            development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader username | artifactory_username;
+            development/artifactory/token/{REPO_OWNER_NAME_DASH}-private-reader access_token | artifactory_password;
+      - name: Checkout
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+      - name: Self-hosted Renovate dry run
+        uses: renovatebot/github-action@3064367f740a1a91cca218698a63902689cce200 # v46.1.20
+        env:
+          ARTIFACTORY_PRIVATE_PASSWORD: ${{ fromJSON(steps.secrets.outputs.vault).artifactory_password }}
+          ARTIFACTORY_PRIVATE_USERNAME: ${{ fromJSON(steps.secrets.outputs.vault).artifactory_username }}
+          LOG_LEVEL: debug
+          RENOVATE_ALLOWED_COMMANDS: >-
+            ["^[.]/gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties$",
+            "^[.]/gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent$",
+            "^[.]/gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt$",
+            "^[.]/gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test$"]
+          RENOVATE_BRANCH_PREFIX: self-hosted-renovate/
+          RENOVATE_DRY_RUN: full
+          RENOVATE_REPOSITORIES: ${{ github.repository }}
+        with:
+          env-regex: "^(?:RENOVATE_\\w+|LOG_LEVEL|ARTIFACTORY_PRIVATE_(?:USERNAME|PASSWORD))$"
+          renovate-version: 43.275.2
+          token: ${{ fromJSON(steps.secrets.outputs.vault).renovate_token }}
