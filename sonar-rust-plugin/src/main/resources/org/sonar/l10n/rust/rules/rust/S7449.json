@@ -9,14 +9,14 @@
   "tags": [
     "clippy"
   ],
-  "defaultSeverity": "Critical",
+  "defaultSeverity": "Major",
   "ruleSpecification": "RSPEC-7449",
   "sqKey": "S7449",
   "scope": "All",
   "quickfix": "unknown",
   "code": {
     "impacts": {
-      "RELIABILITY": "HIGH"
+      "RELIABILITY": "MEDIUM"
     },
     "attribute": "LOGICAL"
   }
