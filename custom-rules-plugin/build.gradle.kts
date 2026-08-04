@@ -1,6 +1,6 @@
 plugins {
   id("java")
-  id("com.gradleup.shadow") version "9.6.0"
+  id("com.gradleup.shadow") version "9.6.1"
 }
 
 // Test-fixture plugin: a minimal SonarQube plugin that implements the
