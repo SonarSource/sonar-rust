@@ -22,6 +22,7 @@ import org.sonarsource.rust.plugin.RustLanguage;
 import org.sonarsource.rust.plugin.RustPlugin;
 import org.sonarsource.rust.plugin.RustRulesDefinition;
 import org.sonarsource.rust.plugin.Telemetry;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Objects;
 import org.slf4j.Logger;
@@ -103,10 +104,11 @@ public class ClippySensor implements Sensor {
       .filter(Objects::nonNull)
       .toList();
 
+    Telemetry.reportManifestInfo(context, manifests.stream().map(File::toPath).toList());
+
     try {
       for (var manifest : manifests) {
         Path manifestPath = manifest.toPath();
-        Telemetry.reportManifestInfo(context, manifestPath);
 
         var workDir = manifestPath.getParent();
         clippy.run(workDir, lints, diagnostic -> {
