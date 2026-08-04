@@ -99,14 +99,27 @@ public class Telemetry {
     }
   }
 
-  public static void reportManifestInfo(SensorContext context, Path cargoManifest) {
-    try {
-      String edition = findRustEdition(cargoManifest);
-      if (edition != null) {
-        saveTelemetry(context, RUST_EDITION_NAME, edition);
+  /**
+   * Reports the Rust editions declared across all the given Cargo manifests, deduplicated and
+   * comma-joined under a single property. The telemetry channel requires each key to be reported
+   * at most once per analysis, so a monorepo with several manifests (and possibly several editions)
+   * cannot report one {@code rust.language.edition} value per manifest.
+   */
+  public static void reportManifestInfo(SensorContext context, List<Path> cargoManifests) {
+    var editions = new TreeSet<String>();
+    for (Path cargoManifest : cargoManifests) {
+      try {
+        String edition = findRustEdition(cargoManifest);
+        if (edition != null) {
+          editions.add(edition);
+        }
+      } catch (IOException ex) {
+        // Ignore - skip this manifest and keep collecting from the others
       }
-    } catch (IOException ex) {
-      // Ignore - don't try to report anything if the manifest can't be read
+    }
+
+    if (!editions.isEmpty()) {
+      saveTelemetry(context, RUST_EDITION_NAME, String.join(",", editions));
     }
   }
 

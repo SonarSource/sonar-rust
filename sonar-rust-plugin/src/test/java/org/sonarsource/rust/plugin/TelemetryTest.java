@@ -18,6 +18,7 @@ package org.sonarsource.rust.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 
@@ -57,7 +58,7 @@ class TelemetryTest {
 
     SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
-    Telemetry.reportManifestInfo(sct, manifest);
+    Telemetry.reportManifestInfo(sct, List.of(manifest));
 
     if (expected != null) {
       verify(sct).addTelemetryProperty("rust.language.edition", expected);
@@ -71,9 +72,38 @@ class TelemetryTest {
     var manifest = tmpDir.resolve("noSuchCargo.toml");
     SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
 
-    Telemetry.reportManifestInfo(sct, manifest);
+    Telemetry.reportManifestInfo(sct, List.of(manifest));
 
     verify(sct, never()).addTelemetryProperty(Mockito.anyString(), Mockito.anyString());
+  }
+
+  @Test
+  void report_manifest_info_aggregates_distinct_editions_from_several_manifests() throws IOException {
+    var manifest2021 = tmpDir.resolve("Cargo2021.toml");
+    Files.writeString(manifest2021, "[package]\nedition = \"2021\"\n");
+    var manifest2018 = tmpDir.resolve("Cargo2018.toml");
+    Files.writeString(manifest2018, "[package]\nedition = \"2018\"\n");
+    var manifest2021Duplicate = tmpDir.resolve("Cargo2021Duplicate.toml");
+    Files.writeString(manifest2021Duplicate, "[package]\nedition = \"2021\"\n");
+
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+
+    Telemetry.reportManifestInfo(sct, List.of(manifest2021, manifest2018, manifest2021Duplicate));
+
+    verify(sct, times(1)).addTelemetryProperty("rust.language.edition", "2018,2021");
+  }
+
+  @Test
+  void report_manifest_info_skips_unreadable_manifests_and_reports_the_rest() throws IOException {
+    var readable = tmpDir.resolve("Cargo.toml");
+    Files.writeString(readable, "[package]\nedition = \"2021\"\n");
+    var unreadable = tmpDir.resolve("noSuchCargo.toml");
+
+    SensorContextTester sct = spy(SensorContextTester.create(tmpDir).setRuntime(SONAR_RUNTIME));
+
+    Telemetry.reportManifestInfo(sct, List.of(unreadable, readable));
+
+    verify(sct).addTelemetryProperty("rust.language.edition", "2021");
   }
 
   @ParameterizedTest
