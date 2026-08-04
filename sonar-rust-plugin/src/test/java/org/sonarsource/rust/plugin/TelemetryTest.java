@@ -18,6 +18,7 @@ package org.sonarsource.rust.plugin;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.never;
 
@@ -89,7 +90,7 @@ class TelemetryTest {
 
     Telemetry.reportManifestInfo(sct, List.of(manifest2021, manifest2018, manifest2021Duplicate));
 
-    verify(sct, Mockito.times(1)).addTelemetryProperty("rust.language.edition", "2018,2021");
+    verify(sct, times(1)).addTelemetryProperty("rust.language.edition", "2018,2021");
   }
 
   @Test
