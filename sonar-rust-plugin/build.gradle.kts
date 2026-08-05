@@ -9,7 +9,7 @@ plugins {
   id("com.diffplug.spotless") version "8.9.0"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
-  id("com.gradleup.shadow") version "9.6.0"
+  id("com.gradleup.shadow") version "9.6.1"
   id("license-file-generator")
 }
 
@@ -23,7 +23,7 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
-val sonarApiVersion = "13.8.0.4399"
+val sonarApiVersion = "13.9.0.4428"
 val scannerEngineVersion = "13.6.0.4299"
 val analyzerCommonsVersion = "2.29.0.5138"
 
@@ -46,7 +46,7 @@ dependencies {
   
   // Force specific versions of transitive dependencies
   constraints {
-    implementation("ch.qos.logback:logback-classic:1.6.0") {
+    implementation("ch.qos.logback:logback-classic:1.6.1") {
       because("CVE-2023-6378 - Deserialization of Untrusted Data")
     }
   }
