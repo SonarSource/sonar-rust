@@ -1,13 +1,13 @@
 plugins {
   id("java")
-  id("com.gradleup.shadow") version "9.6.0"
+  id("com.gradleup.shadow") version "9.6.1"
 }
 
 // Test-fixture plugin: a minimal SonarQube plugin that implements the
 // org.sonar.plugins.rust.api.RustRulesRepository extension point exposed by sonar-rust, used by the
 // e2e module to exercise that API independently of any other plugin. Not published or released.
 
-val sonarApiVersion = "13.8.0.4399"
+val sonarApiVersion = "13.9.0.4428"
 
 repositories {
   val artifactoryUsername = System.getenv("ARTIFACTORY_PRIVATE_USERNAME") ?: project.findProperty("artifactoryUsername")

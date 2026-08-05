@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-val orchestratorVersion = "6.4.0.4572"
+val orchestratorVersion = "6.4.0.4580"
 
 dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
@@ -19,7 +19,7 @@ dependencies {
 
     // Force specific versions of transitive dependencies
     constraints {
-      implementation("ch.qos.logback:logback-classic:1.6.0") {
+      implementation("ch.qos.logback:logback-classic:1.6.1") {
         because("CVE-2023-6378 - Deserialization of Untrusted Data")
       }
       implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.1") {
