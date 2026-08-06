@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -68,7 +68,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -140,7 +140,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       - name: Setup Rust toolchain
         run: |
           sudo apt-get update
@@ -175,7 +175,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       # Download Darwin artifacts (only if macos_analyzers job succeeded)
       - name: Download Darwin ARM64 artifact
         if: needs.macos_analyzers.result == 'success'
@@ -230,7 +230,7 @@ jobs:
           key-prefix: e2e
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
@@ -262,7 +262,7 @@ jobs:
           key-prefix: e2e
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
@@ -308,7 +308,7 @@ jobs:
           key-prefix: e2e
       - uses: jdx/mise-action@9e7f7633ff6f6d6048a9418a68d48f288f50eb14 # v4.2.3
         with:
-          version: 2026.7.18
+          version: 2026.8.0
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
