@@ -25,7 +25,7 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
 
 val sonarApiVersion = "13.9.0.4428"
 val scannerEngineVersion = "13.6.0.4299"
-val analyzerCommonsVersion = "2.29.0.5138"
+val analyzerCommonsVersion = "2.30.0.5193"
 
 dependencies {
   implementation("com.google.code.gson:gson:2.14.0")
