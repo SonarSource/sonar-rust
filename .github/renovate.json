@@ -24,7 +24,7 @@
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --no-configure-on-demand :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
         ],
         "fileFilters": [
           "**/gradle.lockfile",
