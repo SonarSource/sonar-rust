@@ -13,6 +13,7 @@
         "gradle",
         "gradle-wrapper"
       ],
+      "skipArtifactsUpdate": true,
       "constraints": {
         "java": "21"
       },
