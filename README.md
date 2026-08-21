@@ -21,7 +21,7 @@ We welcome your feedback and feature requests to help improve the Rust analyzer.
 
 To work on this project, you will need the following tools:
 
-- Java 17
+- Java 21
 - Rust 2021
 - Gradle
 - Cargo

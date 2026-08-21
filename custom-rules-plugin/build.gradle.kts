@@ -33,13 +33,13 @@ dependencies {
 
 java {
   toolchain {
-    // Build and run on Java 21, but keep compiling to Java 17 bytecode.
+    // Build, run, and compile bytecode for Java 21.
     languageVersion = JavaLanguageVersion.of(21)
   }
 }
 
 tasks.withType<JavaCompile>().configureEach {
-  options.release.set(17)
+  options.release.set(21)
 }
 
 sonarqube.isSkipProject = true

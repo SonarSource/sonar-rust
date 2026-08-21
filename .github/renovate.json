@@ -17,15 +17,14 @@
         "java": "21"
       },
       "postUpgradeTasks": {
+        "executionMode": "branch",
         "installTools": {
           "java": {}
         },
         "commands": [
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies :e2e:dependencies --configuration testCompileClasspath",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :e2e:dependencies --configuration testRuntimeClasspath",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies --update-locks {{#each (distinct (lookupArray upgrades \"depName\"))}}{{{.}}}{{#unless @last}},{{/unless}}{{/each}} :e2e:dependencies --configuration testCompileClasspath :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --update-locks {{#each (distinct (lookupArray upgrades \"depName\"))}}{{{.}}}{{#unless @last}},{{/unless}}{{/each}} :e2e:dependencies --configuration testRuntimeClasspath :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --no-configure-on-demand :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
