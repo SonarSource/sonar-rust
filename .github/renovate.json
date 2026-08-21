@@ -44,16 +44,6 @@
       "skipArtifactsUpdate": true
     },
     {
-      "description": "Keep scanner engine test dependencies compatible with the Java 17 bytecode target",
-      "matchManagers": [
-        "gradle"
-      ],
-      "matchPackageNames": [
-        "/^org\\.sonarsource\\.scanner\\.engine:/"
-      ],
-      "allowedVersions": "/^13\\.6\\./"
-    },
-    {
       "matchManagers": [
         "mise"
       ],
