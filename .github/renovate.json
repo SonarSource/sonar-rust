@@ -22,6 +22,7 @@
         },
         "commands": [
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :e2e:dependencies",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --no-configure-on-demand :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
@@ -32,6 +33,13 @@
           "gradle/verification-metadata.xml"
         ]
       }
+    },
+    {
+      "description": "Let repository tasks own artifacts for Gradle wrapper updates",
+      "matchManagers": [
+        "gradle-wrapper"
+      ],
+      "skipArtifactsUpdate": true
     },
     {
       "matchManagers": [
