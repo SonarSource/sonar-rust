@@ -52,6 +52,10 @@ public class Telemetry {
   // Matches `version = "1.0"` inside an inline table, e.g. `{ version = "1.0", features = [...] }`.
   private static final Pattern INLINE_VERSION_PATTERN = Pattern.compile("\\bversion\\s*=\\s*[\"']([^\"']*)[\"']");
 
+  private static final Pattern COMMENT_PATTERN = Pattern.compile("#.*");
+  private static final Pattern LEADING_QUOTE_PATTERN = Pattern.compile("^[\"']");
+  private static final Pattern TRAILING_QUOTE_PATTERN = Pattern.compile("[\"']$");
+
   // The telemetry channel has practical per-analysis limits on value length, so the joined
   // dependency list is capped and truncated at a token boundary.
   private static final int MAX_VALUE_LENGTH = 1000;
@@ -129,7 +133,7 @@ public class Telemetry {
 
     String currentSection = null;
     for (var line : lines) {
-      String trimmed = line.replaceAll("#.*", "").trim();
+      String trimmed = COMMENT_PATTERN.matcher(line).replaceAll("").trim();
       if (trimmed.isEmpty()) {
         continue;
       }
@@ -139,7 +143,8 @@ public class Telemetry {
       } else if ("package".equals(currentSection) && trimmed.startsWith("edition")) {
         var parts = trimmed.split("=");
         if (parts.length == 2) {
-          return parts[1].trim().replaceAll("^[\"']", "").replaceAll("[\"']$", "");
+          String val = parts[1].trim();
+          return TRAILING_QUOTE_PATTERN.matcher(LEADING_QUOTE_PATTERN.matcher(val).replaceAll("")).replaceAll("");
         }
       }
     }
@@ -178,11 +183,10 @@ public class Telemetry {
     // Preserve declaration order; the value is the version ("" when versionless).
     var deps = new LinkedHashMap<String, String>();
     Section section = Section.OTHER;
-
     for (var line : Files.readAllLines(cargoManifest)) {
       // Best-effort comment stripping: a '#' inside a quoted value (e.g. a git rev/URL fragment) is
       // also stripped. Accepted for this best-effort telemetry parser.
-      String trimmed = line.replaceAll("#.*", "").trim();
+      String trimmed = COMMENT_PATTERN.matcher(line).replaceAll("").trim();
       if (trimmed.isEmpty()) {
         continue;
       }
@@ -266,7 +270,7 @@ public class Telemetry {
   }
 
   private static String unquote(String value) {
-    return value.replaceAll("^[\"']", "").replaceAll("[\"']$", "");
+    return TRAILING_QUOTE_PATTERN.matcher(LEADING_QUOTE_PATTERN.matcher(value).replaceAll("")).replaceAll("");
   }
 
   private static String formatToken(Dependency dependency) {
