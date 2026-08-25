@@ -10,8 +10,7 @@
     {
       "description": "Refresh Gradle lockfiles and verification metadata after dependency updates",
       "matchManagers": [
-        "gradle",
-        "gradle-wrapper"
+        "gradle"
       ],
       "constraints": {
         "java": "21"
@@ -41,7 +40,34 @@
       "matchManagers": [
         "gradle-wrapper"
       ],
-      "skipArtifactsUpdate": true
+      "constraints": {
+        "java": "21"
+      },
+      "skipArtifactsUpdate": true,
+      "postUpgradeTasks": {
+        "executionMode": "update",
+        "installTools": {
+          "java": {}
+        },
+        "commands": [
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :wrapper --gradle-version {{{newValue}}}",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies :e2e:dependencies --configuration testCompileClasspath :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :e2e:dependencies --configuration testRuntimeClasspath :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --no-configure-on-demand :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
+        ],
+        "fileFilters": [
+          "gradlew",
+          "gradlew.bat",
+          "gradle/wrapper/gradle-wrapper.jar",
+          "gradle/wrapper/gradle-wrapper.properties",
+          "**/gradle.lockfile",
+          "**/settings-gradle.lockfile",
+          "gradle/verification-metadata.xml"
+        ]
+      }
     },
     {
       "matchManagers": [
