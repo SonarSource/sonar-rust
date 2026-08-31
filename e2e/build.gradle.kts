@@ -22,7 +22,7 @@ dependencies {
       implementation("ch.qos.logback:logback-classic:1.6.3") {
         because("CVE-2023-6378 - Deserialization of Untrusted Data")
       }
-      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.1") {
+      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.2") {
         because("CVE-2020-36518 - Out-of-bounds Write")
       }
     }
