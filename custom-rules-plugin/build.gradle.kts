@@ -7,7 +7,7 @@ plugins {
 // org.sonar.plugins.rust.api.RustRulesRepository extension point exposed by sonar-rust, used by the
 // e2e module to exercise that API independently of any other plugin. Not published or released.
 
-val sonarApiVersion = "13.11.0.4459"
+val sonarApiVersion = "14.0.0.4498"
 
 repositories {
   val artifactoryUsername = System.getenv("ARTIFACTORY_PRIVATE_USERNAME") ?: project.findProperty("artifactoryUsername")
