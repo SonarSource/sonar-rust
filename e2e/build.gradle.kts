@@ -11,7 +11,7 @@ dependencies {
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator-junit5:$orchestratorVersion")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator:$orchestratorVersion")
     testImplementation(libs.junit.platform.suite.api)
-    testImplementation("org.sonarsource.sonarqube:sonar-ws:26.8.0.126808")
+    testImplementation("org.sonarsource.sonarqube:sonar-ws:26.9.0.129388")
 
     testRuntimeOnly(libs.junit.platform.launcher)
     testRuntimeOnly(libs.junit.platform.suite.engine)
