@@ -44,12 +44,6 @@ dependencies {
   testImplementation("org.awaitility:awaitility:4.3.0")
   testRuntimeOnly(libs.junit.platform.launcher)
   
-  // Force specific versions of transitive dependencies
-  constraints {
-    implementation("ch.qos.logback:logback-classic:1.6.3") {
-      because("CVE-2023-6378 - Deserialization of Untrusted Data")
-    }
-  }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.

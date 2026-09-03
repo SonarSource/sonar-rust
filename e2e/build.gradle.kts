@@ -20,7 +20,7 @@ dependencies {
     // Force specific versions of transitive dependencies
     constraints {
       implementation("ch.qos.logback:logback-classic:1.6.3") {
-        because("CVE-2023-6378 - Deserialization of Untrusted Data")
+        because("orchestrator pins logback 1.5.37; keep aligned with the Plugin API v14 logging stack")
       }
       implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.2") {
         because("CVE-2020-36518 - Out-of-bounds Write")
