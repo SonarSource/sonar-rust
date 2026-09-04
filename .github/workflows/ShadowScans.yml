@@ -10,7 +10,7 @@ concurrency:
 
 jobs:
   build:
-    runs-on: github-ubuntu-latest-m
+    runs-on: sonar-m
     name: Build for Shadow Scan
     permissions:
       id-token: write
@@ -45,7 +45,7 @@ jobs:
     concurrency:
       group: iris-${{ github.ref }}
       cancel-in-progress: false
-    runs-on: github-ubuntu-latest-s
+    runs-on: sonar-xs
     name: Run IRIS
     permissions:
       id-token: write
