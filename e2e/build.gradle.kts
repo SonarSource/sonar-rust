@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-val orchestratorVersion = "6.4.2.4626"
+val orchestratorVersion = "6.4.3.4676"
 
 dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
