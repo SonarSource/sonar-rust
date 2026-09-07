@@ -264,20 +264,16 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.8.15
-          # Rust is installed below; avoid building the unused cargo-about tool on this runner.
-          install_args: java
+          # Install only the tools needed by E2E; cargo-about is not used in this job.
+          install_args: java rust
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - name: Install Rust
-        run: |
-          curl -O https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
-          ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
-          $env:PATH += ";$env:USERPROFILE\.cargo\bin"
-          rustup component add clippy
+      - name: Install Clippy
+        run: rustup component add clippy
       - uses: SonarSource/ci-github-actions/config-gradle@v1
       - name: Run E2E tests
         shell: bash
