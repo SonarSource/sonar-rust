@@ -66,14 +66,14 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
-        with:
-          version: 2026.8.15
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get -y install autoconf build-essential gcc-mingw-w64 git libtool musl-dev musl-tools pkg-config rustup
           sudo apt-get clean
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          version: 2026.8.15
       - name: Cache cross-compiler
         id: cache-cross-compiler
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
