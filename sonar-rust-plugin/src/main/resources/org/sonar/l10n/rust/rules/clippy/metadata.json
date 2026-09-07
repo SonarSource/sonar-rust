@@ -240,6 +240,12 @@
     "description": "Clippy lint <code>builtin_type_shadow</code>."
   },
   {
+    "key": "by_ref_peekable_peek",
+    "name": "by_ref_peekable_peek",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#by_ref_peekable_peek",
+    "description": "Clippy lint <code>by_ref_peekable_peek</code>."
+  },
+  {
     "key": "byte_char_slices",
     "name": "byte_char_slices",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#byte_char_slices",
@@ -376,6 +382,12 @@
     "name": "checked_conversions",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#checked_conversions",
     "description": "Clippy lint <code>checked_conversions</code>."
+  },
+  {
+    "key": "chunks_exact_to_as_chunks",
+    "name": "chunks_exact_to_as_chunks",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#chunks_exact_to_as_chunks",
+    "description": "Clippy lint <code>chunks_exact_to_as_chunks</code>."
   },
   {
     "key": "clear_with_drain",
@@ -1128,6 +1140,12 @@
     "description": "Clippy lint <code>for_kv_map</code>."
   },
   {
+    "key": "for_unbounded_range",
+    "name": "for_unbounded_range",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#for_unbounded_range",
+    "description": "Clippy lint <code>for_unbounded_range</code>."
+  },
+  {
     "key": "forget_non_drop",
     "name": "forget_non_drop",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#forget_non_drop",
@@ -1156,12 +1174,6 @@
     "name": "four_forward_slashes",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#four_forward_slashes",
     "description": "Clippy lint <code>four_forward_slashes</code>."
-  },
-  {
-    "key": "from_iter_instead_of_collect",
-    "name": "from_iter_instead_of_collect",
-    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#from_iter_instead_of_collect",
-    "description": "Clippy lint <code>from_iter_instead_of_collect</code>."
   },
   {
     "key": "from_over_into",
@@ -1998,6 +2010,12 @@
     "description": "Clippy lint <code>manual_is_variant_and</code>."
   },
   {
+    "key": "manual_isolate_lowest_one",
+    "name": "manual_isolate_lowest_one",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_isolate_lowest_one",
+    "description": "Clippy lint <code>manual_isolate_lowest_one</code>."
+  },
+  {
     "key": "manual_let_else",
     "name": "manual_let_else",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_let_else",
@@ -2242,6 +2260,12 @@
     "name": "map_identity",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_identity",
     "description": "Clippy lint <code>map_identity</code>."
+  },
+  {
+    "key": "map_or_identity",
+    "name": "map_or_identity",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#map_or_identity",
+    "description": "Clippy lint <code>map_or_identity</code>."
   },
   {
     "key": "map_unwrap_or",
@@ -4488,6 +4512,12 @@
     "description": "Clippy lint <code>unnecessary_unwrap</code>."
   },
   {
+    "key": "unnecessary_unwrap_unchecked",
+    "name": "unnecessary_unwrap_unchecked",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_unwrap_unchecked",
+    "description": "Clippy lint <code>unnecessary_unwrap_unchecked</code>."
+  },
+  {
     "key": "unnecessary_wraps",
     "name": "unnecessary_wraps",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_wraps",
@@ -4558,6 +4588,12 @@
     "name": "unused_async",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_async",
     "description": "Clippy lint <code>unused_async</code>."
+  },
+  {
+    "key": "unused_async_trait_impl",
+    "name": "unused_async_trait_impl",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unused_async_trait_impl",
+    "description": "Clippy lint <code>unused_async_trait_impl</code>."
   },
   {
     "key": "unused_enumerate_index",
@@ -4816,6 +4852,12 @@
     "name": "wildcard_in_or_patterns",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#wildcard_in_or_patterns",
     "description": "Clippy lint <code>wildcard_in_or_patterns</code>."
+  },
+  {
+    "key": "with_capacity_zero",
+    "name": "with_capacity_zero",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#with_capacity_zero",
+    "description": "Clippy lint <code>with_capacity_zero</code>."
   },
   {
     "key": "write_literal",
