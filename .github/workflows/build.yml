@@ -58,7 +58,7 @@ jobs:
           path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
 
   cross_platform_analyzers:
-    runs-on: github-ubuntu-latest-m
+    runs-on: warp-custom-ubuntu-24-04
     name: Cross-Platform Analyzers Build
     env:
       MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
@@ -66,14 +66,14 @@ jobs:
       id-token: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
-        with:
-          version: 2026.8.15
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get -y install autoconf build-essential gcc-mingw-w64 git libtool musl-dev musl-tools pkg-config rustup
           sudo apt-get clean
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          version: 2026.8.15
       - name: Cache cross-compiler
         id: cache-cross-compiler
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -98,7 +98,8 @@ jobs:
       - name: Install cross-compiler
         run: |
           # Install cross-compiler to system location
-          sudo cp -r cross-compiler-output/* /usr/local/
+          # Warp runners use a restrictive sudo umask, so preserve executable permissions from the cache.
+          sudo cp -r --preserve=mode cross-compiler-output/* /usr/local/
       - name: Setup Rust toolchain
         run: |
           # Setup Rust toolchain
@@ -132,7 +133,7 @@ jobs:
           path: analyzer/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz
 
   unit_test_and_analysis:
-    runs-on: github-ubuntu-latest-m
+    runs-on: sonar-m
     name: Unit Tests and Analysis
     permissions:
       id-token: write
@@ -164,7 +165,7 @@ jobs:
       !cancelled() &&
       (needs.macos_analyzers.result == 'success' || needs.macos_analyzers.result == 'skipped') &&
       needs.cross_platform_analyzers.result == 'success'
-    runs-on: github-ubuntu-latest-m
+    runs-on: sonar-m
     name: Build
     permissions:
       id-token: write
@@ -216,7 +217,7 @@ jobs:
   e2e:
     needs: [build]
     if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: github-ubuntu-latest-m
+    runs-on: sonar-m
     name: E2E Tests
     permissions:
       id-token: write
@@ -247,7 +248,7 @@ jobs:
   e2e_win:
     needs: [build]
     if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: github-windows-latest-m
+    runs-on: warp-custom-windows-2022-m
     name: E2E Tests Windows
     permissions:
       id-token: write
@@ -263,18 +264,16 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.8.15
+          # Install only the tools needed by E2E; cargo-about is not used in this job.
+          install_args: java rust
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - name: Install Rust
-        run: |
-          curl -O https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe
-          ./rustup-init.exe -y --default-host x86_64-pc-windows-msvc --default-toolchain stable --profile minimal
-          $env:PATH += ";$env:USERPROFILE\.cargo\bin"
-          rustup component add clippy
+      - name: Install Clippy
+        run: rustup component add clippy
       - uses: SonarSource/ci-github-actions/config-gradle@v1
       - name: Run E2E tests
         shell: bash
@@ -309,6 +308,8 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.8.15
+      - name: Install Clippy
+        run: rustup component add clippy
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
@@ -340,7 +341,7 @@ jobs:
       startsWith(github.ref_name, 'dogfood-'))
     permissions:
       id-token: write
-    runs-on: github-ubuntu-latest-s
+    runs-on: sonar-xs
     steps:
       # https://github.com/SonarSource/release-github-actions/tree/master/notify-slack
       - uses: SonarSource/release-github-actions/notify-slack@v1
@@ -359,7 +360,7 @@ jobs:
       needs.e2e.result == 'success' &&
       needs.e2e_win.result == 'success' &&
       needs.e2e_linux_arm64.result == 'success'
-    runs-on: github-ubuntu-latest-s
+    runs-on: sonar-xs
     name: Promote
     permissions:
       id-token: write

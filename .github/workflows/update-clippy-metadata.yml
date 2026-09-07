@@ -25,7 +25,7 @@ concurrency:
 
 jobs:
   update:
-    runs-on: github-ubuntu-latest-s
+    runs-on: sonar-xs
     permissions:
       id-token: write
       contents: write
