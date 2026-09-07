@@ -535,7 +535,7 @@ match x { // +1
 
         let mut increments = vec![];
         while let Some(m) = matches.next() {
-            for capture in m.captures {
+            for capture in m.captures() {
                 let text = source_code[capture.node.start_byte()..capture.node.end_byte()]
                     .trim_start_matches("//")
                     .trim();

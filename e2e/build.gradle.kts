@@ -2,7 +2,7 @@ plugins {
     id("java")
 }
 
-val orchestratorVersion = "6.4.2.4626"
+val orchestratorVersion = "6.4.3.4676"
 
 dependencies {
     testImplementation("org.assertj:assertj-core:3.27.7")
@@ -11,7 +11,7 @@ dependencies {
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator-junit5:$orchestratorVersion")
     testImplementation("org.sonarsource.orchestrator:sonar-orchestrator:$orchestratorVersion")
     testImplementation(libs.junit.platform.suite.api)
-    testImplementation("org.sonarsource.sonarqube:sonar-ws:26.8.0.126808")
+    testImplementation("org.sonarsource.sonarqube:sonar-ws:26.9.0.129388")
 
     testRuntimeOnly(libs.junit.platform.launcher)
     testRuntimeOnly(libs.junit.platform.suite.engine)
@@ -20,9 +20,9 @@ dependencies {
     // Force specific versions of transitive dependencies
     constraints {
       implementation("ch.qos.logback:logback-classic:1.6.3") {
-        because("CVE-2023-6378 - Deserialization of Untrusted Data")
+        because("orchestrator pins logback 1.5.37; keep aligned with the Plugin API v14 logging stack")
       }
-      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.1") {
+      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.2") {
         because("CVE-2020-36518 - Out-of-bounds Write")
       }
     }

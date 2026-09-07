@@ -3,6 +3,6 @@
 # This file is expected to be part of source control.
 # To regenerate this file, run: ./gradlew :custom-rules-plugin:dependencies --write-locks
 com.android.tools:r8:9.1.31=shadowR8
-org.slf4j:slf4j-api:1.7.30=compileClasspath
-org.sonarsource.api.plugin:sonar-plugin-api:13.11.0.4459=compileClasspath
+org.slf4j:slf4j-api:2.0.18=compileClasspath
+org.sonarsource.api.plugin:sonar-plugin-api:14.0.0.4498=compileClasspath
 empty=annotationProcessor,runtimeClasspath,shadow,testAnnotationProcessor,testCompileClasspath,testRuntimeClasspath

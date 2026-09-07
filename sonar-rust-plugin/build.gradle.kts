@@ -6,7 +6,7 @@ plugins {
   id("jacoco")
   `maven-publish`
   signing
-  id("com.diffplug.spotless") version "8.10.0"
+  id("com.diffplug.spotless") version "8.10.1"
   id("org.sonarqube")
   id("com.jfrog.artifactory")
   id("com.gradleup.shadow") version "9.6.1"
@@ -23,9 +23,9 @@ if (project.version.toString().endsWith("-SNAPSHOT") && buildNumber != null) {
   project.version = project.version.toString().replace("-SNAPSHOT", versionSuffix)
 }
 
-val sonarApiVersion = "13.11.0.4459"
-val scannerEngineVersion = "13.9.0.4593"
-val analyzerCommonsVersion = "2.30.0.5193"
+val sonarApiVersion = "14.0.0.4498"
+val scannerEngineVersion = "13.10.0.4657"
+val analyzerCommonsVersion = "2.31.0.5284"
 
 dependencies {
   implementation("com.google.code.gson:gson:2.14.0")
@@ -44,12 +44,6 @@ dependencies {
   testImplementation("org.awaitility:awaitility:4.3.0")
   testRuntimeOnly(libs.junit.platform.launcher)
   
-  // Force specific versions of transitive dependencies
-  constraints {
-    implementation("ch.qos.logback:logback-classic:1.6.3") {
-      because("CVE-2023-6378 - Deserialization of Untrusted Data")
-    }
-  }
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
