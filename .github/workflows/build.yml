@@ -98,7 +98,8 @@ jobs:
       - name: Install cross-compiler
         run: |
           # Install cross-compiler to system location
-          sudo cp -r cross-compiler-output/* /usr/local/
+          # Warp runners use a restrictive sudo umask, so preserve executable permissions from the cache.
+          sudo cp -r --preserve=mode cross-compiler-output/* /usr/local/
       - name: Setup Rust toolchain
         run: |
           # Setup Rust toolchain
