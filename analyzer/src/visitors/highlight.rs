@@ -85,7 +85,7 @@ pub fn highlight(tree: &Tree, source_code: &str) -> Result<Vec<HighlightToken>, 
     let mut doc_comments: HashSet<Node<'_>> = HashSet::new();
 
     while let Some(m) = query_matches.next() {
-        for capture in m.captures {
+        for capture in m.captures() {
             match HighlightTokenType::from_capture_name(capture_names[capture.index as usize]) {
                 Some(HighlightTokenType::Comment) => {
                     comments.insert(capture.node);
