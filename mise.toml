@@ -1,4 +1,4 @@
 [tools]
 java = "21"
-rust = "1.95.0"
+rust = "1.98.0"
 "cargo:cargo-about" = { version = "0.9.0", features = "cli" }
