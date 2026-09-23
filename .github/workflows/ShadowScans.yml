@@ -45,6 +45,7 @@ jobs:
     concurrency:
       group: iris-${{ github.ref }}
       cancel-in-progress: false
+      queue: single
     runs-on: sonar-xs
     name: Run IRIS
     permissions:
