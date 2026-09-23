@@ -66,7 +66,7 @@ class PlatformDetection {
   }
 
   String debug() {
-    return String.format("os: %s, arch: %s", system.getOsName(), system.getOsArch());
+    return "os: " + system.getOsName() + ", arch: " + system.getOsArch();
   }
 
   private boolean isX64() {
