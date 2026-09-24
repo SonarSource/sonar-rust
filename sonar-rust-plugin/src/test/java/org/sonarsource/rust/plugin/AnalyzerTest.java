@@ -32,7 +32,7 @@ class AnalyzerTest {
   public static final Map<String, String> TEST_PARAMETERS = new HashMap<>();
   static {
     for (var param : RustRulesDefinition.parameters()) {
-      TEST_PARAMETERS.put(String.format("%s:%s", param.ruleKey(), param.paramKey()), param.defaultValue());
+      TEST_PARAMETERS.put(param.ruleKey() + ":" + param.paramKey(), param.defaultValue());
     }
   }
 
@@ -128,7 +128,7 @@ class AnalyzerTest {
   @Test
   void cognitive_complexity_check() throws IOException {
     var parameters = new HashMap<>(TEST_PARAMETERS);
-    parameters.put(String.format("%s:%s", "S3776", "threshold"), "3");
+    parameters.put("S3776:threshold", "3");
 
     try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, parameters)) {
       var result = analyzer.analyze("""
