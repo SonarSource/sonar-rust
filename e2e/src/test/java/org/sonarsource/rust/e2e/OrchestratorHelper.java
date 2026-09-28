@@ -20,6 +20,7 @@ import static org.junit.jupiter.api.extension.ExtensionContext.Namespace.GLOBAL;
 
 import com.sonar.orchestrator.build.SonarScanner;
 import com.sonar.orchestrator.container.Edition;
+import com.sonar.orchestrator.container.Server;
 import com.sonar.orchestrator.junit5.OrchestratorExtension;
 import com.sonar.orchestrator.locator.FileLocation;
 import com.sonar.orchestrator.locator.Location;
@@ -27,6 +28,9 @@ import com.sonar.orchestrator.locator.MavenLocation;
 import java.io.File;
 import org.junit.jupiter.api.extension.BeforeAllCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
+import org.sonarqube.ws.client.HttpConnector;
+import org.sonarqube.ws.client.WsClientFactories;
+import org.sonarqube.ws.client.qualityprofiles.SetDefaultRequest;
 
 public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.Store.CloseableResource {
 
@@ -62,6 +66,13 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
       // this will register "this.close()" method to be called when GLOBAL context is shutdown
       context.getRoot().getStore(GLOBAL).put(OrchestratorHelper.class, this);
       orchestrator.start();
+      var wsClient = WsClientFactories.getDefault().newClient(HttpConnector.newBuilder()
+        .url(orchestrator.getServer().getUrl())
+        .credentials(Server.ADMIN_LOGIN, Server.ADMIN_PASSWORD)
+        .build());
+      wsClient.qualityprofiles().setDefault(new SetDefaultRequest()
+        .setLanguage("rust")
+        .setQualityProfile("Sonar way comprehensive"));
     }
   }
 
