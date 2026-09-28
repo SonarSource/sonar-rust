@@ -51,6 +51,8 @@ class ProjectLayoutTest {
     var projectName = "Package Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/package").toURI()).toFile();
 
+    OrchestratorHelper.provisionProjectWithFullProfile(projectKey, projectName);
+
     var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
@@ -95,6 +97,8 @@ class ProjectLayoutTest {
     var projectKey = "hybrid-layout";
     var projectName = "Hybrid Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/hybrid").toURI()).toFile();
+
+    OrchestratorHelper.provisionProjectWithFullProfile(projectKey, projectName);
 
     var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
@@ -144,6 +148,8 @@ class ProjectLayoutTest {
     var projectName = "Monorepo Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/monorepo").toURI()).toFile();
 
+    OrchestratorHelper.provisionProjectWithFullProfile(projectKey, projectName);
+
     var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
@@ -192,6 +198,8 @@ class ProjectLayoutTest {
     var projectKey = "workspace-layout";
     var projectName = "Workspace Layout";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/layouts/workspace").toURI()).toFile();
+
+    OrchestratorHelper.provisionProjectWithFullProfile(projectKey, projectName);
 
     var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
