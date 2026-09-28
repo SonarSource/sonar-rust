@@ -22,7 +22,7 @@ dependencies {
       implementation("ch.qos.logback:logback-classic:1.6.3") {
         because("orchestrator pins logback 1.5.37; keep aligned with the Plugin API v14 logging stack")
       }
-      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.2") {
+      implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.3") {
         because("CVE-2020-36518 - Out-of-bounds Write")
       }
     }
