@@ -41,6 +41,8 @@ class ClippyRunnerTest {
     var projectName = "Clippy";
     var projectDir = Paths.get(getClass().getClassLoader().getResource("projects/runner").toURI()).toFile();
 
+    OrchestratorHelper.provisionProjectWithFullProfile(projectKey, projectName);
+
     var scanner = OrchestratorHelper.createSonarScanner()
       .setProjectKey(projectKey)
       .setProjectName(projectName)
