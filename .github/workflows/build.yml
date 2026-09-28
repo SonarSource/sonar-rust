@@ -239,11 +239,15 @@ jobs:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - name: Wait for Artifactory token federation
+        uses: SonarSource/sonarsource-infra-artifactory/.github/actions/wait-for-artifactory-token-federation@979fc5f122d4f67f0d7e0ea880e0f1c3b8019941
+        with:
+          probe-path: "api/search/versions?g=com.sonarsource.sonarqube&a=sonarqube-enterprise-lw&remote=1&repos=sonarsource-releases&v=*"
       - name: Run E2E tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
         run: |
-          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} -Dorchestrator.artifactory.url=https://repox-internal.dev.sonar.build/artifactory "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" --info --stacktrace
 
   e2e_win:
     needs: [build]
@@ -275,6 +279,10 @@ jobs:
       - name: Install Clippy
         run: rustup component add clippy
       - uses: SonarSource/ci-github-actions/config-gradle@v1
+      - name: Wait for Artifactory token federation
+        uses: SonarSource/sonarsource-infra-artifactory/.github/actions/wait-for-artifactory-token-federation@979fc5f122d4f67f0d7e0ea880e0f1c3b8019941
+        with:
+          probe-path: "api/search/versions?g=com.sonarsource.sonarqube&a=sonarqube-enterprise-lw&remote=1&repos=sonarsource-releases&v=*"
       - name: Run E2E tests
         shell: bash
         env:
@@ -282,7 +290,7 @@ jobs:
         run: |
           echo "org.gradle.daemon=false" >> "gradle.properties"
           export PATH=$PATH:$HOME/.cargo/bin
-          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
+          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} -Dorchestrator.artifactory.url=https://repox-internal.dev.sonar.build/artifactory "-Dorchestrator.artifactory.accessToken=${ARTIFACTORY_ACCESS_TOKEN}" --info --stacktrace
       - name: Upload test reports
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
