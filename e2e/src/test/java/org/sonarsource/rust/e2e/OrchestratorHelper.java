@@ -78,4 +78,10 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
     return SonarScanner.create()
       .setProperty("sonar.scanner.skipJreProvisioning", "true");
   }
+
+  static void provisionProjectWithFullProfile(String projectKey, String projectName) {
+    var server = orchestrator.getServer();
+    server.provisionProject(projectKey, projectName);
+    server.associateProjectToQualityProfile(projectKey, "rust", "Sonar way");
+  }
 }

@@ -99,10 +99,10 @@ class RustRulesRepositoryApiTest {
     return wsClient.qualityprofiles()
       .search(new org.sonarqube.ws.client.qualityprofiles.SearchRequest().setLanguage(BASE_REPOSITORY))
       .getProfilesList().stream()
-      .filter(p -> p.getIsBuiltIn() && "Sonar way".equals(p.getName()))
+      .filter(p -> p.getIsBuiltIn() && ("Sonar way comprehensive".equals(p.getName()) || "Sonar way".equals(p.getName())))
       .map(org.sonarqube.ws.Qualityprofiles.SearchWsResponse.QualityProfile::getKey)
       .findFirst()
-      .orElseThrow(() -> new AssertionError("Built-in 'Sonar way' profile for rust not found"));
+      .orElseThrow(() -> new AssertionError("Built-in 'Sonar way comprehensive' profile for rust not found"));
   }
 
   private static Set<String> activeRuleIds(WsClient wsClient, String profileKey, String repository) {
