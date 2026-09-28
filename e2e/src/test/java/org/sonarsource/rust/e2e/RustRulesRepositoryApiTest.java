@@ -95,13 +95,26 @@ class RustRulesRepositoryApiTest {
       .build());
   }
 
+  /**
+   * Since SonarQube 2026.6 (SONAR-32511), the built-in "Sonar way" profile contributed by
+   * {@link org.sonarsource.rust.plugin.RustProfile} is split by the platform into three tiers
+   * ("Sonar way core", "Sonar way extended" and "Sonar way comprehensive"); the plain "Sonar way"
+   * name is no longer registered. "Sonar way comprehensive" is the superset containing the full
+   * rule set the plugin activated, so it is the equivalent of the old "Sonar way" on those
+   * versions. Older SonarQube versions still register a plain "Sonar way".
+   */
   private static String builtInSonarWayKey(WsClient wsClient) {
-    return wsClient.qualityprofiles()
+    var builtInProfiles = wsClient.qualityprofiles()
       .search(new org.sonarqube.ws.client.qualityprofiles.SearchRequest().setLanguage(BASE_REPOSITORY))
       .getProfilesList().stream()
-      .filter(p -> p.getIsBuiltIn() && "Sonar way".equals(p.getName()))
-      .map(org.sonarqube.ws.Qualityprofiles.SearchWsResponse.QualityProfile::getKey)
+      .filter(org.sonarqube.ws.Qualityprofiles.SearchWsResponse.QualityProfile::getIsBuiltIn)
+      .toList();
+
+    return builtInProfiles.stream()
+      .filter(p -> "Sonar way".equals(p.getName()))
       .findFirst()
+      .or(() -> builtInProfiles.stream().filter(p -> "Sonar way comprehensive".equals(p.getName())).findFirst())
+      .map(org.sonarqube.ws.Qualityprofiles.SearchWsResponse.QualityProfile::getKey)
       .orElseThrow(() -> new AssertionError("Built-in 'Sonar way' profile for rust not found"));
   }
 
