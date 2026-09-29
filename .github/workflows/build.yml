@@ -240,7 +240,7 @@ jobs:
             development/github/token/licenses-ro token | GITHUB_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v1
       - name: Wait for Artifactory token federation
-        uses: SonarSource/sonarsource-infra-artifactory/.github/actions/wait-for-artifactory-token-federation@979fc5f122d4f67f0d7e0ea880e0f1c3b8019941
+        uses: ./.github/actions/wait-for-artifactory-token-federation
         with:
           probe-path: "api/search/versions?g=com.sonarsource.sonarqube&a=sonarqube-enterprise-lw&remote=1&repos=sonarsource-releases&v=*"
       - name: Run E2E tests
@@ -280,7 +280,7 @@ jobs:
         run: rustup component add clippy
       - uses: SonarSource/ci-github-actions/config-gradle@v1
       - name: Wait for Artifactory token federation
-        uses: SonarSource/sonarsource-infra-artifactory/.github/actions/wait-for-artifactory-token-federation@979fc5f122d4f67f0d7e0ea880e0f1c3b8019941
+        uses: ./.github/actions/wait-for-artifactory-token-federation
         with:
           probe-path: "api/search/versions?g=com.sonarsource.sonarqube&a=sonarqube-enterprise-lw&remote=1&repos=sonarsource-releases&v=*"
       - name: Run E2E tests
