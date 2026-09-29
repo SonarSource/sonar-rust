@@ -246,7 +246,7 @@ jobs:
             --output e2e/sonar-rust-plugin.jar \
             "https://repox.jfrog.io/artifactory/sonarsource-qa/org/sonarsource/rust/sonar-rust-plugin/${PROJECT_VERSION}/sonar-rust-plugin-${PROJECT_VERSION}.jar"
       - name: Wait for Artifactory token federation
-        uses: ./.github/actions/wait-for-artifactory-token-federation
+        uses: SonarSource/ci-github-actions/wait-for-artifactory-token-federation@715009ff183f509d685a028c3cac34c69e3714c4
         with:
           probe-path: "api/search/versions?g=com.sonarsource.sonarqube&a=sonarqube-enterprise-lw&remote=1&repos=sonarsource-releases&v=*"
       - name: Run E2E tests
@@ -293,7 +293,7 @@ jobs:
             --output e2e/sonar-rust-plugin.jar \
             "https://repox.jfrog.io/artifactory/sonarsource-qa/org/sonarsource/rust/sonar-rust-plugin/${PROJECT_VERSION}/sonar-rust-plugin-${PROJECT_VERSION}.jar"
       - name: Wait for Artifactory token federation
-        uses: ./.github/actions/wait-for-artifactory-token-federation
+        uses: SonarSource/ci-github-actions/wait-for-artifactory-token-federation@715009ff183f509d685a028c3cac34c69e3714c4
         with:
           probe-path: "api/search/versions?g=com.sonarsource.sonarqube&a=sonarqube-enterprise-lw&remote=1&repos=sonarsource-releases&v=*"
       - name: Run E2E tests
