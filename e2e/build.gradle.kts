@@ -51,6 +51,9 @@ tasks.test {
     }
     useJUnitPlatform()
     systemProperty("pluginVersion", System.getProperty("pluginVersion", null))
+    System.getProperty("pluginFile")?.let {
+        systemProperty("pluginFile", it)
+    }
     System.getProperty("orchestrator.artifactory.url")?.let {
         systemProperty("orchestrator.artifactory.url", it)
     }
@@ -61,7 +64,7 @@ tasks.test {
         // RustRulesRepositoryApiTest installs the fixture plugin from its build output. Build it (and,
         // for local runs, the base plugin jar the OrchestratorHelper picks up) before the ITs run.
         dependsOn(":custom-rules-plugin:shadowJar")
-        if (System.getProperty("pluginVersion").isNullOrEmpty()) {
+        if (System.getProperty("pluginVersion").isNullOrEmpty() && System.getProperty("pluginFile").isNullOrEmpty()) {
             dependsOn(":sonar-rust-plugin:shadowJar")
         }
     }
