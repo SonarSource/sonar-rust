@@ -40,7 +40,7 @@ dependencies {
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation("org.assertj:assertj-core:3.27.7")
-  testImplementation("org.mockito:mockito-core:5.23.0")
+  testImplementation("org.mockito:mockito-core:5.24.0")
   testImplementation("org.awaitility:awaitility:4.3.0")
   testRuntimeOnly(libs.junit.platform.launcher)
   
