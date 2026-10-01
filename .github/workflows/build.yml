@@ -25,6 +25,7 @@ jobs:
     if: github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/branch-') || startsWith(github.ref, 'refs/heads/dogfood-') || github.event_name == 'workflow_dispatch'
     permissions:
       id-token: write
+      contents: write
     steps:
       # see https://xtranet-sonarsource.atlassian.net/wiki/spaces/Platform/pages/4412309510/MacOS+Runners+-+GitHub
       - name: Setup Cloudflare WARP
@@ -64,6 +65,7 @@ jobs:
       MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Install system dependencies
@@ -137,6 +139,7 @@ jobs:
     name: Unit Tests and Analysis
     permissions:
       id-token: write
+      contents: write
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
