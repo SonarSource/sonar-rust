@@ -48,10 +48,6 @@ public class OrchestratorHelper implements BeforeAllCallback,  ExtensionContext.
    * CI it is resolved from JFrog by the version published during the build.
    */
   static Location basePluginLocation() {
-    var pluginFile = System.getProperty("pluginFile");
-    if (pluginFile != null && !pluginFile.isEmpty()) {
-      return FileLocation.of(new File(pluginFile));
-    }
     var version = System.getProperty("pluginVersion");
     if (version == null || version.isEmpty()) {
       return FileLocation.byWildcardMavenFilename(new File("../sonar-rust-plugin/build/libs"), "sonar-rust-plugin-*.jar");
