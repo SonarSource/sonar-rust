@@ -83,11 +83,11 @@ public class RustSensor implements Sensor {
     // Find rule parameters
     Map<String, String> parameters = new HashMap<>();
     for (var parameter : RustRulesDefinition.parameters()) {
-      parameters.put(String.format("%s:%s", parameter.ruleKey(), parameter.paramKey()), parameter.defaultValue());
+      parameters.put(parameter.ruleKey() + ":" + parameter.paramKey(), parameter.defaultValue());
     }
     for (var activeRule : sensorContext.activeRules().findByRepository(RustLanguage.KEY)) {
       for (var parameter : activeRule.params().entrySet()) {
-        parameters.put(String.format("%s:%s", activeRule.ruleKey().rule(), parameter.getKey()), parameter.getValue());
+        parameters.put(activeRule.ruleKey().rule() + ":" + parameter.getKey(), parameter.getValue());
       }
     }
     analyzerFactory.addParameters(parameters);

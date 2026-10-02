@@ -65,7 +65,7 @@ public class ClippyRunner {
       cmd.add("--offline");
     }
     cmd.addAll(List.of("--", "-A", "clippy::all"));
-    lints.stream().map(lint -> String.format("-W%s", lint)).forEach(cmd::add);
+    lints.stream().map(lint -> "-W" + lint).forEach(cmd::add);
     return cmd;
   }
 
