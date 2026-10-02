@@ -4,5 +4,5 @@
 # To regenerate this file, run: ./gradlew :custom-rules-plugin:dependencies --write-locks
 com.android.tools:r8:9.1.31=shadowR8
 org.slf4j:slf4j-api:2.0.18=compileClasspath
-org.sonarsource.api.plugin:sonar-plugin-api:14.0.0.4498=compileClasspath
+org.sonarsource.api.plugin:sonar-plugin-api:14.1.0.5543=compileClasspath
 empty=annotationProcessor,runtimeClasspath,shadow,testAnnotationProcessor,testCompileClasspath,testRuntimeClasspath
