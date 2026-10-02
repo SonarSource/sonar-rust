@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
-          version: 2026.9.12
+          version: 2026.9.14
       - name: Setup Rust toolchain
         run: |
           sudo apt-get update
@@ -32,7 +32,7 @@ jobs:
           rustup target add x86_64-unknown-linux-musl
           cargo install cargo-llvm-cov
       - name: SQC shadow scans
-        uses: SonarSource/ci-github-actions/build-gradle@v1
+        uses: SonarSource/ci-github-actions/build-gradle@v2
         with:
           deploy: false
           deploy-pull-request: false
