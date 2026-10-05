@@ -333,7 +333,7 @@ jobs:
           path: e2e/build/reports/tests/**
 
   notify-build-failure:
-    needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64, promote]
+    needs: [macos_analyzers, cross_platform_analyzers, build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64, promote]
     if: >-
       always()
       && (github.ref_name == github.event.repository.default_branch || startsWith(github.ref_name, 'branch-') || startsWith(github.ref_name, 'dogfood-'))
