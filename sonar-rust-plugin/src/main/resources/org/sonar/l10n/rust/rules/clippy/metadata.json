@@ -90,6 +90,12 @@
     "description": "Clippy lint <code>as_underscore</code>."
   },
   {
+    "key": "assert_is_empty",
+    "name": "assert_is_empty",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#assert_is_empty",
+    "description": "Clippy lint <code>assert_is_empty</code>."
+  },
+  {
     "key": "assertions_on_constants",
     "name": "assertions_on_constants",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#assertions_on_constants",
@@ -160,6 +166,12 @@
     "name": "blanket_clippy_restriction_lints",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#blanket_clippy_restriction_lints",
     "description": "Clippy lint <code>blanket_clippy_restriction_lints</code>."
+  },
+  {
+    "key": "block_scrutinee",
+    "name": "block_scrutinee",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#block_scrutinee",
+    "description": "Clippy lint <code>block_scrutinee</code>."
   },
   {
     "key": "blocks_in_conditions",
@@ -580,6 +592,12 @@
     "name": "default_union_representation",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#default_union_representation",
     "description": "Clippy lint <code>default_union_representation</code>."
+  },
+  {
+    "key": "definition_in_module_root",
+    "name": "definition_in_module_root",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#definition_in_module_root",
+    "description": "Clippy lint <code>definition_in_module_root</code>."
   },
   {
     "key": "deprecated_cfg_attr",
@@ -1866,6 +1884,12 @@
     "description": "Clippy lint <code>manual_async_fn</code>."
   },
   {
+    "key": "manual_bit_width",
+    "name": "manual_bit_width",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_bit_width",
+    "description": "Clippy lint <code>manual_bit_width</code>."
+  },
+  {
     "key": "manual_bits",
     "name": "manual_bits",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#manual_bits",
@@ -2392,6 +2416,12 @@
     "name": "min_max",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#min_max",
     "description": "Clippy lint <code>min_max</code>."
+  },
+  {
+    "key": "mismatched_bit_width_type",
+    "name": "mismatched_bit_width_type",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#mismatched_bit_width_type",
+    "description": "Clippy lint <code>mismatched_bit_width_type</code>."
   },
   {
     "key": "mismatching_type_param_order",
@@ -2956,6 +2986,12 @@
     "name": "nonminimal_bool",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#nonminimal_bool",
     "description": "Clippy lint <code>nonminimal_bool</code>."
+  },
+  {
+    "key": "nonnull_unchecked_on_box_ptr",
+    "name": "nonnull_unchecked_on_box_ptr",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#nonnull_unchecked_on_box_ptr",
+    "description": "Clippy lint <code>nonnull_unchecked_on_box_ptr</code>."
   },
   {
     "key": "nonsensical_open_options",
@@ -3568,6 +3604,12 @@
     "name": "rest_pat_in_fully_bound_structs",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#rest_pat_in_fully_bound_structs",
     "description": "Clippy lint <code>rest_pat_in_fully_bound_structs</code>."
+  },
+  {
+    "key": "rest_pattern_accessible_field",
+    "name": "rest_pattern_accessible_field",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#rest_pattern_accessible_field",
+    "description": "Clippy lint <code>rest_pattern_accessible_field</code>."
   },
   {
     "key": "result_filter_map",
@@ -4450,6 +4492,12 @@
     "name": "unnecessary_owned_empty_strings",
     "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_owned_empty_strings",
     "description": "Clippy lint <code>unnecessary_owned_empty_strings</code>."
+  },
+  {
+    "key": "unnecessary_rest_pattern",
+    "name": "unnecessary_rest_pattern",
+    "url": "https://rust-lang.github.io/rust-clippy/master/index.html#unnecessary_rest_pattern",
+    "description": "Clippy lint <code>unnecessary_rest_pattern</code>."
   },
   {
     "key": "unnecessary_result_map_or_else",
