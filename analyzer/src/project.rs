@@ -36,6 +36,7 @@ type Ranges = HashSet<(usize, usize)>;
 #[derive(Default)]
 pub struct Project {
     files: HashMap<PathBuf, (Arc<String>, Ranges)>,
+    roots: HashSet<PathBuf>,
 }
 
 impl Project {
@@ -125,7 +126,10 @@ impl Project {
                 },
             );
         }
-        let mut project = Self::default();
+        let mut project = Self {
+            roots: crates.iter().map(|krate| absolute(&krate.root)).collect(),
+            ..Self::default()
+        };
         for path in &builder.loaded {
             if let Some(source) = builder.sources.get(path) {
                 project
@@ -171,6 +175,10 @@ impl Project {
             ));
         }
         (project, warnings)
+    }
+
+    pub fn is_root(&self, path: &str) -> bool {
+        self.roots.contains(&absolute(Path::new(path)))
     }
 
     pub fn ranges(&self, path: &str, source: &str) -> Option<&Ranges> {

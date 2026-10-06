@@ -51,7 +51,20 @@ impl Recursion {
         source: &str,
         crates: &HashMap<String, CrateContext>,
     ) -> Self {
-        let resolver = Resolver::with_crates(root, source, crates);
+        Self::with_context(root, source, crates, true)
+    }
+
+    pub fn unknown_root(root: Node<'_>, source: &str) -> Self {
+        Self::with_context(root, source, &HashMap::new(), false)
+    }
+
+    fn with_context(
+        root: Node<'_>,
+        source: &str,
+        crates: &HashMap<String, CrateContext>,
+        known_root: bool,
+    ) -> Self {
+        let resolver = Resolver::with_crates(root, source, crates, known_root);
         let mut edges = vec![Vec::new(); resolver.functions.len()];
         for call in nodes(root).filter(|node| node.kind() == "call_expression") {
             let Some(caller) = enclosing_function(call) else {
@@ -200,6 +213,7 @@ struct Resolver<'tree, 'source> {
     implementations: Vec<Node<'tree>>,
     active_lookups: RefCell<HashSet<(usize, String, Namespace)>>,
     crate_roots: HashSet<usize>,
+    known_root: bool,
     extern_preludes: HashMap<usize, HashMap<String, Node<'tree>>>,
     editions: HashMap<usize, u16>,
 }
@@ -209,6 +223,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         root: Node<'tree>,
         source: &'source str,
         crates: &HashMap<String, CrateContext>,
+        known_root: bool,
     ) -> Self {
         let mut resolver = Self {
             source,
@@ -219,6 +234,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             implementations: Vec::new(),
             active_lookups: RefCell::new(HashSet::new()),
             crate_roots: HashSet::new(),
+            known_root,
             extern_preludes: HashMap::new(),
             editions: HashMap::new(),
         };
@@ -335,6 +351,14 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 return self.root;
             };
             node = parent;
+        }
+    }
+
+    fn confirmed_crate_root(&self, context: Node<'tree>) -> Option<Node<'tree>> {
+        if self.known_root || !self.crate_roots.is_empty() {
+            Some(self.crate_root(context))
+        } else {
+            None
         }
     }
 
@@ -522,7 +546,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 }
                 self.lookup(self.text(path), context, namespace, depth + 1)
             }
-            "crate" => Some(Symbol::Module(self.crate_root(context))),
+            "crate" => self.confirmed_crate_root(context).map(Symbol::Module),
             "self" => Some(Symbol::Module(module_scope(
                 context,
                 self.crate_root(context),
@@ -873,7 +897,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             Namespace::Type
         };
         let mut symbol = match first.as_str() {
-            "crate" => Symbol::Module(self.crate_root(context)),
+            "crate" => Symbol::Module(self.confirmed_crate_root(context)?),
             "self" => Symbol::Module(module_scope(context, self.crate_root(context))),
             "super" => Symbol::Module(parent_module(
                 module_scope(context, self.crate_root(context)),

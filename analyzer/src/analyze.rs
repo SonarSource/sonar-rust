@@ -38,18 +38,29 @@ pub fn analyze(
     source_code: &str,
     parameters: &HashMap<String, String>,
 ) -> Result<Output, AnalyzerError> {
-    analyze_project_file(source_code, parameters, None)
+    analyze_file_context(source_code, parameters, None, true)
 }
 
+#[cfg(test)]
 pub fn analyze_project_file(
     source_code: &str,
     parameters: &HashMap<String, String>,
     ranges: Option<&HashSet<(usize, usize)>>,
 ) -> Result<Output, AnalyzerError> {
+    analyze_file_context(source_code, parameters, ranges, false)
+}
+
+pub fn analyze_file_context(
+    source_code: &str,
+    parameters: &HashMap<String, String>,
+    ranges: Option<&HashSet<(usize, usize)>>,
+    known_root: bool,
+) -> Result<Output, AnalyzerError> {
     let tree = parse_rust_code(source_code)?;
     let recursion = match ranges {
         Some(ranges) => Recursion::for_file(tree.root_node(), ranges),
-        None => Recursion::new(tree.root_node(), source_code),
+        None if known_root => Recursion::new(tree.root_node(), source_code),
+        None => Recursion::unknown_root(tree.root_node(), source_code),
     };
 
     Ok(Output {
@@ -68,6 +79,22 @@ mod tests {
     use crate::visitors::highlight::HighlightTokenType;
 
     use super::*;
+
+    #[test]
+    fn unknown_root_does_not_guess_crate_paths_or_imports() {
+        let parameters = HashMap::from([("S3776:threshold".to_owned(), "0".to_owned())]);
+        for source in [
+            "pub fn parse(s: &str) { crate::parse(s) }",
+            "use crate::parse as other; pub fn parse(s: &str) { other(s) }",
+        ] {
+            let output = analyze_project_file(source, &parameters, None).unwrap();
+            assert_eq!(output.metrics.cognitive_complexity, 0);
+            let output = analyze_file_context(source, &parameters, None, true).unwrap();
+            assert_eq!(output.metrics.cognitive_complexity, 1);
+        }
+        let output = analyze_project_file("fn parse() { parse(); }", &parameters, None).unwrap();
+        assert_eq!(output.metrics.cognitive_complexity, 1);
+    }
 
     #[test]
     fn recursion_fixture_reports_every_cycle_member_and_excludes_entry() {

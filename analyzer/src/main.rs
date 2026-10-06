@@ -32,7 +32,7 @@ mod visitors {
     pub mod metrics;
 }
 
-use analyze::{analyze, analyze_project_file};
+use analyze::{analyze, analyze_file_context};
 use project::Project;
 use std::{
     collections::HashMap,
@@ -75,9 +75,12 @@ fn main() {
         let source_code = std::str::from_utf8(&buf).expect("UTF-8 conversion error");
 
         let result = match path {
-            Some(path) => {
-                analyze_project_file(source_code, &parameters, project.ranges(&path, source_code))
-            }
+            Some(path) => analyze_file_context(
+                source_code,
+                &parameters,
+                project.ranges(&path, source_code),
+                project.is_root(&path),
+            ),
             None => analyze(source_code, &parameters),
         };
         let output = match result {
