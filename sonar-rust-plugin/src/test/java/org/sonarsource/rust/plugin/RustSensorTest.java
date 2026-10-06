@@ -43,8 +43,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class RustSensorTest {
 
@@ -76,6 +78,36 @@ class RustSensorTest {
     sensor().execute(context);
     assertThat(context.measure(PROJECT_KEY + ":src/lib.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
     assertThat(context.measure(PROJECT_KEY + ":src/other.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+  }
+
+  @Test
+  void project_initialization_failure_restarts_analyzer_and_preserves_file_analysis() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"recovery\"\nversion = \"0.1.0\"\n");
+    context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));
+    var creations = new AtomicInteger();
+    var failed = new AtomicReference<Analyzer>();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        if (creations.incrementAndGet() == 1) {
+          Analyzer analyzer = spy(new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+            @Override
+            public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+              close();
+              throw new IOException("project process stopped");
+            }
+          });
+          failed.set(analyzer);
+          return analyzer;
+        }
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
+    assertThat(creations.get()).isEqualTo(2);
+    verify(failed.get(), org.mockito.Mockito.atLeastOnce()).close();
+    assertThat(context.measure(PROJECT_KEY + ":src/util.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.highlightingTypeAt(PROJECT_KEY + ":src/util.rs", 1, 0)).contains(TypeOfText.KEYWORD);
   }
 
   @Test

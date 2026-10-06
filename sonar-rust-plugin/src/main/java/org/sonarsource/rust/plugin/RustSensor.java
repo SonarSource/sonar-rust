@@ -93,14 +93,7 @@ public class RustSensor implements Sensor {
     }
     analyzerFactory.addParameters(parameters);
 
-    try (Analyzer analyzer = analyzerFactory.create(platform)) {
-      if (!manifests.isEmpty()) {
-        Map<String, String> sources = projectSources(inputFiles);
-        for (String warning : analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), sources)) {
-          LOG.warn("Rust project resolution: {}", warning);
-          analysisWarnings.addUnique("Rust project resolution: " + warning);
-        }
-      }
+    try (Analyzer analyzer = createForAnalysis(platform, manifests, inputFiles)) {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
@@ -108,6 +101,25 @@ public class RustSensor implements Sensor {
       LOG.error("Failed to create Rust analyzer: {}", ex.getMessage());
       analysisWarnings.addUnique("Failed to create Rust analyzer: " + ex.getMessage());
       failFastCheck(sensorContext, ex);
+    }
+  }
+
+  private Analyzer createForAnalysis(Platform platform, List<File> manifests, List<InputFile> inputFiles) throws IOException {
+    Analyzer analyzer = analyzerFactory.create(platform);
+    if (manifests.isEmpty()) {
+      return analyzer;
+    }
+    try {
+      for (String warning : analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), projectSources(inputFiles))) {
+        LOG.warn("Rust project resolution: {}", warning);
+        analysisWarnings.addUnique("Rust project resolution: " + warning);
+      }
+      return analyzer;
+    } catch (Exception ex) {
+      analyzer.close();
+      LOG.warn("Rust project initialization failed; restarting with standalone analysis: {}", ex.getMessage());
+      analysisWarnings.addUnique("Rust project resolution unavailable; continuing with standalone analysis.");
+      return analyzerFactory.create(platform);
     }
   }
 
