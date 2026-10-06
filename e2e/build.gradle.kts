@@ -19,7 +19,7 @@ dependencies {
 
     // Force specific versions of transitive dependencies
     constraints {
-      implementation("ch.qos.logback:logback-classic:1.6.4") {
+      implementation("ch.qos.logback:logback-classic:1.6.5") {
         because("orchestrator pins logback 1.5.37; keep aligned with the Plugin API v14 logging stack")
       }
       implementation("com.fasterxml.jackson.dataformat:jackson-dataformat-xml:2.22.3") {
