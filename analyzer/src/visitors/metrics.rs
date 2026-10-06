@@ -14,8 +14,9 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
+use crate::recursion::Recursion;
 use crate::tree::{walk_tree, AnalyzerError, NodeVisitor};
-use crate::visitors::cognitive_complexity::calculate_total_cognitive_complexity;
+use crate::visitors::cognitive_complexity::calculate_with_recursion;
 use crate::visitors::cyclomatic_complexity::calculate_cyclomatic_complexity;
 use std::collections::HashSet;
 use tree_sitter::{Node, Tree};
@@ -31,13 +32,26 @@ pub struct Metrics {
     pub cyclomatic_complexity: i32,
 }
 
+#[cfg(test)]
 pub fn calculate_metrics(tree: &Tree, source_code: &str) -> Result<Metrics, AnalyzerError> {
+    let recursion = Recursion::new(tree.root_node(), source_code);
+    calculate_metrics_with_recursion(tree, source_code, &recursion)
+}
+
+pub fn calculate_metrics_with_recursion(
+    tree: &Tree,
+    source_code: &str,
+    recursion: &Recursion,
+) -> Result<Metrics, AnalyzerError> {
     let mut metrics_visitor = MetricsVisitor::new(source_code);
     walk_tree(tree.root_node(), &mut metrics_visitor)?;
 
     let mut metrics = Metrics::default();
     metrics_visitor.update_metrics(&mut metrics);
-    metrics.cognitive_complexity = calculate_total_cognitive_complexity(tree)?;
+    metrics.cognitive_complexity = calculate_with_recursion(tree.root_node(), recursion)?
+        .iter()
+        .map(|increment| increment.nesting + 1)
+        .sum();
     metrics.cyclomatic_complexity = calculate_cyclomatic_complexity(tree)?;
 
     Ok(metrics)
@@ -121,6 +135,15 @@ mod tests {
 
     use super::*;
     use crate::tree::parse_rust_code;
+
+    #[test]
+    fn recursion_contributes_to_file_metrics() {
+        let source = "fn recursive() { recursive(); recursive(); } fn ordinary() {}";
+        let tree = parse_rust_code(source).unwrap();
+        let metrics = calculate_metrics(&tree, source).unwrap();
+        assert_eq!(metrics.cognitive_complexity, 1);
+        assert_eq!(metrics.cyclomatic_complexity, 1);
+    }
 
     #[test]
     fn test_comment_metrics() {
