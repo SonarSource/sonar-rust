@@ -21,6 +21,9 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +37,8 @@ public class Analyzer implements AutoCloseable {
   private final ProcessWrapper process;
   private final DataOutputStream outputStream;
   private final DataInputStream inputStream;
+
+  private Set<String> knownCrateRoots = Set.of();
 
   public Analyzer(List<String> command, Map<String, String> parameters) {
     try {
@@ -50,7 +55,7 @@ public class Analyzer implements AutoCloseable {
   }
 
   /**
-   * Use the analyzer subprocess to analyze the given code.
+   * Use the analyzer subprocess to analyze a standalone crate-root snippet.
    * @throws IOException if executing the analyzer fails due to an I/O error
    */
   public AnalysisResult analyze(String code) throws IOException {
@@ -59,8 +64,22 @@ public class Analyzer implements AutoCloseable {
     return readAnalysis();
   }
 
+  /** Retain Cargo-confirmed identities when replacing a failed project analyser. */
+  public void preserveCrateRootsFrom(Analyzer previous) {
+    knownCrateRoots = previous.knownCrateRoots;
+  }
+
+  private static String canonicalPath(String path) {
+    Path file = Path.of(path);
+    try {
+      return file.toRealPath().toString();
+    } catch (IOException ex) {
+      return file.toAbsolutePath().normalize().toString();
+    }
+  }
+
   public AnalysisResult analyze(String path, String code) throws IOException {
-    writeString("analyze-file");
+    writeString(knownCrateRoots.contains(canonicalPath(path)) ? "analyze-root" : "analyze-file");
     writeString(path);
     writeString(code);
     return readAnalysis();
@@ -74,6 +93,15 @@ public class Analyzer implements AutoCloseable {
       writeString(manifest);
     }
     writeMap(sources);
+    if (!"project-roots".equals(readString())) {
+      throw new IOException("Unexpected project root discovery response");
+    }
+    int rootCount = inputStream.readInt();
+    Set<String> roots = new HashSet<>();
+    for (int i = 0; i < rootCount; i++) {
+      roots.add(canonicalPath(readString()));
+    }
+    knownCrateRoots = Set.copyOf(roots);
     if (!"project-ready".equals(readString())) {
       throw new IOException("Unexpected project initialization response");
     }

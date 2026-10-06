@@ -84,6 +84,18 @@ class AnalyzerTest {
   }
 
   @Test
+  void unindexed_files_do_not_guess_roots_from_filenames() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
+      for (String name : List.of("lib.rs", "main.rs", "util.rs")) {
+        String path = temporary.resolve(name).toString();
+        assertThat(analyzer.analyze(path, "fn parse() { crate::parse(); }").measures().cognitiveComplexity()).isZero();
+        assertThat(analyzer.analyze(path, "use crate::parse as other; fn parse() { other(); }").measures().cognitiveComplexity()).isZero();
+        assertThat(analyzer.analyze(path, "fn parse() { parse(); }").measures().cognitiveComplexity()).isOne();
+      }
+    }
+  }
+
+  @Test
   void unavailable_cargo_project_does_not_break_legacy_analysis() throws IOException {
     try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
       assertThat(analyzer.initializeProject(List.of(temporary.resolve("missing/Cargo.toml").toString()), Map.of())).isNotEmpty();

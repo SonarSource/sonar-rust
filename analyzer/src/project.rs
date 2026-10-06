@@ -40,7 +40,16 @@ pub struct Project {
 }
 
 impl Project {
+    #[cfg(test)]
     pub fn load(manifests: &[String], overrides: HashMap<String, String>) -> (Self, Vec<String>) {
+        Self::load_with_roots(manifests, overrides, |_| {})
+    }
+
+    pub fn load_with_roots(
+        manifests: &[String],
+        overrides: HashMap<String, String>,
+        on_roots: impl FnOnce(&[PathBuf]),
+    ) -> (Self, Vec<String>) {
         let mut warnings = Vec::new();
         let mut packages = HashMap::new();
         let mut workspace = HashSet::new();
@@ -85,6 +94,12 @@ impl Project {
             }
         }
         let crates = crate_targets(&packages, &workspace, &dependencies);
+        let mut roots: Vec<_> = crates.iter().map(|krate| krate.root.clone()).collect();
+        roots.sort();
+        roots.dedup();
+        // Publish confirmed identities before parsing the combined graph, so the
+        // scanner can retain them if that more expensive phase fails.
+        on_roots(&roots);
         Self::from_crates(crates, overrides, warnings)
     }
 

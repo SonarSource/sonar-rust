@@ -40,7 +40,13 @@ or Git dependencies). Analysis does not download crates or run build scripts.
 Recursive call locations are mapped back to the original files for metrics and
 S3776 issues. If dependency metadata is unavailable, the analyser warns and uses
 local Cargo targets where possible; files outside the discovered module trees
-and files changed after indexing fall back to standalone analysis.
+and files changed after indexing fall back to standalone analysis. Cargo-confirmed
+crate roots are reported before graph construction and retained if the sensor
+restarts a failed analyser. Without a confirmed root, standalone file analysis
+leaves `crate::` paths unresolved; `lib.rs` and `main.rs` filenames alone are not
+proof of crate identity. Unqualified local recursion remains supported. The legacy
+pathless `analyze` command treats its snippet as a standalone crate root; the
+scanner uses path-aware analysis and requires confirmed root identity.
 
 The resolver does not expand macros or generated modules, evaluate `cfg`, load
 standard-library sources, solve generic bounds or specialize generic impls, perform

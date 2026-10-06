@@ -123,7 +123,9 @@ public class RustSensor implements Sensor {
       failFastCheck(sensorContext, ex);
       LOG.warn("Rust project initialization failed; restarting with standalone analysis: {}", ex.getMessage());
       analysisWarnings.addUnique("Rust project resolution unavailable; continuing with standalone analysis.");
-      return analyzerFactory.create(platform);
+      Analyzer standalone = analyzerFactory.create(platform);
+      standalone.preserveCrateRootsFrom(analyzer);
+      return standalone;
     }
   }
 

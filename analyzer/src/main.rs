@@ -52,7 +52,14 @@ fn main() {
         if command == "project" {
             let manifests: Vec<_> = (0..read_i32()).map(|_| read_string()).collect();
             let sources = read_map();
-            let (loaded, warnings) = Project::load(&manifests, sources);
+            let (loaded, warnings) = Project::load_with_roots(&manifests, sources, |roots| {
+                write_string("project-roots");
+                write_int(roots.len() as i32);
+                for root in roots {
+                    write_string(&root.to_string_lossy());
+                }
+                io::stdout().flush().expect("flush project roots");
+            });
             project = loaded;
             write_string("project-ready");
             write_int(warnings.len() as i32);
@@ -64,7 +71,7 @@ fn main() {
         }
         let path = match command.as_str() {
             "analyze" => None,
-            "analyze-file" => Some(read_string()),
+            "analyze-file" | "analyze-root" => Some(read_string()),
             _ => return,
         };
 
@@ -79,7 +86,7 @@ fn main() {
                 source_code,
                 &parameters,
                 project.ranges(&path, source_code),
-                project.is_root(&path),
+                command == "analyze-root" || project.is_root(&path),
             ),
             None => analyze(source_code, &parameters),
         };

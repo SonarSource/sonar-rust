@@ -148,6 +148,39 @@ class RustSensorTest {
   }
 
   @Test
+  void recovery_preserves_custom_cargo_root_without_guessing_nested_lib_module() throws IOException {
+    Files.createDirectories(baseDir.toPath().resolve("roots"));
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"root_recovery\"\nversion = \"0.1.0\"\nedition = \"2021\"\n[lib]\npath = \"roots/entry.rs\"\n");
+    Files.writeString(baseDir.toPath().resolve("Cargo.lock"), "version = 4\n[[package]]\nname = \"root_recovery\"\nversion = \"0.1.0\"\n");
+    String root = "mod lib; pub fn parse() { crate::parse(); }";
+    String module = "pub fn parse() { crate::parse(); }";
+    Files.writeString(baseDir.toPath().resolve("roots/entry.rs"), root);
+    Files.writeString(baseDir.toPath().resolve("roots/lib.rs"), module);
+    context.fileSystem().add(inputFile("roots/entry.rs", root));
+    context.fileSystem().add(inputFile("roots/lib.rs", module));
+    var creations = new AtomicInteger();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        if (creations.incrementAndGet() == 1) {
+          return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+            @Override
+            public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+              super.initializeProject(manifests, sources);
+              throw new IOException("project phase failed after root discovery");
+            }
+          };
+        }
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
+    assertThat(creations.get()).isEqualTo(2);
+    assertThat(context.measure(PROJECT_KEY + ":roots/entry.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.measure(PROJECT_KEY + ":roots/lib.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isZero();
+  }
+
+  @Test
   void partial_resolution_logs_one_summary_without_ui_warning_banners() throws IOException {
     Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"partial\"\nversion = \"0.1.0\"\n");
     context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));
