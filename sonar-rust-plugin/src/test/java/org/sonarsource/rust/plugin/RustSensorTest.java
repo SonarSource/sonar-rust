@@ -111,6 +111,29 @@ class RustSensorTest {
   }
 
   @Test
+  void partial_resolution_logs_one_summary_without_ui_warning_banners() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"partial\"\nversion = \"0.1.0\"\n");
+    context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+          @Override
+          public List<String> initializeProject(List<String> manifests, Map<String, String> sources) {
+            return List.of("Dependency resolution unavailable", "Module generated source unavailable");
+          }
+        };
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper(warnings)).execute(context);
+    assertThat(warnings.warnings).isEmpty();
+    assertThat(logTester.logs(Level.WARN).stream().filter(message -> message.startsWith("Rust project resolution")).toList()).hasSize(1).allSatisfy(message -> assertThat(message).contains("cross-file recursion detection may be incomplete"));
+    assertThat(logTester.logs(Level.DEBUG)).anySatisfy(message -> assertThat(message).contains("Module generated source unavailable"));
+    assertThat(context.measure(PROJECT_KEY + ":src/util.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+  }
+
+  @Test
   void sensor_descriptor() {
     DefaultSensorDescriptor descriptor = new DefaultSensorDescriptor();
     sensor().describe(descriptor);

@@ -110,9 +110,12 @@ public class RustSensor implements Sensor {
       return analyzer;
     }
     try {
-      for (String warning : analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), projectSources(inputFiles))) {
-        LOG.warn("Rust project resolution: {}", warning);
-        analysisWarnings.addUnique("Rust project resolution: " + warning);
+      List<String> warnings = analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), projectSources(inputFiles));
+      for (String warning : warnings) {
+        LOG.debug("Rust project resolution: {}", warning);
+      }
+      if (!warnings.isEmpty()) {
+        LOG.warn("Rust project resolution was partial; cross-file recursion detection may be incomplete ({} diagnostics). Enable debug logs for details.", warnings.size());
       }
       return analyzer;
     } catch (Exception ex) {
