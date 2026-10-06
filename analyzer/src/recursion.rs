@@ -642,6 +642,95 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         }
     }
 
+    fn local_binding(
+        &self,
+        node: Node<'tree>,
+        context: Node<'tree>,
+        name: &str,
+    ) -> Option<Symbol<'tree>> {
+        if node.kind() == "block" {
+            let mut lets: Vec<_> = children(node)
+                .filter(|child| {
+                    child.kind() == "let_declaration" && child.end_byte() <= context.start_byte()
+                })
+                .collect();
+            lets.reverse();
+            for binding in lets {
+                if binding
+                    .child_by_field_name("pattern")
+                    .is_some_and(|p| pattern_contains(p, name, self.source))
+                {
+                    return Some(Symbol::Binding(binding));
+                }
+            }
+        }
+        if matches!(node.kind(), "function_item" | "closure_expression") {
+            if let Some(parameters) = node.child_by_field_name("parameters") {
+                for parameter in children(parameters) {
+                    let pattern = parameter
+                        .child_by_field_name("pattern")
+                        .unwrap_or(parameter);
+                    if pattern_contains(pattern, name, self.source) {
+                        return Some(Symbol::Binding(parameter));
+                    }
+                }
+            }
+        }
+        if ((node.kind() == "for_expression"
+            && node
+                .child_by_field_name("body")
+                .is_some_and(|body| contains(body, context)))
+            || node.kind() == "match_arm")
+            && node
+                .child_by_field_name("pattern")
+                .is_some_and(|pattern| pattern_contains(pattern, name, self.source))
+        {
+            return Some(Symbol::Unknown);
+        }
+        self.condition_binding(node, context, name)
+    }
+
+    fn condition_binding(
+        &self,
+        node: Node<'tree>,
+        context: Node<'tree>,
+        name: &str,
+    ) -> Option<Symbol<'tree>> {
+        if matches!(node.kind(), "if_expression" | "while_expression") {
+            if let Some(condition) = node.child_by_field_name("condition") {
+                let in_body = node
+                    .child_by_field_name(if node.kind() == "if_expression" {
+                        "consequence"
+                    } else {
+                        "body"
+                    })
+                    .is_some_and(|body| contains(body, context));
+                for binding in nodes(condition).filter(|node| node.kind() == "let_condition") {
+                    if (in_body
+                        || (contains(condition, context)
+                            && binding.end_byte() <= context.start_byte()))
+                        && binding
+                            .child_by_field_name("pattern")
+                            .is_some_and(|pattern| pattern_contains(pattern, name, self.source))
+                    {
+                        return Some(Symbol::Unknown);
+                    }
+                }
+            }
+        }
+        None
+    }
+
+    fn generic_parameter_shadows(&self, node: Node<'tree>, name: &str) -> bool {
+        node.child_by_field_name("type_parameters")
+            .is_some_and(|parameters| {
+                children(parameters).any(|p| {
+                    p.child_by_field_name("name")
+                        .is_some_and(|p| self.text(p) == name)
+                })
+            })
+    }
+
     fn lookup(
         &self,
         name: &str,
@@ -656,83 +745,13 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         let mut locals = true;
         while let Some(node) = scope {
             if matches!(namespace, Namespace::Value) && locals {
-                if node.kind() == "block" {
-                    let mut lets: Vec<_> = children(node)
-                        .filter(|child| {
-                            child.kind() == "let_declaration"
-                                && child.end_byte() <= context.start_byte()
-                        })
-                        .collect();
-                    lets.reverse();
-                    for binding in lets {
-                        if binding
-                            .child_by_field_name("pattern")
-                            .is_some_and(|p| pattern_contains(p, name, self.source))
-                        {
-                            return Some(Symbol::Binding(binding));
-                        }
-                    }
-                }
-                if matches!(node.kind(), "function_item" | "closure_expression") {
-                    if let Some(parameters) = node.child_by_field_name("parameters") {
-                        for parameter in children(parameters) {
-                            let pattern = parameter
-                                .child_by_field_name("pattern")
-                                .unwrap_or(parameter);
-                            if pattern_contains(pattern, name, self.source) {
-                                return Some(Symbol::Binding(parameter));
-                            }
-                        }
-                    }
-                }
-                if ((node.kind() == "for_expression"
-                    && node
-                        .child_by_field_name("body")
-                        .is_some_and(|body| contains(body, context)))
-                    || node.kind() == "match_arm")
-                    && node
-                        .child_by_field_name("pattern")
-                        .is_some_and(|pattern| pattern_contains(pattern, name, self.source))
-                {
-                    return Some(Symbol::Unknown);
-                }
-                if matches!(node.kind(), "if_expression" | "while_expression") {
-                    if let Some(condition) = node.child_by_field_name("condition") {
-                        let in_body = node
-                            .child_by_field_name(if node.kind() == "if_expression" {
-                                "consequence"
-                            } else {
-                                "body"
-                            })
-                            .is_some_and(|body| contains(body, context));
-                        for binding in
-                            nodes(condition).filter(|node| node.kind() == "let_condition")
-                        {
-                            if (in_body
-                                || (contains(condition, context)
-                                    && binding.end_byte() <= context.start_byte()))
-                                && binding
-                                    .child_by_field_name("pattern")
-                                    .is_some_and(|pattern| {
-                                        pattern_contains(pattern, name, self.source)
-                                    })
-                            {
-                                return Some(Symbol::Unknown);
-                            }
-                        }
-                    }
+                if let Some(binding) = self.local_binding(node, context, name) {
+                    return Some(binding);
                 }
             }
             // Generic parameters shadow concrete type items; their dispatch is unknown.
-            if matches!(namespace, Namespace::Type) {
-                if let Some(parameters) = node.child_by_field_name("type_parameters") {
-                    if children(parameters).any(|p| {
-                        p.child_by_field_name("name")
-                            .is_some_and(|p| self.text(p) == name)
-                    }) {
-                        return Some(Symbol::Unknown);
-                    }
-                }
+            if matches!(namespace, Namespace::Type) && self.generic_parameter_shadows(node, name) {
+                return Some(Symbol::Unknown);
             }
             if matches!(node.kind(), "block" | "source_file" | "declaration_list") {
                 if let Some(symbol) = self.scope_symbol(node, name, namespace, depth + 1) {
