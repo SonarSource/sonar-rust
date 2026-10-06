@@ -111,6 +111,32 @@ class RustSensorTest {
   }
 
   @Test
+  void project_initialization_honors_fail_fast_without_restarting() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"fail_fast\"\nversion = \"0.1.0\"\n");
+    context.settings().setProperty("sonar.internal.analysis.rust.failFast", "true");
+    var creations = new AtomicInteger();
+    var failed = new AtomicReference<Analyzer>();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        creations.incrementAndGet();
+        Analyzer analyzer = spy(new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+          @Override
+          public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+            throw new IOException("invalid project response");
+          }
+        });
+        failed.set(analyzer);
+        return analyzer;
+      }
+    };
+    assertThatThrownBy(() -> new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context))
+      .isInstanceOf(IllegalStateException.class).hasMessage("Analysis failed").hasRootCauseMessage("invalid project response");
+    assertThat(creations.get()).isEqualTo(1);
+    verify(failed.get()).close();
+  }
+
+  @Test
   void partial_resolution_logs_one_summary_without_ui_warning_banners() throws IOException {
     Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"partial\"\nversion = \"0.1.0\"\n");
     context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));

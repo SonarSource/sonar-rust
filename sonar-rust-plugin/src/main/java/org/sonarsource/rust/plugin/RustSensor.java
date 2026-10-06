@@ -93,7 +93,7 @@ public class RustSensor implements Sensor {
     }
     analyzerFactory.addParameters(parameters);
 
-    try (Analyzer analyzer = createForAnalysis(platform, manifests, inputFiles)) {
+    try (Analyzer analyzer = createForAnalysis(sensorContext, platform, manifests, inputFiles)) {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
@@ -104,7 +104,7 @@ public class RustSensor implements Sensor {
     }
   }
 
-  private Analyzer createForAnalysis(Platform platform, List<File> manifests, List<InputFile> inputFiles) throws IOException {
+  private Analyzer createForAnalysis(SensorContext sensorContext, Platform platform, List<File> manifests, List<InputFile> inputFiles) throws IOException {
     Analyzer analyzer = analyzerFactory.create(platform);
     if (manifests.isEmpty()) {
       return analyzer;
@@ -120,6 +120,7 @@ public class RustSensor implements Sensor {
       return analyzer;
     } catch (Exception ex) {
       analyzer.close();
+      failFastCheck(sensorContext, ex);
       LOG.warn("Rust project initialization failed; restarting with standalone analysis: {}", ex.getMessage());
       analysisWarnings.addUnique("Rust project resolution unavailable; continuing with standalone analysis.");
       return analyzerFactory.create(platform);
