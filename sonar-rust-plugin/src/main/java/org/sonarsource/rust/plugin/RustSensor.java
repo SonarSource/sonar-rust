@@ -21,6 +21,7 @@ import org.sonarsource.rust.cargo.CargoManifestProvider;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
@@ -93,6 +94,20 @@ public class RustSensor implements Sensor {
     analyzerFactory.addParameters(parameters);
 
     try (Analyzer analyzer = analyzerFactory.create(platform)) {
+      if (!manifests.isEmpty()) {
+        Map<String, String> sources = new HashMap<>();
+        for (InputFile inputFile : inputFiles) {
+          try {
+            sources.put(Path.of(inputFile.uri()).toString(), inputFile.contents());
+          } catch (IOException ex) {
+            LOG.warn("Cannot provide project source for {}: {}", inputFile.filename(), ex.getMessage());
+          }
+        }
+        for (String warning : analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), sources)) {
+          LOG.warn("Rust project resolution: {}", warning);
+          analysisWarnings.addUnique("Rust project resolution: " + warning);
+        }
+      }
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
@@ -111,7 +126,7 @@ public class RustSensor implements Sensor {
 
   private static void analyzeFile(Analyzer analyzer, SensorContext sensorContext, InputFile inputFile) {
     try {
-      var result = analyzer.analyze(inputFile.contents());
+      var result = analyzer.analyze(Path.of(inputFile.uri()).toString(), inputFile.contents());
 
       saveMeasures(sensorContext, inputFile, result.measures());
       saveHighlighting(sensorContext, inputFile, result.highlightTokens());
