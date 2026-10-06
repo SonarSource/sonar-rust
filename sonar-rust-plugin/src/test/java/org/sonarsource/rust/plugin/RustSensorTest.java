@@ -63,6 +63,22 @@ class RustSensorTest {
   }
 
   @Test
+  void initializes_project_and_reports_cross_file_recursion() throws IOException {
+    Files.createDirectories(baseDir.toPath().resolve("src"));
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"sensor_project\"\nversion = \"0.1.0\"\nedition = \"2021\"\n");
+    Files.writeString(baseDir.toPath().resolve("Cargo.lock"), "version = 4\n[[package]]\nname = \"sensor_project\"\nversion = \"0.1.0\"\n");
+    String root = "mod other; pub fn a() { other::b(); }";
+    String other = "pub fn b() { crate::a(); }";
+    Files.writeString(baseDir.toPath().resolve("src/lib.rs"), root);
+    Files.writeString(baseDir.toPath().resolve("src/other.rs"), "pub fn b() {}");
+    context.fileSystem().add(inputFile("src/lib.rs", root));
+    context.fileSystem().add(inputFile("src/other.rs", other));
+    sensor().execute(context);
+    assertThat(context.measure(PROJECT_KEY + ":src/lib.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.measure(PROJECT_KEY + ":src/other.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+  }
+
+  @Test
   void sensor_descriptor() {
     DefaultSensorDescriptor descriptor = new DefaultSensorDescriptor();
     sensor().describe(descriptor);

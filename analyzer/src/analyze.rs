@@ -15,15 +15,16 @@
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
 use crate::{
-    issue::{find_issues, Issue},
+    issue::{find_issues_with_recursion, Issue},
+    recursion::Recursion,
     tree::{parse_rust_code, AnalyzerError},
     visitors::{
         cpd::{calculate_cpd_tokens, CpdToken},
         highlight::{highlight, HighlightToken},
-        metrics::{calculate_metrics, Metrics},
+        metrics::{calculate_metrics_with_recursion, Metrics},
     },
 };
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug)]
 pub struct Output {
@@ -37,13 +38,25 @@ pub fn analyze(
     source_code: &str,
     parameters: &HashMap<String, String>,
 ) -> Result<Output, AnalyzerError> {
+    analyze_project_file(source_code, parameters, None)
+}
+
+pub fn analyze_project_file(
+    source_code: &str,
+    parameters: &HashMap<String, String>,
+    ranges: Option<&HashSet<(usize, usize)>>,
+) -> Result<Output, AnalyzerError> {
     let tree = parse_rust_code(source_code)?;
+    let recursion = match ranges {
+        Some(ranges) => Recursion::for_file(tree.root_node(), ranges),
+        None => Recursion::new(tree.root_node(), source_code),
+    };
 
     Ok(Output {
         highlight_tokens: highlight(&tree, source_code)?,
-        metrics: calculate_metrics(&tree, source_code)?,
+        metrics: calculate_metrics_with_recursion(&tree, source_code, &recursion)?,
         cpd_tokens: calculate_cpd_tokens(&tree, source_code)?,
-        issues: find_issues(&tree, source_code, parameters)?,
+        issues: find_issues_with_recursion(&tree, source_code, parameters, &recursion)?,
     })
 }
 
@@ -55,6 +68,48 @@ mod tests {
     use crate::visitors::highlight::HighlightTokenType;
 
     use super::*;
+
+    #[test]
+    fn recursion_fixture_reports_every_cycle_member_and_excludes_entry() {
+        let source = include_str!("../tests/fixtures/recursion.rs");
+        let parameters = HashMap::from([("S3776:threshold".to_owned(), "1".to_owned())]);
+        let output = analyze(source, &parameters).unwrap();
+        assert_eq!(output.metrics.cognitive_complexity, 9);
+        assert_eq!(output.issues.len(), 3);
+        assert!(output
+            .issues
+            .iter()
+            .all(|issue| issue.message.contains("from 3 to the 1 allowed")
+                && issue.secondary_locations.len() == 3));
+    }
+
+    #[test]
+    fn resolved_method_cycle_updates_metrics_and_s3776_locations() {
+        let source = "struct S;\nimpl S {\n    fn récurse(&self) { helper(self); }\n}\nfn helper(s: &S) {\n    s.récurse();\n}\nfn entry(s: &S) { helper(s); }";
+        let parameters = HashMap::from([("S3776:threshold".to_owned(), "0".to_owned())]);
+        let output = analyze(source, &parameters).unwrap();
+        assert_eq!(output.metrics.cognitive_complexity, 2);
+        assert_eq!(output.issues.len(), 2);
+        assert!(output
+            .issues
+            .iter()
+            .all(|issue| issue.rule_key == "S3776" && issue.secondary_locations.len() == 1));
+        let helper_issue = output
+            .issues
+            .iter()
+            .find(|issue| issue.location.start_line == 5)
+            .unwrap();
+        assert_eq!(helper_issue.secondary_locations[0].message, "+1");
+        assert_eq!(
+            helper_issue.secondary_locations[0].location,
+            SonarLocation {
+                start_line: 6,
+                start_column: 6,
+                end_line: 6,
+                end_column: 13,
+            }
+        );
+    }
 
     #[test]
     fn test_analyze() {
