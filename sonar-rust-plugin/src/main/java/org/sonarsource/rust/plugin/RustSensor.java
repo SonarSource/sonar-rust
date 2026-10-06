@@ -21,6 +21,7 @@ import org.sonarsource.rust.cargo.CargoManifestProvider;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.StreamSupport;
@@ -92,7 +93,7 @@ public class RustSensor implements Sensor {
     }
     analyzerFactory.addParameters(parameters);
 
-    try (Analyzer analyzer = analyzerFactory.create(platform)) {
+    try (Analyzer analyzer = createForAnalysis(platform, manifests, inputFiles)) {
       for (InputFile inputFile : inputFiles) {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
@@ -103,6 +104,40 @@ public class RustSensor implements Sensor {
     }
   }
 
+  private Analyzer createForAnalysis(Platform platform, List<File> manifests, List<InputFile> inputFiles) throws IOException {
+    Analyzer analyzer = analyzerFactory.create(platform);
+    if (manifests.isEmpty()) {
+      return analyzer;
+    }
+    try {
+      List<String> warnings = analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), projectSources(inputFiles));
+      for (String warning : warnings) {
+        LOG.debug("Rust project resolution: {}", warning);
+      }
+      if (!warnings.isEmpty()) {
+        LOG.warn("Rust project resolution was partial; cross-file recursion detection may be incomplete ({} diagnostics). Enable debug logs for details.", warnings.size());
+      }
+      return analyzer;
+    } catch (Exception ex) {
+      analyzer.close();
+      LOG.warn("Rust project initialization failed; restarting with standalone analysis: {}", ex.getMessage());
+      analysisWarnings.addUnique("Rust project resolution unavailable; continuing with standalone analysis.");
+      return analyzerFactory.create(platform);
+    }
+  }
+
+  private static Map<String, String> projectSources(List<InputFile> inputFiles) {
+    Map<String, String> sources = new HashMap<>();
+    for (InputFile inputFile : inputFiles) {
+      try {
+        sources.put(Path.of(inputFile.uri()).toString(), inputFile.contents());
+      } catch (IOException ex) {
+        LOG.warn("Cannot provide project source for {}: {}", inputFile.filename(), ex.getMessage());
+      }
+    }
+    return sources;
+  }
+
   private static void failFastCheck(SensorContext sensorContext, Exception ex) {
     if (sensorContext.config().getBoolean(RustPlugin.FAIL_FAST_PROPERTY).orElse(false)) {
       throw new IllegalStateException("Analysis failed", ex);
@@ -111,7 +146,7 @@ public class RustSensor implements Sensor {
 
   private static void analyzeFile(Analyzer analyzer, SensorContext sensorContext, InputFile inputFile) {
     try {
-      var result = analyzer.analyze(inputFile.contents());
+      var result = analyzer.analyze(Path.of(inputFile.uri()).toString(), inputFile.contents());
 
       saveMeasures(sensorContext, inputFile, result.measures());
       saveHighlighting(sensorContext, inputFile, result.highlightTokens());

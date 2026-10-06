@@ -16,6 +16,8 @@
  */
 mod analyze;
 mod issue;
+mod project;
+mod recursion;
 mod rules {
     pub mod cognitive_complexity_check;
     pub mod parsing_error_check;
@@ -30,7 +32,8 @@ mod visitors {
     pub mod metrics;
 }
 
-use analyze::analyze;
+use analyze::{analyze, analyze_file_context};
+use project::Project;
 use std::{
     collections::HashMap,
     io::{self, Read, Write},
@@ -43,11 +46,27 @@ fn main() {
     }
     let parameters = read_map();
 
+    let mut project = Project::default();
     loop {
         let command = read_string();
-        if command != "analyze" {
-            return;
+        if command == "project" {
+            let manifests: Vec<_> = (0..read_i32()).map(|_| read_string()).collect();
+            let sources = read_map();
+            let (loaded, warnings) = Project::load(&manifests, sources);
+            project = loaded;
+            write_string("project-ready");
+            write_int(warnings.len() as i32);
+            for warning in warnings {
+                write_string(&warning);
+            }
+            io::stdout().flush().expect("flush project response");
+            continue;
         }
+        let path = match command.as_str() {
+            "analyze" => None,
+            "analyze-file" => Some(read_string()),
+            _ => return,
+        };
 
         let len = read_i32();
         let mut buf = vec![0u8; len as usize];
@@ -55,7 +74,16 @@ fn main() {
 
         let source_code = std::str::from_utf8(&buf).expect("UTF-8 conversion error");
 
-        let output = match analyze(source_code, &parameters) {
+        let result = match path {
+            Some(path) => analyze_file_context(
+                source_code,
+                &parameters,
+                project.ranges(&path, source_code),
+                project.is_root(&path),
+            ),
+            None => analyze(source_code, &parameters),
+        };
+        let output = match result {
             Ok(output) => output,
             Err(AnalyzerError::FileError(message)) => {
                 eprintln!("warn {}", message);

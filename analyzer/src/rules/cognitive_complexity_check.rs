@@ -16,9 +16,10 @@
  */
 use crate::{
     issue::{Issue, SecondaryLocation},
+    recursion::Recursion,
     rules::rule::Rule,
     tree::{AnalyzerError, NodeIterator, TreeSitterLocation},
-    visitors::cognitive_complexity::calculate_cognitive_complexity,
+    visitors::cognitive_complexity::calculate_with_recursion,
 };
 use tree_sitter::{Node, Tree};
 
@@ -36,11 +37,21 @@ impl CognitiveComplexityCheck {
 
 impl Rule for CognitiveComplexityCheck {
     fn check(&self, tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError> {
+        let recursion = Recursion::new(tree.root_node(), source_code);
+        self.check_with_recursion(tree, source_code, &recursion)
+    }
+
+    fn check_with_recursion(
+        &self,
+        tree: &Tree,
+        source_code: &str,
+        recursion: &Recursion,
+    ) -> Result<Vec<Issue>, AnalyzerError> {
         let iter = NodeIterator::new(tree.root_node(), |node| is_outer_function_node(node));
         let mut issues: Vec<Issue> = vec![];
 
         for function_item in iter {
-            let increments = calculate_cognitive_complexity(function_item)?;
+            let increments = calculate_with_recursion(function_item, recursion)?;
             let total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();
 
             if total > self.threshold {
@@ -96,6 +107,38 @@ fn is_outer_function_node(node: Node<'_>) -> bool {
 mod tests {
     use super::*;
     use crate::tree::{parse_rust_code, SonarLocation};
+
+    #[test]
+    fn recursion_crosses_threshold_and_highlights_the_callee() {
+        let source =
+            "fn recurse() {\n    if ready {\n        recurse();\n        recurse();\n    }\n}";
+        let tree = parse_rust_code(source).unwrap();
+        let issues = CognitiveComplexityCheck::new(1)
+            .check(&tree, source)
+            .unwrap();
+        assert_eq!(issues.len(), 1);
+        assert_eq!(issues[0].rule_key, RULE_KEY);
+        assert_eq!(
+            issues[0].message,
+            "Refactor this function to reduce its Cognitive Complexity from 2 to the 1 allowed."
+        );
+        assert_eq!(
+            issues[0].secondary_locations[1],
+            SecondaryLocation {
+                message: "+1".to_owned(),
+                location: SonarLocation {
+                    start_line: 3,
+                    start_column: 8,
+                    end_line: 3,
+                    end_column: 15,
+                },
+            }
+        );
+        assert!(CognitiveComplexityCheck::new(2)
+            .check(&tree, source)
+            .unwrap()
+            .is_empty());
+    }
 
     #[test]
     fn test_zero_complexity() {

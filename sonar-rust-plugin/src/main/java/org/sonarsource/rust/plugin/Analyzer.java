@@ -55,11 +55,37 @@ public class Analyzer implements AutoCloseable {
    */
   public AnalysisResult analyze(String code) throws IOException {
     writeString("analyze");
+    writeString(code);
+    return readAnalysis();
+  }
 
-    byte[] bytes = code.getBytes(StandardCharsets.UTF_8);
-    writeInt(bytes.length);
-    write(bytes);
+  public AnalysisResult analyze(String path, String code) throws IOException {
+    writeString("analyze-file");
+    writeString(path);
+    writeString(code);
+    return readAnalysis();
+  }
 
+  /** Supply Cargo roots and scanner source snapshots before analyzing files. */
+  public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+    writeString("project");
+    writeInt(manifests.size());
+    for (String manifest : manifests) {
+      writeString(manifest);
+    }
+    writeMap(sources);
+    if (!"project-ready".equals(readString())) {
+      throw new IOException("Unexpected project initialization response");
+    }
+    int count = inputStream.readInt();
+    List<String> warnings = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      warnings.add(readString());
+    }
+    return warnings;
+  }
+
+  private AnalysisResult readAnalysis() throws IOException {
     List<HighlightTokens> highlightTokens = new ArrayList<>();
     Measures measures = new Measures();
     List<CpdToken> cpdTokens = new ArrayList<>();
@@ -134,12 +160,8 @@ public class Analyzer implements AutoCloseable {
   }
 
   private void writeString(String value) throws IOException {
-    outputStream.writeInt(value.length());
-    outputStream.write(value.getBytes(StandardCharsets.UTF_8));
-    outputStream.flush();
-  }
-
-  private void write(byte[] bytes) throws IOException {
+    byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+    outputStream.writeInt(bytes.length);
     outputStream.write(bytes);
     outputStream.flush();
   }
@@ -150,6 +172,7 @@ public class Analyzer implements AutoCloseable {
       writeString(entry.getKey());
       writeString(entry.getValue());
     }
+    outputStream.flush();
   }
 
   public record AnalysisResult(List<HighlightTokens> highlightTokens, Measures measures, List<CpdToken> cpdTokens, List<Issue> issues) {
