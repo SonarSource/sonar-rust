@@ -43,6 +43,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
@@ -116,7 +117,7 @@ class RustSensorTest {
     };
     new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
     assertThat(creations.get()).isEqualTo(2);
-    verify(failed.get(), org.mockito.Mockito.times(stopped ? 2 : 1)).close();
+    verify(failed.get(), times(stopped ? 2 : 1)).close();
     assertThat(context.measure(PROJECT_KEY + ":src/util.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
     assertThat(context.highlightingTypeAt(PROJECT_KEY + ":src/util.rs", 1, 0)).contains(TypeOfText.KEYWORD);
   }
