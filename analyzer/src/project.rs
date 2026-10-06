@@ -203,6 +203,47 @@ fn crate_targets(
     workspace: &HashSet<String>,
     resolve: &HashMap<String, Value>,
 ) -> Vec<Crate> {
+    let selected = select_targets(packages, workspace);
+    let libraries: HashMap<_, _> = selected
+        .iter()
+        .enumerate()
+        .filter(|(_, (_, _, lib, _))| *lib)
+        .map(|(index, (id, _, _, _))| (id.clone(), format!("__sonar_crate_{index}")))
+        .collect();
+    let manifest_packages: HashMap<_, _> = packages
+        .iter()
+        .filter_map(|(id, p)| {
+            p["manifest_path"]
+                .as_str()
+                .map(|p| (absolute(Path::new(p)), id))
+        })
+        .collect();
+    selected
+        .into_iter()
+        .enumerate()
+        .map(|(index, (id, target, library, root))| {
+            let aliases = dependency_aliases(&id, packages, resolve, &manifest_packages);
+            let bindings = dependency_bindings(&id, &packages[&id], library, aliases, &libraries);
+            Crate {
+                name: format!("__sonar_crate_{index}"),
+                root,
+                edition: target["edition"]
+                    .as_str()
+                    .or_else(|| packages[&id]["edition"].as_str())
+                    .and_then(|s| s.parse().ok())
+                    .unwrap_or(2021),
+                dependencies: bindings,
+            }
+        })
+        .collect()
+}
+
+type SelectedTarget = (String, Value, bool, PathBuf);
+
+fn select_targets(
+    packages: &HashMap<String, Value>,
+    workspace: &HashSet<String>,
+) -> Vec<SelectedTarget> {
     let mut selected = Vec::new();
     let mut ids: Vec<_> = packages.keys().collect();
     ids.sort();
@@ -229,106 +270,90 @@ fn crate_targets(
             }
         }
     }
-    let libraries: HashMap<_, _> = selected
-        .iter()
-        .enumerate()
-        .filter(|(_, (_, _, lib, _))| *lib)
-        .map(|(index, (id, _, _, _))| (id.clone(), format!("__sonar_crate_{index}")))
-        .collect();
-    let manifest_packages: HashMap<_, _> = packages
-        .iter()
-        .filter_map(|(id, p)| {
-            p["manifest_path"]
-                .as_str()
-                .map(|p| (absolute(Path::new(p)), id))
-        })
-        .collect();
     selected
-        .into_iter()
-        .enumerate()
-        .map(|(index, (id, target, library, root))| {
-            let mut bindings = HashMap::new();
-            let mut ambiguous = HashSet::new();
-            let bind = |bindings: &mut HashMap<String, String>,
-                        ambiguous: &mut HashSet<String>,
-                        alias: String,
-                        package_id: &str| {
-                if let Some(root) = libraries.get(package_id) {
-                    if bindings
-                        .get(&alias)
-                        .is_some_and(|previous| previous != root)
-                    {
-                        ambiguous.insert(alias.clone());
-                    }
-                    bindings.insert(alias, root.clone());
+}
+
+fn dependency_aliases(
+    id: &str,
+    packages: &HashMap<String, Value>,
+    resolve: &HashMap<String, Value>,
+    manifest_packages: &HashMap<PathBuf, &String>,
+) -> Vec<(String, String)> {
+    if let Some(deps) = resolve.get(id) {
+        return array(deps)
+            .filter_map(|dependency| {
+                // Build dependencies are not in the ordinary source extern prelude.
+                if array(&dependency["dep_kinds"]).all(|kind| kind["kind"] == "build") {
+                    return None;
                 }
-            };
-            if let Some(deps) = resolve.get(&id) {
-                for dependency in array(deps) {
-                    // Build dependencies are not in the ordinary source extern prelude.
-                    if array(&dependency["dep_kinds"]).all(|kind| kind["kind"] == "build") {
-                        continue;
-                    }
-                    if let (Some(alias), Some(package_id)) =
-                        (dependency["name"].as_str(), dependency["pkg"].as_str())
-                    {
-                        bind(&mut bindings, &mut ambiguous, alias.to_owned(), package_id);
-                    }
-                }
-            } else {
-                // --no-deps still supplies workspace path declarations, allowing local
-                // package resolution when a registry dependency is unavailable offline.
-                for dependency in array(&packages[&id]["dependencies"]) {
-                    if dependency["kind"] == "build" {
-                        continue;
-                    }
-                    let Some(path) = dependency["path"].as_str() else {
-                        continue;
-                    };
-                    if let Some(package_id) =
-                        manifest_packages.get(&absolute(&Path::new(path).join("Cargo.toml")))
-                    {
-                        if let Some(alias) = dependency["rename"]
-                            .as_str()
-                            .or_else(|| dependency["name"].as_str())
-                        {
-                            bind(
-                                &mut bindings,
-                                &mut ambiguous,
-                                alias.replace('-', "_"),
-                                package_id,
-                            );
-                        }
-                    }
-                }
+                Some((
+                    dependency["name"].as_str()?.to_owned(),
+                    dependency["pkg"].as_str()?.to_owned(),
+                ))
+            })
+            .collect();
+    }
+    // --no-deps still supplies workspace path declarations.
+    declared_path_dependencies(&packages[id], manifest_packages)
+}
+
+fn declared_path_dependencies(
+    package: &Value,
+    manifest_packages: &HashMap<PathBuf, &String>,
+) -> Vec<(String, String)> {
+    array(&package["dependencies"])
+        .filter_map(|dependency| {
+            if dependency["kind"] == "build" {
+                return None;
             }
-            // A package's binary/test/example targets can refer to its own library.
-            if !library {
-                if let Some(root) = libraries.get(&id) {
-                    if let Some(lib) = array(&packages[&id]["targets"])
-                        .find(|target| array(&target["kind"]).any(|kind| kind == "lib"))
-                    {
-                        if let Some(name) = lib["name"].as_str() {
-                            bindings.insert(name.replace('-', "_"), root.clone());
-                        }
-                    }
-                }
-            }
-            for alias in ambiguous {
-                bindings.remove(&alias);
-            }
-            Crate {
-                name: format!("__sonar_crate_{index}"),
-                root,
-                edition: target["edition"]
-                    .as_str()
-                    .or_else(|| packages[&id]["edition"].as_str())
-                    .and_then(|s| s.parse().ok())
-                    .unwrap_or(2021),
-                dependencies: bindings,
-            }
+            let path = dependency["path"].as_str()?;
+            let package_id =
+                manifest_packages.get(&absolute(&Path::new(path).join("Cargo.toml")))?;
+            let alias = dependency["rename"]
+                .as_str()
+                .or_else(|| dependency["name"].as_str())?;
+            Some((alias.replace('-', "_"), (*package_id).clone()))
         })
         .collect()
+}
+
+fn dependency_bindings(
+    id: &str,
+    package: &Value,
+    library: bool,
+    aliases: Vec<(String, String)>,
+    libraries: &HashMap<String, String>,
+) -> HashMap<String, String> {
+    let mut bindings = HashMap::new();
+    let mut ambiguous = HashSet::new();
+    for (alias, package_id) in aliases {
+        let Some(root) = libraries.get(&package_id) else {
+            continue;
+        };
+        if bindings
+            .get(&alias)
+            .is_some_and(|previous| previous != root)
+        {
+            ambiguous.insert(alias.clone());
+        }
+        bindings.insert(alias, root.clone());
+    }
+    // A package's binary/test/example targets can refer to its own library.
+    if !library {
+        if let Some(root) = libraries.get(id) {
+            if let Some(lib) = array(&package["targets"])
+                .find(|target| array(&target["kind"]).any(|kind| kind == "lib"))
+            {
+                if let Some(name) = lib["name"].as_str() {
+                    bindings.insert(name.replace('-', "_"), root.clone());
+                }
+            }
+        }
+    }
+    for alias in ambiguous {
+        bindings.remove(&alias);
+    }
+    bindings
 }
 
 fn array(value: &Value) -> impl Iterator<Item = &Value> {
