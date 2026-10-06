@@ -142,7 +142,8 @@ class RustSensorTest {
         return analyzer;
       }
     };
-    assertThatThrownBy(() -> new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context))
+    var sensor = new RustSensor(factory, new AnalysisWarningsWrapper());
+    assertThatThrownBy(() -> sensor.execute(context))
       .isInstanceOf(IllegalStateException.class).hasMessage("Analysis failed").hasRootCauseMessage("invalid project response");
     assertThat(creations.get()).isEqualTo(1);
     verify(failed.get()).close();
