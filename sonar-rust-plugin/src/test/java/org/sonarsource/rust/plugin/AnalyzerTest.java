@@ -17,11 +17,14 @@
 package org.sonarsource.rust.plugin;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -33,6 +36,70 @@ class AnalyzerTest {
   static {
     for (var param : RustRulesDefinition.parameters()) {
       TEST_PARAMETERS.put(String.format("%s:%s", param.ruleKey(), param.paramKey()), param.defaultValue());
+    }
+  }
+
+  @TempDir
+  Path temporary;
+
+  @Test
+  void resolves_cargo_workspace_files_and_renamed_external_types() throws IOException {
+    Path fixture = Path.of("../analyzer/tests/fixtures/project").toAbsolutePath();
+    Path receiver = fixture.resolve("app/src/receiver.rs");
+    String source = Files.readString(receiver);
+    var parameters = new HashMap<>(TEST_PARAMETERS);
+    parameters.put("S3776:threshold", "0");
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, parameters)) {
+      assertThat(analyzer.initializeProject(List.of(fixture.resolve("Cargo.toml").toString()), Map.of(receiver.toString(), source))).isEmpty();
+      var result = analyzer.analyze(receiver.toString(), source);
+      assertThat(result.measures().cognitiveComplexity()).isEqualTo(2);
+      assertThat(result.issues()).hasSize(2).allSatisfy(issue -> {
+        assertThat(issue.ruleKey()).isEqualTo("S3776");
+        assertThat(issue.secondaryLocations()).hasSize(1);
+      });
+      assertThat(analyzer.analyze(fixture.resolve("app/src/lib.rs").toString(), Files.readString(fixture.resolve("app/src/lib.rs"))).issues()).isEmpty();
+      assertThat(analyzer.initializeProject(List.of(), Map.of())).isEmpty();
+      assertThat(analyzer.analyze(receiver.toString(), source).measures().cognitiveComplexity()).isZero();
+    }
+  }
+
+  @Test
+  void project_protocol_uses_utf8_paths_and_scanner_snapshots() throws IOException {
+    Path project = temporary.resolve("résolution");
+    Files.createDirectories(project.resolve("src"));
+    Files.writeString(project.resolve("Cargo.toml"), "[package]\nname = \"unicode_project\"\nversion = \"0.1.0\"\nedition = \"2021\"\n");
+    Files.writeString(project.resolve("Cargo.lock"), "version = 4\n[[package]]\nname = \"unicode_project\"\nversion = \"0.1.0\"\n");
+    Path root = project.resolve("src/lib.rs");
+    Path module = project.resolve("src/módulo.rs");
+    String rootSource = "mod módulo; pub fn back() { módulo::récurse(); }";
+    String moduleSource = "pub fn récurse() { crate::back(); }";
+    Files.writeString(root, rootSource);
+    Files.writeString(module, "pub fn récurse() {}");
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
+      assertThat(analyzer.initializeProject(List.of(project.resolve("Cargo.toml").toString()), Map.of(module.toString(), moduleSource))).isEmpty();
+      assertThat(analyzer.analyze(root.toString(), rootSource).measures().cognitiveComplexity()).isOne();
+      assertThat(analyzer.analyze(module.toString(), moduleSource).measures().cognitiveComplexity()).isOne();
+      assertThat(analyzer.analyze(module.toString(), "pub fn récurse() {}").measures().cognitiveComplexity()).isZero();
+    }
+  }
+
+  @Test
+  void unindexed_files_do_not_guess_roots_from_filenames() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
+      for (String name : List.of("lib.rs", "main.rs", "util.rs")) {
+        String path = temporary.resolve(name).toString();
+        assertThat(analyzer.analyze(path, "fn parse() { crate::parse(); }").measures().cognitiveComplexity()).isZero();
+        assertThat(analyzer.analyze(path, "use crate::parse as other; fn parse() { other(); }").measures().cognitiveComplexity()).isZero();
+        assertThat(analyzer.analyze(path, "fn parse() { parse(); }").measures().cognitiveComplexity()).isOne();
+      }
+    }
+  }
+
+  @Test
+  void unavailable_cargo_project_does_not_break_legacy_analysis() throws IOException {
+    try (Analyzer analyzer = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
+      assertThat(analyzer.initializeProject(List.of(temporary.resolve("missing/Cargo.toml").toString()), Map.of())).isNotEmpty();
+      assertThat(analyzer.analyze("fn a() { a(); }").measures().cognitiveComplexity()).isOne();
     }
   }
 
