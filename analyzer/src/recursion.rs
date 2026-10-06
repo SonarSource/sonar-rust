@@ -1193,37 +1193,8 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 if children(scope).any(|item| item == trait_node) {
                     return true;
                 }
-                for item in children(scope).filter(|item| item.kind() == "use_declaration") {
-                    if let Some(argument) = item.child_by_field_name("argument") {
-                        for import in imports(argument, Vec::new(), self.source) {
-                            let target = self.resolve_segments(
-                                &import.path,
-                                item,
-                                Namespace::Type,
-                                depth + 1,
-                            );
-                            if target == Some(Symbol::Trait(trait_node)) {
-                                return true;
-                            }
-                            if import.alias.is_none() {
-                                if let Some(owner) = target {
-                                    let Some(name) = trait_node.child_by_field_name("name") else {
-                                        continue;
-                                    };
-                                    if self.path_member(
-                                        owner,
-                                        self.text(name),
-                                        Namespace::Type,
-                                        item,
-                                        depth + 1,
-                                    ) == Some(Symbol::Trait(trait_node))
-                                    {
-                                        return true;
-                                    }
-                                }
-                            }
-                        }
-                    }
+                if self.imports_trait(scope, trait_node, depth) {
+                    return true;
                 }
                 if scope.kind() == "source_file"
                     || scope.parent().is_some_and(|p| p.kind() == "mod_item")
@@ -1234,6 +1205,44 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             current = scope.parent();
         }
         false
+    }
+
+    fn imports_trait(&self, scope: Node<'tree>, trait_node: Node<'tree>, depth: usize) -> bool {
+        for item in children(scope).filter(|item| item.kind() == "use_declaration") {
+            let Some(argument) = item.child_by_field_name("argument") else {
+                continue;
+            };
+            for import in imports(argument, Vec::new(), self.source) {
+                if self.import_exposes_trait(&import, item, trait_node, depth) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    fn import_exposes_trait(
+        &self,
+        import: &Import,
+        item: Node<'tree>,
+        trait_node: Node<'tree>,
+        depth: usize,
+    ) -> bool {
+        let target = self.resolve_segments(&import.path, item, Namespace::Type, depth + 1);
+        if target == Some(Symbol::Trait(trait_node)) {
+            return true;
+        }
+        if import.alias.is_some() {
+            return false;
+        }
+        let Some(owner) = target else {
+            return false;
+        };
+        let Some(name) = trait_node.child_by_field_name("name") else {
+            return false;
+        };
+        self.path_member(owner, self.text(name), Namespace::Type, item, depth + 1)
+            == Some(Symbol::Trait(trait_node))
     }
 
     fn default_trait_call(
