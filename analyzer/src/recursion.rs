@@ -1069,6 +1069,55 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         if receiver.is_none() && explicit_trait.is_none() && !inherent.is_empty() {
             return unique(&inherent);
         }
+        let mut candidates = self.trait_members(ty, name, explicit_trait, receiver, context, depth);
+        if let Some(mode) = receiver {
+            let mut ranked = Vec::new();
+            for index in inherent.iter().chain(candidates.iter()).copied() {
+                let Some(target_mode) =
+                    self.function_receiver_mode(self.functions[index].node, depth + 1)
+                else {
+                    continue;
+                };
+                let rank = match (mode, target_mode) {
+                    (0, target) => target,
+                    (1, 1) | (2, 2) => 0,
+                    (1 | 2, 0) => 3,
+                    (2, 1) => 4,
+                    (1, 2) => 5,
+                    _ => continue,
+                };
+                ranked.push(((rank, if inherent.contains(&index) { 0 } else { 1 }), index));
+            }
+            ranked.sort_unstable();
+            let best = ranked.first()?.0;
+            candidates = ranked
+                .into_iter()
+                .filter(|(rank, _)| *rank == best)
+                .map(|(_, index)| index)
+                .collect();
+        }
+        candidates.sort_unstable();
+        candidates.dedup();
+        unique(&candidates)
+    }
+
+    fn trait_members(
+        &self,
+        ty: Node<'tree>,
+        name: &str,
+        explicit_trait: Option<usize>,
+        receiver: Option<u8>,
+        context: Node<'tree>,
+        depth: usize,
+    ) -> Vec<usize> {
+        let named = |function: &&Function<'tree>| {
+            function.owner == Some(ty)
+                && function
+                    .node
+                    .child_by_field_name("name")
+                    .is_some_and(|n| self.text(n) == name)
+                && (receiver.is_none() || function.method)
+        };
         let mut candidates = Vec::new();
         for &implementation in &self.implementations {
             let Some(trait_path) = implementation.child_by_field_name("trait") else {
@@ -1122,35 +1171,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 }
             }
         }
-        if let Some(mode) = receiver {
-            let mut ranked = Vec::new();
-            for index in inherent.iter().chain(candidates.iter()).copied() {
-                let Some(target_mode) =
-                    self.function_receiver_mode(self.functions[index].node, depth + 1)
-                else {
-                    continue;
-                };
-                let rank = match (mode, target_mode) {
-                    (0, target) => target,
-                    (1, 1) | (2, 2) => 0,
-                    (1 | 2, 0) => 3,
-                    (2, 1) => 4,
-                    (1, 2) => 5,
-                    _ => continue,
-                };
-                ranked.push(((rank, if inherent.contains(&index) { 0 } else { 1 }), index));
-            }
-            ranked.sort_unstable();
-            let best = ranked.first()?.0;
-            candidates = ranked
-                .into_iter()
-                .filter(|(rank, _)| *rank == best)
-                .map(|(_, index)| index)
-                .collect();
-        }
-        candidates.sort_unstable();
-        candidates.dedup();
-        unique(&candidates)
+        candidates
     }
 
     fn universal_impl(&self, implementation: Node<'tree>) -> bool {
