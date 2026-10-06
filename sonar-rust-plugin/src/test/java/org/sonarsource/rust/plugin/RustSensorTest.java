@@ -81,7 +81,16 @@ class RustSensorTest {
   }
 
   @Test
-  void project_initialization_failure_restarts_analyzer_and_preserves_file_analysis() throws IOException {
+  void project_initialization_failure_closes_live_analyzer_and_preserves_file_analysis() throws IOException {
+    verifyProjectFailureRecovery(false);
+  }
+
+  @Test
+  void project_initialization_failure_cleans_up_stopped_analyzer_and_preserves_file_analysis() throws IOException {
+    verifyProjectFailureRecovery(true);
+  }
+
+  private void verifyProjectFailureRecovery(boolean stopped) throws IOException {
     Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"recovery\"\nversion = \"0.1.0\"\n");
     context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));
     var creations = new AtomicInteger();
@@ -93,8 +102,10 @@ class RustSensorTest {
           Analyzer analyzer = spy(new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
             @Override
             public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
-              close();
-              throw new IOException("project process stopped");
+              if (stopped) {
+                close();
+              }
+              throw new IOException("project initialization failed");
             }
           });
           failed.set(analyzer);
@@ -105,7 +116,7 @@ class RustSensorTest {
     };
     new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
     assertThat(creations.get()).isEqualTo(2);
-    verify(failed.get(), org.mockito.Mockito.atLeastOnce()).close();
+    verify(failed.get(), org.mockito.Mockito.times(stopped ? 2 : 1)).close();
     assertThat(context.measure(PROJECT_KEY + ":src/util.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
     assertThat(context.highlightingTypeAt(PROJECT_KEY + ":src/util.rs", 1, 0)).contains(TypeOfText.KEYWORD);
   }
