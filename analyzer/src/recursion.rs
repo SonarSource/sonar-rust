@@ -196,6 +196,36 @@ enum Namespace {
     Type,
 }
 
+#[derive(Default)]
+struct ImportCandidates<'tree> {
+    explicit: Vec<Symbol<'tree>>,
+    glob: Vec<Symbol<'tree>>,
+    glob_unknown: bool,
+}
+
+impl<'tree> ImportCandidates<'tree> {
+    fn resolve(self) -> Option<Symbol<'tree>> {
+        let candidates = if !self.explicit.is_empty() {
+            self.explicit
+        } else if self.glob_unknown {
+            return Some(Symbol::Unknown);
+        } else {
+            self.glob
+        };
+        let mut unique = Vec::new();
+        for symbol in candidates {
+            if !unique.contains(&symbol) {
+                unique.push(symbol);
+            }
+        }
+        match unique.len() {
+            0 => None,
+            1 => unique.pop(),
+            _ => Some(Symbol::Unknown),
+        }
+    }
+}
+
 struct Function<'tree> {
     node: Node<'tree>,
     owner: Option<Node<'tree>>,
@@ -795,12 +825,11 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         result
     }
 
-    fn scope_symbol_inner(
+    fn declared_symbol(
         &self,
         scope: Node<'tree>,
         name: &str,
         namespace: Namespace,
-        depth: usize,
     ) -> Option<Symbol<'tree>> {
         if let Some(symbols) = self.symbols.get(&(scope.id(), name.to_owned())) {
             let mut symbols = symbols.iter().copied().filter(|symbol| match namespace {
@@ -821,81 +850,92 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 });
             }
         }
-        let mut candidates = Vec::new();
-        let mut explicit_candidates = Vec::new();
-        let mut glob_unknown = false;
+        None
+    }
+
+    fn scope_symbol_inner(
+        &self,
+        scope: Node<'tree>,
+        name: &str,
+        namespace: Namespace,
+        depth: usize,
+    ) -> Option<Symbol<'tree>> {
+        if let Some(symbol) = self.declared_symbol(scope, name, namespace) {
+            return Some(symbol);
+        }
+        let mut candidates = ImportCandidates::default();
         for item in children(scope) {
-            if item.kind() == "extern_crate_declaration" && matches!(namespace, Namespace::Type) {
-                if let Some(crate_name) = item.child_by_field_name("name") {
-                    let alias = item.child_by_field_name("alias").unwrap_or(crate_name);
-                    if self.text(alias) == name {
-                        explicit_candidates.push(
-                            self.external(self.text(crate_name), item)
-                                .unwrap_or(Symbol::Unknown),
-                        );
-                    }
+            self.collect_import_candidates(item, name, namespace, depth, &mut candidates);
+        }
+        candidates.resolve()
+    }
+
+    fn collect_import_candidates(
+        &self,
+        item: Node<'tree>,
+        name: &str,
+        namespace: Namespace,
+        depth: usize,
+        candidates: &mut ImportCandidates<'tree>,
+    ) {
+        if item.kind() == "extern_crate_declaration" && matches!(namespace, Namespace::Type) {
+            if let Some(crate_name) = item.child_by_field_name("name") {
+                let alias = item.child_by_field_name("alias").unwrap_or(crate_name);
+                if self.text(alias) == name {
+                    candidates.explicit.push(
+                        self.external(self.text(crate_name), item)
+                            .unwrap_or(Symbol::Unknown),
+                    );
                 }
             }
-            if item.kind() == "use_declaration" {
-                if let Some(argument) = item.child_by_field_name("argument") {
-                    for import in imports(argument, Vec::new(), self.source) {
-                        if import.alias.as_deref() == Some(name) {
-                            explicit_candidates.push(
-                                self.resolve_segments(&import.path, item, namespace, depth + 1)
-                                    .unwrap_or(Symbol::Unknown),
-                            );
-                        } else if import.alias.is_none() {
-                            if let Some(owner) = self.resolve_segments(
-                                &import.path,
-                                item,
-                                Namespace::Type,
-                                depth + 1,
-                            ) {
-                                if owner == Symbol::Unknown {
-                                    glob_unknown = true;
-                                }
-                                if let Some(symbol) =
-                                    self.path_member(owner, name, namespace, item, depth + 1)
-                                {
-                                    candidates.push(symbol);
-                                }
-                            } else {
-                                glob_unknown = true;
-                            }
-                        }
-                    }
+        }
+        if item.kind() == "use_declaration" {
+            if let Some(argument) = item.child_by_field_name("argument") {
+                for import in imports(argument, Vec::new(), self.source) {
+                    self.collect_import(import, item, name, namespace, depth, candidates);
                 }
             }
-            // Statement macros can create bindings. Ignore ordinary expression macros
-            // in initializers, whose generated names cannot escape their expression.
-            if matches!(item.kind(), "macro_invocation" | "foreign_mod_item")
-                || (item.kind() == "expression_statement"
-                    && children(item)
-                        .next()
-                        .is_some_and(|c| c.kind() == "macro_invocation"))
-            {
-                glob_unknown = true;
-            }
         }
-        if !explicit_candidates.is_empty() {
-            candidates = explicit_candidates;
-        } else if glob_unknown {
-            return Some(Symbol::Unknown);
+        // Statement macros and foreign modules can introduce unknown names.
+        if matches!(item.kind(), "macro_invocation" | "foreign_mod_item")
+            || (item.kind() == "expression_statement"
+                && children(item)
+                    .next()
+                    .is_some_and(|c| c.kind() == "macro_invocation"))
+        {
+            candidates.glob_unknown = true;
         }
-        // Deduplicate reexports of the same symbol without formatting AST nodes.
-        let mut unique_candidates = Vec::new();
-        for symbol in candidates {
-            if !unique_candidates.contains(&symbol) {
-                unique_candidates.push(symbol);
-            }
+    }
+
+    fn collect_import(
+        &self,
+        import: Import,
+        item: Node<'tree>,
+        name: &str,
+        namespace: Namespace,
+        depth: usize,
+        candidates: &mut ImportCandidates<'tree>,
+    ) {
+        if import.alias.as_deref() == Some(name) {
+            candidates.explicit.push(
+                self.resolve_segments(&import.path, item, namespace, depth + 1)
+                    .unwrap_or(Symbol::Unknown),
+            );
+            return;
         }
-        let mut candidates = unique_candidates;
-        if candidates.len() == 1 {
-            candidates.pop()
-        } else if !candidates.is_empty() || glob_unknown {
-            Some(Symbol::Unknown)
-        } else {
-            None
+        if import.alias.is_some() {
+            return;
+        }
+        let Some(owner) = self.resolve_segments(&import.path, item, Namespace::Type, depth + 1)
+        else {
+            candidates.glob_unknown = true;
+            return;
+        };
+        if owner == Symbol::Unknown {
+            candidates.glob_unknown = true;
+        }
+        if let Some(symbol) = self.path_member(owner, name, namespace, item, depth + 1) {
+            candidates.glob.push(symbol);
         }
     }
 
