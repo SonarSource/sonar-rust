@@ -126,6 +126,8 @@ class RustSensorTest {
   void project_initialization_honors_fail_fast_without_restarting() throws IOException {
     Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"fail_fast\"\nversion = \"0.1.0\"\n");
     context.settings().setProperty("sonar.internal.analysis.rust.failFast", "true");
+    IOException originalFailure = new IOException("invalid project response");
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
     var creations = new AtomicInteger();
     var failed = new AtomicReference<Analyzer>();
     var factory = new AnalyzerFactory(null) {
@@ -135,18 +137,20 @@ class RustSensorTest {
         Analyzer analyzer = spy(new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
           @Override
           public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
-            throw new IOException("invalid project response");
+            throw originalFailure;
           }
         });
         failed.set(analyzer);
         return analyzer;
       }
     };
-    var sensor = new RustSensor(factory, new AnalysisWarningsWrapper());
+    var sensor = new RustSensor(factory, new AnalysisWarningsWrapper(warnings));
     assertThatThrownBy(() -> sensor.execute(context))
-      .isInstanceOf(IllegalStateException.class).hasMessage("Analysis failed").hasRootCauseMessage("invalid project response");
+      .isInstanceOf(IllegalStateException.class).hasMessage("Analysis failed").hasCause(originalFailure);
     assertThat(creations.get()).isEqualTo(1);
     verify(failed.get()).close();
+    assertThat(logTester.logs(Level.ERROR)).containsExactly("Rust analysis failed: invalid project response");
+    assertThat(warnings.warnings).containsExactly("Rust analysis failed: invalid project response");
   }
 
   @Test
@@ -344,7 +348,7 @@ fn foo(c1: bool) {
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("Analysis failed");
     assertThat(warnings.warnings).hasSize(1);
-    assertThat(warnings.warnings.get(0)).startsWith("Failed to create Rust analyzer: Cannot run program");
+    assertThat(warnings.warnings.get(0)).startsWith("Rust analysis failed: Cannot run program");
   }
 
   @Test

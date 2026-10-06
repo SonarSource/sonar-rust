@@ -98,8 +98,8 @@ public class RustSensor implements Sensor {
         analyzeFile(analyzer, sensorContext, inputFile);
       }
     } catch (Exception ex) {
-      LOG.error("Failed to create Rust analyzer: {}", ex.getMessage());
-      analysisWarnings.addUnique("Failed to create Rust analyzer: " + ex.getMessage());
+      LOG.error("Rust analysis failed: {}", ex.getMessage());
+      analysisWarnings.addUnique("Rust analysis failed: " + ex.getMessage());
       failFastCheck(sensorContext, ex);
     }
   }
@@ -120,7 +120,10 @@ public class RustSensor implements Sensor {
       return analyzer;
     } catch (Exception ex) {
       analyzer.close();
-      failFastCheck(sensorContext, ex);
+      if (failFastEnabled(sensorContext)) {
+        // Let execute report the original failure and wrap it exactly once.
+        throw ex;
+      }
       LOG.warn("Rust project initialization failed; restarting with standalone analysis: {}", ex.getMessage());
       analysisWarnings.addUnique("Rust project resolution unavailable; continuing with standalone analysis.");
       Analyzer standalone = analyzerFactory.create(platform);
@@ -141,8 +144,12 @@ public class RustSensor implements Sensor {
     return sources;
   }
 
+  private static boolean failFastEnabled(SensorContext sensorContext) {
+    return sensorContext.config().getBoolean(RustPlugin.FAIL_FAST_PROPERTY).orElse(false);
+  }
+
   private static void failFastCheck(SensorContext sensorContext, Exception ex) {
-    if (sensorContext.config().getBoolean(RustPlugin.FAIL_FAST_PROPERTY).orElse(false)) {
+    if (failFastEnabled(sensorContext)) {
       throw new IllegalStateException("Analysis failed", ex);
     }
   }
