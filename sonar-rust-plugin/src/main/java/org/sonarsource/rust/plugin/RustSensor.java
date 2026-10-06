@@ -95,14 +95,7 @@ public class RustSensor implements Sensor {
 
     try (Analyzer analyzer = analyzerFactory.create(platform)) {
       if (!manifests.isEmpty()) {
-        Map<String, String> sources = new HashMap<>();
-        for (InputFile inputFile : inputFiles) {
-          try {
-            sources.put(Path.of(inputFile.uri()).toString(), inputFile.contents());
-          } catch (IOException ex) {
-            LOG.warn("Cannot provide project source for {}: {}", inputFile.filename(), ex.getMessage());
-          }
-        }
+        Map<String, String> sources = projectSources(inputFiles);
         for (String warning : analyzer.initializeProject(manifests.stream().map(File::getAbsolutePath).toList(), sources)) {
           LOG.warn("Rust project resolution: {}", warning);
           analysisWarnings.addUnique("Rust project resolution: " + warning);
@@ -116,6 +109,18 @@ public class RustSensor implements Sensor {
       analysisWarnings.addUnique("Failed to create Rust analyzer: " + ex.getMessage());
       failFastCheck(sensorContext, ex);
     }
+  }
+
+  private static Map<String, String> projectSources(List<InputFile> inputFiles) {
+    Map<String, String> sources = new HashMap<>();
+    for (InputFile inputFile : inputFiles) {
+      try {
+        sources.put(Path.of(inputFile.uri()).toString(), inputFile.contents());
+      } catch (IOException ex) {
+        LOG.warn("Cannot provide project source for {}: {}", inputFile.filename(), ex.getMessage());
+      }
+    }
+    return sources;
   }
 
   private static void failFastCheck(SensorContext sensorContext, Exception ex) {
