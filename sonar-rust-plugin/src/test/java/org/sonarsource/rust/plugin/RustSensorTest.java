@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.time.Duration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
@@ -41,6 +42,10 @@ import org.sonar.api.rule.RuleKey;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.times;
@@ -87,13 +92,14 @@ class RustSensorTest {
   }
 
   @Test
-  @org.junit.jupiter.api.Timeout(10)
   void stalled_project_initialization_restarts_and_preserves_file_analysis() throws IOException {
     Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"timeout\"\nversion = \"0.1.0\"\n");
     String root = baseDir.toPath().resolve("src/custom.rs").toString();
     context.fileSystem().add(inputFile("src/custom.rs", "fn a() { crate::a(); }"));
     var creations = new AtomicInteger();
-    var stalled = AnalyzerTest.stalledProjectAnalyzer(java.nio.file.Path.of(root));
+    var stalled = spy(AnalyzerTest.stalledProjectAnalyzer(java.nio.file.Path.of(root)));
+    doAnswer(invocation -> assertTimeoutPreemptively(Duration.ofSeconds(10), invocation::callRealMethod))
+      .when(stalled).initializeProject(anyList(), anyMap());
     var factory = new AnalyzerFactory(null) {
       @Override
       public Analyzer create(Platform platform) {

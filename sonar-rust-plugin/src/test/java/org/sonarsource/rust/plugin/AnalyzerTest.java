@@ -37,6 +37,7 @@ import org.sonarsource.rust.common.ProcessWrapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -90,13 +91,13 @@ class AnalyzerTest {
   }
 
   @Test
-  @Timeout(10)
   void stalled_project_times_out_and_retains_confirmed_roots_for_recovery() throws IOException {
     Path root = temporary.resolve("custom-entry.rs");
     try (Analyzer stalled = stalledProjectAnalyzer(root);
       Analyzer replacement = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
-      assertThatThrownBy(() -> stalled.initializeProject(List.of(), Map.of()))
-        .isInstanceOf(IOException.class).hasMessageContaining("timed out");
+      assertTimeoutPreemptively(Duration.ofSeconds(10), () ->
+        assertThatThrownBy(() -> stalled.initializeProject(List.of(), Map.of()))
+          .isInstanceOf(IOException.class).hasMessageContaining("timed out"));
       replacement.preserveCrateRootsFrom(stalled);
       assertThat(replacement.analyze(root.toString(), "fn a() { crate::a(); }").measures().cognitiveComplexity()).isOne();
     }
