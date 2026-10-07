@@ -349,30 +349,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             let Some(parent) = node.parent() else {
                 continue;
             };
-            if node.kind() == "macro_definition" {
-                if let Some(name) = node.child_by_field_name("name") {
-                    resolver
-                        .macro_definitions
-                        .insert((parent.id(), resolver.text(name).to_owned()));
-                }
-            }
-            if matches!(
-                node.kind(),
-                "use_declaration"
-                    | "extern_crate_declaration"
-                    | "macro_invocation"
-                    | "foreign_mod_item"
-            ) || (node.kind() == "expression_statement"
-                && children(node)
-                    .next()
-                    .is_some_and(|child| child.kind() == "macro_invocation"))
-            {
-                resolver
-                    .import_items
-                    .entry(parent.id())
-                    .or_default()
-                    .push(node);
-            }
+            resolver.index_imports_and_macros(node, parent);
             let symbol = match node.kind() {
                 "mod_item" => Some(Symbol::Module(node)),
                 "struct_item" | "enum_item" | "union_item" => Some(Symbol::Type(node)),
@@ -464,6 +441,28 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             }
         }
         resolver
+    }
+
+    fn index_imports_and_macros(&mut self, node: Node<'tree>, parent: Node<'tree>) {
+        if node.kind() == "macro_definition" {
+            if let Some(name) = node.child_by_field_name("name") {
+                self.macro_definitions
+                    .insert((parent.id(), self.text(name).to_owned()));
+            }
+        }
+        if matches!(
+            node.kind(),
+            "use_declaration"
+                | "extern_crate_declaration"
+                | "macro_invocation"
+                | "foreign_mod_item"
+        ) || (node.kind() == "expression_statement"
+            && children(node)
+                .next()
+                .is_some_and(|child| child.kind() == "macro_invocation"))
+        {
+            self.import_items.entry(parent.id()).or_default().push(node);
+        }
     }
 
     fn crate_root(&self, context: Node<'tree>) -> Node<'tree> {
