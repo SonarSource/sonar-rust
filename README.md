@@ -47,10 +47,15 @@ leaves `crate::` paths unresolved; `lib.rs` and `main.rs` filenames alone are no
 proof of crate identity. Unqualified local recursion remains supported. The legacy
 pathless `analyze` command treats its snippet as a standalone crate root; the
 scanner uses path-aware analysis and requires confirmed root identity.
+Project initialization has a 60-second deadline, including snapshot transfer and
+Cargo discovery. On timeout, the sensor terminates the analyser and restarts in
+standalone mode, retaining any crate roots already confirmed. Fail-fast mode
+reports the timeout instead of restarting.
 
 The resolver does not expand macros or generated modules, evaluate `cfg`, load
 standard-library sources, solve generic bounds or specialize generic impls, perform
 user-defined autoderef, or resolve dynamic dispatch and mutable function pointers.
+Unary operator result types and destructured binding types remain unresolved.
 Ambiguous and unsupported calls do not become graph edges. Calls inside closures
 are attributed to their enclosing function, consistent with the existing
 complexity visitor; closure invocation and reachability are not analyzed.

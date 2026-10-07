@@ -17,16 +17,29 @@
 package org.sonarsource.rust.plugin;
 
 import java.io.IOException;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.io.InputStream;
+import java.io.SequenceInputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.time.Duration;
+import java.util.concurrent.CountDownLatch;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.io.TempDir;
+import org.sonarsource.rust.common.ProcessWrapper;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class AnalyzerTest {
 
@@ -41,6 +54,68 @@ class AnalyzerTest {
 
   @TempDir
   Path temporary;
+
+  static Analyzer stalledProjectAnalyzer(Path root) throws IOException {
+    var process = mock(ProcessWrapper.class);
+    var response = new ByteArrayOutputStream();
+    var protocol = new DataOutputStream(response);
+    for (String value : List.of("project-roots", root.toString())) {
+      byte[] bytes = value.getBytes(java.nio.charset.StandardCharsets.UTF_8);
+      protocol.writeInt(bytes.length);
+      protocol.write(bytes);
+      if (value.equals("project-roots")) {
+        protocol.writeInt(1);
+      }
+    }
+    var stopped = new CountDownLatch(1);
+    InputStream stalled = new InputStream() {
+      @Override
+      public int read() throws IOException {
+        try {
+          stopped.await();
+          return -1;
+        } catch (InterruptedException ex) {
+          Thread.currentThread().interrupt();
+          throw new IOException("Protocol read interrupted", ex);
+        }
+      }
+    };
+    when(process.getInputStream()).thenReturn(new SequenceInputStream(new ByteArrayInputStream(response.toByteArray()), stalled));
+    when(process.getOutputStream()).thenReturn(new ByteArrayOutputStream());
+    doAnswer(invocation -> {
+      stopped.countDown();
+      return null;
+    }).when(process).destroyForcibly();
+    return new Analyzer(process, List.of(), TEST_PARAMETERS, Duration.ofMillis(200));
+  }
+
+  @Test
+  @Timeout(10)
+  void stalled_project_times_out_and_retains_confirmed_roots_for_recovery() throws IOException {
+    Path root = temporary.resolve("custom-entry.rs");
+    try (Analyzer stalled = stalledProjectAnalyzer(root);
+      Analyzer replacement = new Analyzer(RUN_LOCAL_ANALYZER_COMMAND, TEST_PARAMETERS)) {
+      assertThatThrownBy(() -> stalled.initializeProject(List.of(), Map.of()))
+        .isInstanceOf(IOException.class).hasMessageContaining("timed out");
+      replacement.preserveCrateRootsFrom(stalled);
+      assertThat(replacement.analyze(root.toString(), "fn a() { crate::a(); }").measures().cognitiveComplexity()).isOne();
+    }
+  }
+
+  @Test
+  @Timeout(10)
+  void interrupted_project_initialization_restores_interrupt_status() throws IOException {
+    try (Analyzer stalled = stalledProjectAnalyzer(temporary.resolve("root.rs"))) {
+      Thread.currentThread().interrupt();
+      try {
+        assertThatThrownBy(() -> stalled.initializeProject(List.of(), Map.of()))
+          .isInstanceOf(IOException.class).hasMessageContaining("interrupted");
+        assertThat(Thread.currentThread().isInterrupted()).isTrue();
+      } finally {
+        Thread.interrupted();
+      }
+    }
+  }
 
   @Test
   void resolves_cargo_workspace_files_and_renamed_external_types() throws IOException {

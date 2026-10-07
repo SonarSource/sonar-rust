@@ -87,6 +87,26 @@ class RustSensorTest {
   }
 
   @Test
+  @org.junit.jupiter.api.Timeout(10)
+  void stalled_project_initialization_restarts_and_preserves_file_analysis() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"timeout\"\nversion = \"0.1.0\"\n");
+    String root = baseDir.toPath().resolve("src/custom.rs").toString();
+    context.fileSystem().add(inputFile("src/custom.rs", "fn a() { crate::a(); }"));
+    var creations = new AtomicInteger();
+    var stalled = AnalyzerTest.stalledProjectAnalyzer(java.nio.file.Path.of(root));
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        return creations.incrementAndGet() == 1 ? stalled : new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
+    assertThat(creations.get()).isEqualTo(2);
+    assertThat(context.measure(PROJECT_KEY + ":src/custom.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.highlightingTypeAt(PROJECT_KEY + ":src/custom.rs", 1, 0)).contains(TypeOfText.KEYWORD);
+  }
+
+  @Test
   void project_initialization_failure_cleans_up_stopped_analyzer_and_preserves_file_analysis() throws IOException {
     verifyProjectFailureRecovery(true);
   }
