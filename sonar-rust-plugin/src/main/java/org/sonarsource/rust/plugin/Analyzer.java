@@ -21,6 +21,15 @@ import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.Set;
+import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -34,10 +43,18 @@ public class Analyzer implements AutoCloseable {
   private final ProcessWrapper process;
   private final DataOutputStream outputStream;
   private final DataInputStream inputStream;
+  private final Duration projectTimeout;
+
+  private final AtomicReference<Set<String>> knownCrateRoots = new AtomicReference<>(Set.of());
 
   public Analyzer(List<String> command, Map<String, String> parameters) {
+    this(new ProcessWrapper(), command, parameters, Duration.ofSeconds(60));
+  }
+
+  Analyzer(ProcessWrapper process, List<String> command, Map<String, String> parameters, Duration projectTimeout) {
+    this.process = process;
+    this.projectTimeout = projectTimeout;
     try {
-      process = new ProcessWrapper();
       process.start(command, null, null, LOG::warn);
       this.outputStream = new DataOutputStream(process.getOutputStream());
       this.inputStream = new DataInputStream(process.getInputStream());
@@ -50,16 +67,90 @@ public class Analyzer implements AutoCloseable {
   }
 
   /**
-   * Use the analyzer subprocess to analyze the given code.
+   * Use the analyzer subprocess to analyze a standalone crate-root snippet.
    * @throws IOException if executing the analyzer fails due to an I/O error
    */
   public AnalysisResult analyze(String code) throws IOException {
     writeString("analyze");
+    writeString(code);
+    return readAnalysis();
+  }
 
-    byte[] bytes = code.getBytes(StandardCharsets.UTF_8);
-    writeInt(bytes.length);
-    write(bytes);
+  /** Retain Cargo-confirmed identities when replacing a failed project analyser. */
+  public void preserveCrateRootsFrom(Analyzer previous) {
+    knownCrateRoots.set(previous.knownCrateRoots.get());
+  }
 
+  private static String canonicalPath(String path) {
+    Path file = Path.of(path);
+    try {
+      return file.toRealPath().toString();
+    } catch (IOException ex) {
+      return file.toAbsolutePath().normalize().toString();
+    }
+  }
+
+  public AnalysisResult analyze(String path, String code) throws IOException {
+    writeString(knownCrateRoots.get().contains(canonicalPath(path)) ? "analyze-root" : "analyze-file");
+    writeString(path);
+    writeString(code);
+    return readAnalysis();
+  }
+
+  /** Supply Cargo roots and scanner source snapshots before analyzing files. */
+  public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+    // Bound both sending the snapshots and waiting for Cargo/the call graph.
+    // Killing the process releases blocked protocol I/O before the sensor restarts it.
+    try (var executor = Executors.newSingleThreadExecutor()) {
+      var initialization = executor.submit(() -> initializeProjectProtocol(manifests, sources));
+      try {
+        return initialization.get(projectTimeout.toMillis(), TimeUnit.MILLISECONDS);
+      } catch (TimeoutException ex) {
+        initialization.cancel(true);
+        close();
+        throw new IOException("Rust project initialization timed out after " + projectTimeout.toMillis() + " ms", ex);
+      } catch (InterruptedException ex) {
+        initialization.cancel(true);
+        close();
+        Thread.currentThread().interrupt();
+        throw new IOException("Rust project initialization interrupted", ex);
+      } catch (ExecutionException ex) {
+        if (ex.getCause() instanceof IOException ioException) {
+          throw ioException;
+        }
+        throw new IOException("Rust project initialization failed", ex.getCause());
+      }
+    }
+  }
+
+  private List<String> initializeProjectProtocol(List<String> manifests, Map<String, String> sources) throws IOException {
+    writeString("project");
+    writeInt(manifests.size());
+    for (String manifest : manifests) {
+      writeString(manifest);
+    }
+    writeMap(sources);
+    if (!"project-roots".equals(readString())) {
+      throw new IOException("Unexpected project root discovery response");
+    }
+    int rootCount = inputStream.readInt();
+    Set<String> roots = new HashSet<>();
+    for (int i = 0; i < rootCount; i++) {
+      roots.add(canonicalPath(readString()));
+    }
+    knownCrateRoots.set(Set.copyOf(roots));
+    if (!"project-ready".equals(readString())) {
+      throw new IOException("Unexpected project initialization response");
+    }
+    int count = inputStream.readInt();
+    List<String> warnings = new ArrayList<>();
+    for (int i = 0; i < count; i++) {
+      warnings.add(readString());
+    }
+    return warnings;
+  }
+
+  private AnalysisResult readAnalysis() throws IOException {
     List<HighlightTokens> highlightTokens = new ArrayList<>();
     Measures measures = new Measures();
     List<CpdToken> cpdTokens = new ArrayList<>();
@@ -134,12 +225,8 @@ public class Analyzer implements AutoCloseable {
   }
 
   private void writeString(String value) throws IOException {
-    outputStream.writeInt(value.length());
-    outputStream.write(value.getBytes(StandardCharsets.UTF_8));
-    outputStream.flush();
-  }
-
-  private void write(byte[] bytes) throws IOException {
+    byte[] bytes = value.getBytes(StandardCharsets.UTF_8);
+    outputStream.writeInt(bytes.length);
     outputStream.write(bytes);
     outputStream.flush();
   }
@@ -150,6 +237,7 @@ public class Analyzer implements AutoCloseable {
       writeString(entry.getKey());
       writeString(entry.getValue());
     }
+    outputStream.flush();
   }
 
   public record AnalysisResult(List<HighlightTokens> highlightTokens, Measures measures, List<CpdToken> cpdTokens, List<Issue> issues) {
