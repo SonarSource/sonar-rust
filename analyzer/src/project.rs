@@ -668,6 +668,10 @@ fn collect_modules<'tree>(node: Node<'tree>, modules: &mut Vec<Node<'tree>>) {
 fn module_path(module: Node<'_>, source: &str) -> Option<Result<PathBuf, String>> {
     let mut sibling = module.prev_named_sibling();
     while let Some(node) = sibling {
+        if matches!(node.kind(), "line_comment" | "block_comment") {
+            sibling = node.prev_named_sibling();
+            continue;
+        }
         if node.kind() != "attribute_item" {
             break;
         }
@@ -856,6 +860,33 @@ mod tests {
         ];
         let project = virtual_project(&files, &[("local", files[0].0, 2021, &[])]);
         assert_eq!(count(&project, files[0].0, files[0].1), 1);
+        assert_eq!(count(&project, files[1].0, files[1].1), 1);
+    }
+
+    #[test]
+    fn comments_between_path_attributes_and_modules_do_not_hide_paths() {
+        for comment in [
+            "/// Implementation module.\n",
+            "// Implementation module.\n",
+            "/* Implementation module. */",
+            "/** Implementation module. */",
+        ] {
+            let source =
+                format!("#[path = \"impl.rs\"] {comment} mod imp; fn first() {{ imp::second(); }}");
+            let files = [
+                ("/virtual/lib.rs", source.as_str()),
+                ("/virtual/impl.rs", "pub fn second() { crate::first(); }"),
+            ];
+            let project = virtual_project(&files, &[("local", files[0].0, 2021, &[])]);
+            assert_eq!(count(&project, files[0].0, files[0].1), 1);
+            assert_eq!(count(&project, files[1].0, files[1].1), 1);
+        }
+        let source = "#[path = \"wrong.rs\"] mod other {} // boundary\nmod imp; fn first() { imp::second(); }";
+        let files = [
+            ("/virtual/lib.rs", source),
+            ("/virtual/imp.rs", "pub fn second() { crate::first(); }"),
+        ];
+        let project = virtual_project(&files, &[("local", files[0].0, 2021, &[])]);
         assert_eq!(count(&project, files[1].0, files[1].1), 1);
     }
 
