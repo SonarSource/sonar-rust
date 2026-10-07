@@ -278,6 +278,8 @@ struct Resolver<'tree, 'source> {
     root: Node<'tree>,
     functions: Vec<Function<'tree>>,
     function_ids: HashMap<usize, usize>,
+    member_functions: HashMap<(usize, String), Vec<usize>>,
+    implementation_functions: HashMap<(usize, String), Vec<usize>>,
     symbols: HashMap<(usize, String), Vec<Symbol<'tree>>>,
     import_items: HashMap<usize, Vec<Node<'tree>>>,
     implementations: Vec<Node<'tree>>,
@@ -302,6 +304,8 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             root,
             functions: Vec::new(),
             function_ids: HashMap::new(),
+            member_functions: HashMap::new(),
+            implementation_functions: HashMap::new(),
             symbols: HashMap::new(),
             import_items: HashMap::new(),
             implementations: Vec::new(),
@@ -428,6 +432,26 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 resolver.functions[index].trait_id = trait_id;
             } else {
                 resolver.functions[index].trait_id = Some(implementation.id());
+            }
+        }
+        for (index, function) in resolver.functions.iter().enumerate() {
+            let Some(name) = function.node.child_by_field_name("name") else {
+                continue;
+            };
+            let name = resolver.text(name).to_owned();
+            if let Some(owner) = function.owner {
+                resolver
+                    .member_functions
+                    .entry((owner.id(), name.clone()))
+                    .or_default()
+                    .push(index);
+            }
+            if let Some(implementation) = function.implementation {
+                resolver
+                    .implementation_functions
+                    .entry((implementation.id(), name))
+                    .or_default()
+                    .push(index);
             }
         }
         resolver
@@ -1097,36 +1121,28 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         // Generic arguments are not substituted by this prototype. A specialized
         // or constrained impl can compete with a trait method, so reject it rather
         // than treating an erased receiver type as proof that the impl applies.
-        if self.functions.iter().any(|function| {
-            function.owner == Some(ty)
-                && function
-                    .node
-                    .child_by_field_name("name")
-                    .is_some_and(|n| self.text(n) == name)
-                && function
-                    .implementation
-                    .is_some_and(|i| i.kind() == "impl_item" && !self.universal_impl(i))
+        let members = self
+            .member_functions
+            .get(&(ty.id(), name.to_owned()))
+            .map(Vec::as_slice)
+            .unwrap_or_default();
+        if members.iter().any(|&index| {
+            self.functions[index]
+                .implementation
+                .is_some_and(|i| i.kind() == "impl_item" && !self.universal_impl(i))
         }) {
             return None;
         }
-        let named = |function: &&Function<'tree>| {
-            function.owner == Some(ty)
-                && function
-                    .node
-                    .child_by_field_name("name")
-                    .is_some_and(|n| self.text(n) == name)
-                && (receiver.is_none() || function.method)
-        };
-        let inherent: Vec<_> = self
-            .functions
+        let inherent: Vec<_> = members
             .iter()
-            .enumerate()
-            .filter(|(_, f)| {
-                named(f)
-                    && f.implementation
+            .copied()
+            .filter(|&index| {
+                let function = &self.functions[index];
+                (receiver.is_none() || function.method)
+                    && function
+                        .implementation
                         .is_some_and(|i| i.child_by_field_name("trait").is_none())
             })
-            .map(|(i, _)| i)
             .collect();
         if receiver.is_none() && explicit_trait.is_none() && !inherent.is_empty() {
             return unique(&inherent);
@@ -1172,14 +1188,6 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         context: Node<'tree>,
         depth: usize,
     ) -> Vec<usize> {
-        let named = |function: &&Function<'tree>| {
-            function.owner == Some(ty)
-                && function
-                    .node
-                    .child_by_field_name("name")
-                    .is_some_and(|n| self.text(n) == name)
-                && (receiver.is_none() || function.method)
-        };
         let mut candidates = Vec::new();
         for &implementation in &self.implementations {
             let Some(_) = implementation.child_by_field_name("trait") else {
@@ -1203,28 +1211,29 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 }
             }
             let overrides: Vec<_> = self
-                .functions
-                .iter()
-                .enumerate()
-                .filter(|(_, f)| {
-                    named(f)
-                        && f.implementation == Some(implementation)
-                        && f.trait_id == Some(trait_node.id())
+                .member_functions
+                .get(&(ty.id(), name.to_owned()))
+                .into_iter()
+                .flatten()
+                .copied()
+                .filter(|&index| {
+                    let function = &self.functions[index];
+                    (receiver.is_none() || function.method)
+                        && function.implementation == Some(implementation)
+                        && function.trait_id == Some(trait_node.id())
                 })
-                .map(|(i, _)| i)
                 .collect();
             if !overrides.is_empty() {
                 candidates.extend(overrides);
                 continue;
             }
-            for (index, function) in self.functions.iter().enumerate() {
-                if function.implementation == Some(trait_node)
-                    && function
-                        .node
-                        .child_by_field_name("name")
-                        .is_some_and(|n| self.text(n) == name)
-                    && (receiver.is_none() || function.method)
-                {
+            for &index in self
+                .implementation_functions
+                .get(&(trait_node.id(), name.to_owned()))
+                .into_iter()
+                .flatten()
+            {
+                if receiver.is_none() || self.functions[index].method {
                     candidates.push(index);
                 }
             }
