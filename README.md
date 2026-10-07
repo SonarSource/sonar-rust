@@ -56,8 +56,11 @@ The resolver does not expand macros or generated modules, evaluate `cfg`, load
 standard-library sources, solve generic bounds or specialize generic impls, perform
 user-defined autoderef, or resolve dynamic dispatch and mutable function pointers.
 Unary operator result types and destructured binding types remain unresolved.
-Ambiguous and unsupported calls do not become graph edges. Calls inside closures
-are attributed to their enclosing function, consistent with the existing
+Ambiguous and unsupported calls do not become graph edges.
+Block macros are ignored during name lookup, so logging and assertions do not
+hide recursion. Without macro expansion, names introduced by custom block macros
+may shadow a resolved call; module-level macros still make unknown names ambiguous.
+Calls inside closures are attributed to their enclosing function, consistent with the existing
 complexity visitor; closure invocation and reachability are not analyzed.
 
 Compiler-level resolution remains a future extension: a semantic engine such as

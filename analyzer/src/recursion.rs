@@ -982,12 +982,19 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 }
             }
         }
-        // Statement macros and foreign modules can introduce unknown names.
-        if matches!(item.kind(), "macro_invocation" | "foreign_mod_item")
+        // Module macros can introduce unknown items. Block macros are ignored:
+        // common logging/assertion calls must not hide otherwise resolved calls.
+        let macro_item = item.kind() == "macro_invocation"
             || (item.kind() == "expression_statement"
                 && children(item)
                     .next()
-                    .is_some_and(|c| c.kind() == "macro_invocation"))
+                    .is_some_and(|c| c.kind() == "macro_invocation"));
+        if item.kind() == "foreign_mod_item"
+            || (macro_item
+                && item.parent().is_some_and(|scope| {
+                    scope.kind() != "block"
+                        || scope.parent().is_some_and(|p| p.kind() == "mod_item")
+                }))
         {
             candidates.glob_unknown = true;
         }
@@ -1854,6 +1861,24 @@ mod tests {
         check(
             "fn outer() { fn a() { b(); } fn b() { a(); } a(); }",
             &["a", "b"],
+        );
+    }
+
+    #[test]
+    fn block_macros_do_not_hide_recursive_calls() {
+        for invocation in [
+            "println!(\"{n}\");",
+            "assert!(n > 0);",
+            "debug_assert!(n > 0);",
+            "log::info!(\"{n}\");",
+            "custom!();",
+        ] {
+            check(&format!("fn fact(n: u64) -> u64 {{ {invocation} if n == 0 {{ 1 }} else {{ n * fact(n - 1) }} }}"), &["fact"]);
+        }
+        check("fn a() { custom!(); b(); } fn b() { a(); }", &["a", "b"]);
+        check(
+            "custom!(); fn a() { b(); } mod nested { pub fn b() { crate::a(); } } use nested::*;",
+            &[],
         );
     }
 
