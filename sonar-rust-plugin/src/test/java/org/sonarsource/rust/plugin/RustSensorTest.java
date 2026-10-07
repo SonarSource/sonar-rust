@@ -43,8 +43,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.times;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicInteger;
 
 class RustSensorTest {
 
@@ -60,6 +63,170 @@ class RustSensorTest {
   @BeforeEach
   void setup() {
     context = SensorContextTester.create(baseDir);
+  }
+
+  @Test
+  void initializes_project_and_reports_cross_file_recursion() throws IOException {
+    Files.createDirectories(baseDir.toPath().resolve("src"));
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"sensor_project\"\nversion = \"0.1.0\"\nedition = \"2021\"\n");
+    Files.writeString(baseDir.toPath().resolve("Cargo.lock"), "version = 4\n[[package]]\nname = \"sensor_project\"\nversion = \"0.1.0\"\n");
+    String root = "mod other; pub fn a() { other::b(); }";
+    String other = "pub fn b() { crate::a(); }";
+    Files.writeString(baseDir.toPath().resolve("src/lib.rs"), root);
+    Files.writeString(baseDir.toPath().resolve("src/other.rs"), "pub fn b() {}");
+    context.fileSystem().add(inputFile("src/lib.rs", root));
+    context.fileSystem().add(inputFile("src/other.rs", other));
+    sensor().execute(context);
+    assertThat(context.measure(PROJECT_KEY + ":src/lib.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.measure(PROJECT_KEY + ":src/other.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+  }
+
+  @Test
+  void project_initialization_failure_closes_live_analyzer_and_preserves_file_analysis() throws IOException {
+    verifyProjectFailureRecovery(false);
+  }
+
+  @Test
+  @org.junit.jupiter.api.Timeout(10)
+  void stalled_project_initialization_restarts_and_preserves_file_analysis() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"timeout\"\nversion = \"0.1.0\"\n");
+    String root = baseDir.toPath().resolve("src/custom.rs").toString();
+    context.fileSystem().add(inputFile("src/custom.rs", "fn a() { crate::a(); }"));
+    var creations = new AtomicInteger();
+    var stalled = AnalyzerTest.stalledProjectAnalyzer(java.nio.file.Path.of(root));
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        return creations.incrementAndGet() == 1 ? stalled : new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
+    assertThat(creations.get()).isEqualTo(2);
+    assertThat(context.measure(PROJECT_KEY + ":src/custom.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.highlightingTypeAt(PROJECT_KEY + ":src/custom.rs", 1, 0)).contains(TypeOfText.KEYWORD);
+  }
+
+  @Test
+  void project_initialization_failure_cleans_up_stopped_analyzer_and_preserves_file_analysis() throws IOException {
+    verifyProjectFailureRecovery(true);
+  }
+
+  private void verifyProjectFailureRecovery(boolean stopped) throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"recovery\"\nversion = \"0.1.0\"\n");
+    context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));
+    var creations = new AtomicInteger();
+    var failed = new AtomicReference<Analyzer>();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        if (creations.incrementAndGet() == 1) {
+          Analyzer analyzer = spy(new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+            @Override
+            public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+              if (stopped) {
+                close();
+              }
+              throw new IOException("project initialization failed");
+            }
+          });
+          failed.set(analyzer);
+          return analyzer;
+        }
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
+    assertThat(creations.get()).isEqualTo(2);
+    verify(failed.get(), times(stopped ? 2 : 1)).close();
+    assertThat(context.measure(PROJECT_KEY + ":src/util.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.highlightingTypeAt(PROJECT_KEY + ":src/util.rs", 1, 0)).contains(TypeOfText.KEYWORD);
+  }
+
+  @Test
+  void project_initialization_honors_fail_fast_without_restarting() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"fail_fast\"\nversion = \"0.1.0\"\n");
+    context.settings().setProperty("sonar.internal.analysis.rust.failFast", "true");
+    IOException originalFailure = new IOException("invalid project response");
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    var creations = new AtomicInteger();
+    var failed = new AtomicReference<Analyzer>();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        creations.incrementAndGet();
+        Analyzer analyzer = spy(new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+          @Override
+          public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+            throw originalFailure;
+          }
+        });
+        failed.set(analyzer);
+        return analyzer;
+      }
+    };
+    var sensor = new RustSensor(factory, new AnalysisWarningsWrapper(warnings));
+    assertThatThrownBy(() -> sensor.execute(context))
+      .isInstanceOf(IllegalStateException.class).hasMessage("Analysis failed").hasCause(originalFailure);
+    assertThat(creations.get()).isEqualTo(1);
+    verify(failed.get()).close();
+    assertThat(logTester.logs(Level.ERROR)).containsExactly("Rust analysis failed: invalid project response");
+    assertThat(warnings.warnings).containsExactly("Rust analysis failed: invalid project response");
+  }
+
+  @Test
+  void recovery_preserves_custom_cargo_root_without_guessing_nested_lib_module() throws IOException {
+    Files.createDirectories(baseDir.toPath().resolve("roots"));
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"root_recovery\"\nversion = \"0.1.0\"\nedition = \"2021\"\n[lib]\npath = \"roots/entry.rs\"\n");
+    Files.writeString(baseDir.toPath().resolve("Cargo.lock"), "version = 4\n[[package]]\nname = \"root_recovery\"\nversion = \"0.1.0\"\n");
+    String root = "mod lib; pub fn parse() { crate::parse(); }";
+    String module = "pub fn parse() { crate::parse(); }";
+    Files.writeString(baseDir.toPath().resolve("roots/entry.rs"), root);
+    Files.writeString(baseDir.toPath().resolve("roots/lib.rs"), module);
+    context.fileSystem().add(inputFile("roots/entry.rs", root));
+    context.fileSystem().add(inputFile("roots/lib.rs", module));
+    var creations = new AtomicInteger();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        if (creations.incrementAndGet() == 1) {
+          return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+            @Override
+            public List<String> initializeProject(List<String> manifests, Map<String, String> sources) throws IOException {
+              super.initializeProject(manifests, sources);
+              throw new IOException("project phase failed after root discovery");
+            }
+          };
+        }
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS);
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper()).execute(context);
+    assertThat(creations.get()).isEqualTo(2);
+    assertThat(context.measure(PROJECT_KEY + ":roots/entry.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
+    assertThat(context.measure(PROJECT_KEY + ":roots/lib.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isZero();
+  }
+
+  @Test
+  void partial_resolution_logs_one_summary_without_ui_warning_banners() throws IOException {
+    Files.writeString(baseDir.toPath().resolve("Cargo.toml"), "[package]\nname = \"partial\"\nversion = \"0.1.0\"\n");
+    context.fileSystem().add(inputFile("src/util.rs", "fn a() { a(); }"));
+    TestAnalysisWarnigs warnings = new TestAnalysisWarnigs();
+    var factory = new AnalyzerFactory(null) {
+      @Override
+      public Analyzer create(Platform platform) {
+        return new Analyzer(AnalyzerTest.RUN_LOCAL_ANALYZER_COMMAND, AnalyzerTest.TEST_PARAMETERS) {
+          @Override
+          public List<String> initializeProject(List<String> manifests, Map<String, String> sources) {
+            return List.of("Dependency resolution unavailable", "Module generated source unavailable");
+          }
+        };
+      }
+    };
+    new RustSensor(factory, new AnalysisWarningsWrapper(warnings)).execute(context);
+    assertThat(warnings.warnings).isEmpty();
+    assertThat(logTester.logs(Level.WARN).stream().filter(message -> message.startsWith("Rust project resolution")).toList()).hasSize(1).allSatisfy(message -> assertThat(message).contains("cross-file recursion detection may be incomplete"));
+    assertThat(logTester.logs(Level.DEBUG)).anySatisfy(message -> assertThat(message).contains("Module generated source unavailable"));
+    assertThat(context.measure(PROJECT_KEY + ":src/util.rs", CoreMetrics.COGNITIVE_COMPLEXITY).value()).isEqualTo(1);
   }
 
   @Test
@@ -201,7 +368,7 @@ fn foo(c1: bool) {
       .isInstanceOf(IllegalStateException.class)
       .hasMessage("Analysis failed");
     assertThat(warnings.warnings).hasSize(1);
-    assertThat(warnings.warnings.get(0)).startsWith("Failed to create Rust analyzer: Cannot run program");
+    assertThat(warnings.warnings.get(0)).startsWith("Rust analysis failed: Cannot run program");
   }
 
   @Test

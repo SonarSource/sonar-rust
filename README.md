@@ -11,6 +11,58 @@ This SonarSource project is a code analyzer for Rust projects to help developers
 - Import of [test coverage reports](https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/overview/)
 - Import of [external Clippy reports](https://docs.sonarsource.com/sonarqube-cloud/enriching/external-analyzer-reports/)
 
+### Recursion and cognitive complexity
+
+The experimental resolver builds a project call graph and finds strongly
+connected components. Every function in a direct or indirect recursion cycle
+adds one cognitive complexity point, regardless of call count or nesting. Both
+the file metric and rule S3776 use this result. S3776 highlights a call into the
+same cycle, rather than an unrelated call made by the function.
+
+The resolver supports:
+
+- Lexical function scopes, shadowing, raw identifiers, and generic call syntax.
+- Cross-file and inline modules, `#[path]`, `crate`, `self`, `super`, named and grouped imports, aliases,
+  reexports, and unambiguous local glob imports.
+- Inherent methods and associated functions, `self.method()`, `Self::method()`,
+  type-qualified calls, and `<Type as Trait>::method()` / `Trait::method(receiver)`.
+- Concrete receiver types from parameters, local annotations, constructors,
+  references, struct fields, return types, and type aliases.
+- Visible trait impls, receiver reference ordering, definite trait default
+  dispatch, and immutable aliases of function items.
+- Cargo workspace targets and external library crates, including renamed
+  dependencies, package versions, and Rust 2015 `extern crate` aliases.
+
+When Cargo manifests are available, the sensor supplies source snapshots and the
+analyser discovers crate roots and dependencies using `cargo metadata --offline
+--locked`. Dependency sources must already be available locally (path, registry,
+or Git dependencies). Analysis does not download crates or run build scripts.
+Recursive call locations are mapped back to the original files for metrics and
+S3776 issues. If dependency metadata is unavailable, the analyser warns and uses
+local Cargo targets where possible; files outside the discovered module trees
+and files changed after indexing fall back to standalone analysis. Cargo-confirmed
+crate roots are reported before graph construction and retained if the sensor
+restarts a failed analyser. Without a confirmed root, standalone file analysis
+leaves `crate::` paths unresolved; `lib.rs` and `main.rs` filenames alone are not
+proof of crate identity. Unqualified local recursion remains supported. The legacy
+pathless `analyze` command treats its snippet as a standalone crate root; the
+scanner uses path-aware analysis and requires confirmed root identity.
+Project initialization has a 60-second deadline, including snapshot transfer and
+Cargo discovery. On timeout, the sensor terminates the analyser and restarts in
+standalone mode, retaining any crate roots already confirmed. Fail-fast mode
+reports the timeout instead of restarting.
+
+The resolver does not expand macros or generated modules, evaluate `cfg`, load
+standard-library sources, solve generic bounds or specialize generic impls, perform
+user-defined autoderef, or resolve dynamic dispatch and mutable function pointers.
+Unary operator result types and destructured binding types remain unresolved.
+Ambiguous and unsupported calls do not become graph edges. Calls inside closures
+are attributed to their enclosing function, consistent with the existing
+complexity visitor; closure invocation and reachability are not analyzed.
+
+Compiler-level resolution remains a future extension: a semantic engine such as
+rust-analyzer or rustc could feed the same call graph interface.
+
 ## Feedback
 
 We welcome your feedback and feature requests to help improve the Rust analyzer. To share your thoughts or request new features, please visit the [Sonar Community Forum](https://community.sonarsource.com/). 
