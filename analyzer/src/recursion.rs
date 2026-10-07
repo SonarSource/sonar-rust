@@ -51,11 +51,20 @@ impl Recursion {
         source: &str,
         crates: &HashMap<String, CrateContext>,
     ) -> Self {
-        Self::with_context(root, source, crates, true)
+        Self::with_context(root, source, crates, true, None)
+    }
+
+    pub fn reachable_from(
+        root: Node<'_>,
+        source: &str,
+        crates: &HashMap<String, CrateContext>,
+        workspace_ranges: &[(usize, usize)],
+    ) -> Self {
+        Self::with_context(root, source, crates, true, Some(workspace_ranges))
     }
 
     pub fn unknown_root(root: Node<'_>, source: &str) -> Self {
-        Self::with_context(root, source, &HashMap::new(), false)
+        Self::with_context(root, source, &HashMap::new(), false, None)
     }
 
     fn with_context(
@@ -63,9 +72,11 @@ impl Recursion {
         source: &str,
         crates: &HashMap<String, CrateContext>,
         known_root: bool,
+        workspace_ranges: Option<&[(usize, usize)]>,
     ) -> Self {
         let resolver = Resolver::with_crates(root, source, crates, known_root);
         let mut edges = vec![Vec::new(); resolver.functions.len()];
+        let mut calls = vec![Vec::new(); resolver.functions.len()];
         for call in nodes(root).filter(|node| node.kind() == "call_expression") {
             let Some(caller) = enclosing_function(call) else {
                 continue;
@@ -73,8 +84,36 @@ impl Recursion {
             let Some(&from) = resolver.function_ids.get(&caller.id()) else {
                 continue;
             };
-            if let Some((to, location)) = resolver.resolve_call(call, 0) {
-                edges[from].push((to, location));
+            calls[from].push(call);
+        }
+        // A cycle affecting a workspace function is entirely reachable from
+        // that function. Keep dependency symbols available, but resolve their
+        // bodies only when a workspace call actually reaches them.
+        let mut pending: Vec<_> = resolver
+            .functions
+            .iter()
+            .enumerate()
+            .filter(|(_, f)| {
+                workspace_ranges.is_none_or(|ranges| {
+                    ranges.iter().any(|&(start, end)| {
+                        start <= f.node.start_byte() && f.node.end_byte() <= end
+                    })
+                })
+            })
+            .map(|(index, _)| index)
+            .collect();
+        let mut visited = vec![false; resolver.functions.len()];
+        while let Some(from) = pending.pop() {
+            if std::mem::replace(&mut visited[from], true) {
+                continue;
+            }
+            for &call in &calls[from] {
+                if let Some((to, location)) = resolver.resolve_call(call, 0) {
+                    edges[from].push((to, location));
+                    if !visited[to] {
+                        pending.push(to);
+                    }
+                }
             }
         }
         let components = strongly_connected_components(&edges);
@@ -240,7 +279,10 @@ struct Resolver<'tree, 'source> {
     functions: Vec<Function<'tree>>,
     function_ids: HashMap<usize, usize>,
     symbols: HashMap<(usize, String), Vec<Symbol<'tree>>>,
+    import_items: HashMap<usize, Vec<Node<'tree>>>,
     implementations: Vec<Node<'tree>>,
+    implementation_types: RefCell<HashMap<(usize, usize), Option<Node<'tree>>>>,
+    implementation_traits: RefCell<HashMap<(usize, usize), Option<Symbol<'tree>>>>,
     active_lookups: RefCell<HashSet<(usize, String, Namespace)>>,
     crate_roots: HashSet<usize>,
     known_root: bool,
@@ -261,7 +303,10 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             functions: Vec::new(),
             function_ids: HashMap::new(),
             symbols: HashMap::new(),
+            import_items: HashMap::new(),
             implementations: Vec::new(),
+            implementation_types: RefCell::new(HashMap::new()),
+            implementation_traits: RefCell::new(HashMap::new()),
             active_lookups: RefCell::new(HashSet::new()),
             crate_roots: HashSet::new(),
             known_root,
@@ -298,6 +343,23 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             let Some(parent) = node.parent() else {
                 continue;
             };
+            if matches!(
+                node.kind(),
+                "use_declaration"
+                    | "extern_crate_declaration"
+                    | "macro_invocation"
+                    | "foreign_mod_item"
+            ) || (node.kind() == "expression_statement"
+                && children(node)
+                    .next()
+                    .is_some_and(|child| child.kind() == "macro_invocation"))
+            {
+                resolver
+                    .import_items
+                    .entry(parent.id())
+                    .or_default()
+                    .push(node);
+            }
             let symbol = match node.kind() {
                 "mod_item" => Some(Symbol::Module(node)),
                 "struct_item" | "enum_item" | "union_item" => Some(Symbol::Type(node)),
@@ -864,7 +926,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             return Some(symbol);
         }
         let mut candidates = ImportCandidates::default();
-        for item in children(scope) {
+        for &item in self.import_items.get(&scope.id()).into_iter().flatten() {
             self.collect_import_candidates(item, name, namespace, depth, &mut candidates);
         }
         candidates.resolve()
@@ -1120,18 +1182,14 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         };
         let mut candidates = Vec::new();
         for &implementation in &self.implementations {
-            let Some(trait_path) = implementation.child_by_field_name("trait") else {
+            let Some(_) = implementation.child_by_field_name("trait") else {
                 continue;
             };
-            if implementation
-                .child_by_field_name("type")
-                .and_then(|t| self.resolve_type(t, implementation, depth + 1))
-                != Some(ty)
-            {
+            if self.implementation_type(implementation, depth + 1) != Some(ty) {
                 continue;
             }
             let Some(Symbol::Trait(trait_node)) =
-                self.resolve_path(trait_path, implementation, Namespace::Type, depth + 1)
+                self.implementation_trait(implementation, depth + 1)
             else {
                 continue;
             };
@@ -1172,6 +1230,51 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             }
         }
         candidates
+    }
+
+    fn implementation_type(
+        &self,
+        implementation: Node<'tree>,
+        depth: usize,
+    ) -> Option<Node<'tree>> {
+        // An impl's owner is independent of the call site. Preserve both the
+        // remaining resolution budget and import-cycle guards when reusing it:
+        // results obtained during an active lookup may depend on that lookup.
+        let cacheable = self.active_lookups.borrow().is_empty();
+        let key = (implementation.id(), depth);
+        if cacheable {
+            if let Some(&owner) = self.implementation_types.borrow().get(&key) {
+                return owner;
+            }
+        }
+        let owner = implementation
+            .child_by_field_name("type")
+            .and_then(|ty| self.resolve_type(ty, implementation, depth));
+        if cacheable {
+            self.implementation_types.borrow_mut().insert(key, owner);
+        }
+        owner
+    }
+
+    fn implementation_trait(
+        &self,
+        implementation: Node<'tree>,
+        depth: usize,
+    ) -> Option<Symbol<'tree>> {
+        let cacheable = self.active_lookups.borrow().is_empty();
+        let key = (implementation.id(), depth);
+        if cacheable {
+            if let Some(&target) = self.implementation_traits.borrow().get(&key) {
+                return target;
+            }
+        }
+        let target = implementation
+            .child_by_field_name("trait")
+            .and_then(|path| self.resolve_path(path, implementation, Namespace::Type, depth));
+        if cacheable {
+            self.implementation_traits.borrow_mut().insert(key, target);
+        }
+        target
     }
 
     fn universal_impl(&self, implementation: Node<'tree>) -> bool {
@@ -1229,7 +1332,13 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
     }
 
     fn imports_trait(&self, scope: Node<'tree>, trait_node: Node<'tree>, depth: usize) -> bool {
-        for item in children(scope).filter(|item| item.kind() == "use_declaration") {
+        for &item in self
+            .import_items
+            .get(&scope.id())
+            .into_iter()
+            .flatten()
+            .filter(|item| item.kind() == "use_declaration")
+        {
             let Some(argument) = item.child_by_field_name("argument") else {
                 continue;
             };
@@ -1290,10 +1399,10 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         // select the same target. No local implementation means unknown dispatch.
         let mut targets = Vec::new();
         for &implementation in &self.implementations {
-            let Some(trait_path) = implementation.child_by_field_name("trait") else {
+            let Some(_) = implementation.child_by_field_name("trait") else {
                 continue;
             };
-            if self.resolve_path(trait_path, implementation, Namespace::Type, depth + 1)
+            if self.implementation_trait(implementation, depth + 1)
                 != Some(Symbol::Trait(trait_node))
             {
                 continue;
@@ -1308,11 +1417,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             }) {
                 continue;
             }
-            let ty = self.resolve_type(
-                implementation.child_by_field_name("type")?,
-                implementation,
-                depth + 1,
-            )?;
+            let ty = self.implementation_type(implementation, depth + 1)?;
             targets.push(self.member(ty, name, Some(trait_node.id()), None, context, depth + 1)?);
         }
         targets.sort_unstable();
@@ -1530,7 +1635,25 @@ fn nodes(node: Node<'_>) -> impl Iterator<Item = Node<'_>> {
     std::iter::once(node).chain(NodeIterator::new(node, |_| true))
 }
 fn children(node: Node<'_>) -> impl Iterator<Item = Node<'_>> {
-    (0..node.named_child_count()).filter_map(move |index| node.named_child(index as u32))
+    // Indexed child access walks preceding siblings again for every index.
+    // A cursor visits wide module and import lists in linear time.
+    let mut cursor = node.walk();
+    let mut first = true;
+    std::iter::from_fn(move || loop {
+        let found = if first {
+            first = false;
+            cursor.goto_first_child()
+        } else {
+            cursor.goto_next_sibling()
+        };
+        if !found {
+            return None;
+        }
+        let child = cursor.node();
+        if child.is_named() {
+            return Some(child);
+        }
+    })
 }
 fn contains(outer: Node<'_>, inner: Node<'_>) -> bool {
     outer.start_byte() <= inner.start_byte() && inner.end_byte() <= outer.end_byte()
@@ -1952,5 +2075,62 @@ mod tests {
             source.push_str(&format!("fn f{index}() {{ f{}(); }}\n", (index + 1) % 2000));
         }
         assert_eq!(recursive_names(&source).len(), 2000);
+    }
+
+    #[test]
+    fn wide_modules_preserve_import_cycles_and_unknown_names() {
+        let mut source = String::from("mod wide {");
+        for index in 0..2000 {
+            source.push_str(&format!("struct Unused{index};\n"));
+        }
+        source.push_str(
+            "pub fn hop() { super::entry(); } } use wide::hop as next; fn entry() { next(); }",
+        );
+        check(&source, &["hop", "entry"]);
+        // Macro statements and foreign declarations still make glob lookup
+        // uncertain, even though unrelated declarations are no longer scanned.
+        check(
+            "mod m { pub fn a() { super::entry(); } } use m::*; make_names!(); fn entry() { a(); }",
+            &[],
+        );
+        check("mod m { pub fn a() { super::entry(); } } use m::*; extern \"C\" { fn a(); } fn entry() { a(); }", &[]);
+    }
+
+    #[test]
+    fn cached_impl_owners_preserve_the_resolution_budget() {
+        let source = "struct S; type Alias = S; trait T { fn hop(&self); } impl T for Alias { fn hop(&self) {} }";
+        let tree = parse_rust_code(source).unwrap();
+        let resolver = Resolver::with_crates(tree.root_node(), source, &HashMap::new(), true);
+        let implementation = resolver.implementations[0];
+        let owner = resolver.implementation_type(implementation, 0).unwrap();
+        assert_eq!(
+            resolver.text(owner.child_by_field_name("name").unwrap()),
+            "S"
+        );
+        assert!(resolver
+            .implementation_type(implementation, MAX_RESOLUTION_DEPTH)
+            .is_none());
+        assert_eq!(resolver.implementation_type(implementation, 0), Some(owner));
+    }
+
+    #[test]
+    fn reachable_dependency_bodies_preserve_workspace_cycles() {
+        let source = "mod dependency { pub fn hop() { super::app::entry(); } fn unused() { unused(); } } mod app { pub fn entry() { super::dependency::hop(); } }";
+        let tree = parse_rust_code(source).unwrap();
+        let root = tree.root_node();
+        let app = children(root).last().unwrap();
+        let ranges = [(app.start_byte(), app.end_byte())];
+        let reachable = Recursion::reachable_from(root, source, &HashMap::new(), &ranges);
+        let full = Recursion::new(root, source);
+        for function in nodes(root).filter(|n| n.kind() == "function_item") {
+            let name = &source[function.child_by_field_name("name").unwrap().byte_range()];
+            if name == "unused" {
+                assert!(full.location(function).is_some());
+                assert!(reachable.location(function).is_none());
+            } else {
+                assert_eq!(reachable.location(function), full.location(function));
+                assert!(reachable.location(function).is_some());
+            }
+        }
     }
 }

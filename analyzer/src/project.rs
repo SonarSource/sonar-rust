@@ -120,6 +120,7 @@ impl Project {
             warnings: Vec::new(),
         };
         let mut contexts = HashMap::new();
+        let mut workspace_ranges = Vec::new();
         for krate in &crates {
             let name = &krate.name;
             let start = builder.text.len();
@@ -133,6 +134,9 @@ impl Project {
                 continue;
             }
             builder.text.push_str("\n}\n");
+            if krate.workspace {
+                workspace_ranges.push((start, builder.text.len()));
+            }
             contexts.insert(
                 name.clone(),
                 CrateContext {
@@ -154,7 +158,12 @@ impl Project {
         }
         match parse_rust_code(&builder.text) {
             Ok(tree) => {
-                let recursion = Recursion::in_project(tree.root_node(), &builder.text, &contexts);
+                let recursion = Recursion::reachable_from(
+                    tree.root_node(),
+                    &builder.text,
+                    &contexts,
+                    &workspace_ranges,
+                );
                 for (start, end) in recursion.ranges() {
                     let index = builder
                         .spans
@@ -211,6 +220,7 @@ struct Crate {
     root: PathBuf,
     edition: u16,
     dependencies: HashMap<String, String>,
+    workspace: bool,
 }
 
 fn crate_targets(
@@ -248,6 +258,7 @@ fn crate_targets(
                     .and_then(|s| s.parse().ok())
                     .unwrap_or(2021),
                 dependencies: bindings,
+                workspace: workspace.contains(&id),
             }
         })
         .collect()
@@ -717,6 +728,7 @@ mod tests {
         let roots = crates
             .iter()
             .map(|(name, root, edition, deps)| Crate {
+                workspace: true,
                 name: (*name).to_owned(),
                 root: PathBuf::from(root),
                 edition: *edition,
