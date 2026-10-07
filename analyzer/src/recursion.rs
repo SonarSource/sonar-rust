@@ -1488,6 +1488,12 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             "identifier" => {
                 match self.lookup(self.text(expression), context, Namespace::Value, depth + 1) {
                     Some(Symbol::Binding(binding)) => {
+                        if binding
+                            .child_by_field_name("pattern")
+                            .is_some_and(|p| p.kind() != "identifier")
+                        {
+                            return None;
+                        }
                         if let Some(ty) = binding.child_by_field_name("type") {
                             self.type_mode(ty, binding, depth + 1)
                         } else {
@@ -1543,7 +1549,9 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
         let name = self.text(expression.child_by_field_name("field")?);
         let fields = owner.child_by_field_name("body")?;
         let field = if fields.kind() == "ordered_field_declaration_list" {
-            children(fields).nth(name.parse().ok()?)?
+            fields
+                .children_by_field_name("type", &mut fields.walk())
+                .nth(name.parse().ok()?)?
         } else {
             children(fields).find(|f| {
                 f.child_by_field_name("name")
@@ -1567,13 +1575,13 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             "identifier" => {
                 match self.lookup(self.text(expression), context, Namespace::Value, depth + 1)? {
                     Symbol::Binding(binding) => {
-                        if let Some(ty) = binding.child_by_field_name("type") {
-                            return self.resolve_type(ty, binding, depth + 1);
-                        }
                         if let Some(pattern) = binding.child_by_field_name("pattern") {
                             if pattern.kind() != "identifier" {
                                 return None;
                             }
+                        }
+                        if let Some(ty) = binding.child_by_field_name("type") {
+                            return self.resolve_type(ty, binding, depth + 1);
                         }
                         self.expression_type(
                             binding.child_by_field_name("value")?,
@@ -1588,9 +1596,12 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             "reference_expression" => {
                 self.expression_type(expression.child_by_field_name("value")?, context, depth + 1)
             }
-            "parenthesized_expression" | "unary_expression" => {
+            "parenthesized_expression" => {
                 self.expression_type(children(expression).next()?, context, depth + 1)
             }
+            // Deref, Not and Neg can return a different type. Until operator
+            // targets are resolved, the operand does not prove receiver identity.
+            "unary_expression" => None,
             "struct_expression" => {
                 self.resolve_type(expression.child_by_field_name("name")?, context, depth + 1)
             }
@@ -1943,6 +1954,36 @@ mod tests {
             &["a"],
         );
         check("struct S; impl S { fn a() { S::a::<u8>(); } }", &["a"]);
+    }
+
+    #[test]
+    fn unary_operators_do_not_preserve_the_operand_type() {
+        check("struct Inner; impl Inner { fn len(&self) {} } struct W; impl std::ops::Deref for W { type Target = Inner; fn deref(&self) -> &Inner { unknown() } } impl W { fn len(&self) { (**self).len(); } }", &[]);
+        check(
+            "struct W; impl W { fn len(&self) { (!self).len(); (-self).len(); } }",
+            &[],
+        );
+        check(
+            "struct W; impl W { fn len(&self) { (self).len(); } }",
+            &["len"],
+        );
+    }
+
+    #[test]
+    fn tuple_field_indices_ignore_visibility_attributes_and_comments() {
+        check("struct A; struct B; pub struct W(#[allow(dead_code)] pub A, /* field */ pub(crate) B); impl A { fn a(&self) { first(unknown()); } } impl B { fn b(&self) { second(unknown()); } } fn first(w: W) { w.0.a(); } fn second(w: W) { w.1.b(); }", &["a", "b", "first", "second"]);
+        check("struct A; struct B; pub struct W(pub A, pub B); impl A { fn a(&self) { helper(unknown()); } } impl B { fn a(&self) {} } fn helper(w: W) { w.1.a(); }", &[]);
+    }
+
+    #[test]
+    fn annotated_destructuring_does_not_type_each_binding_as_the_container() {
+        check("struct Inner; impl Inner { fn m(&self) {} } struct S(Inner); impl S { fn m(&self) { f(unknown()); } } fn f(S(inner): S) { inner.m(); }", &[]);
+        check("struct Inner; impl Inner { fn m(&self) {} } struct S(Inner); impl S { fn m(&self) { f(); } } fn f() { let S(inner): S = unknown(); inner.m(); }", &[]);
+        check("struct Inner; impl Inner { fn m(&self) {} } struct S { inner: Inner } impl S { fn m(&self) { f(unknown()); } } fn f(S { inner }: S) { inner.m(); }", &[]);
+        check(
+            "struct S; impl S { fn m(&self) { f(unknown()); } } fn f(s: S) { s.m(); }",
+            &["m", "f"],
+        );
     }
 
     #[test]
