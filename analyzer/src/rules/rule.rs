@@ -19,6 +19,7 @@ use std::collections::HashMap;
 
 use crate::{
     issue::Issue,
+    recursion::Recursion,
     rules::{
         cognitive_complexity_check::CognitiveComplexityCheck,
         parsing_error_check::ParsingErrorCheck,
@@ -29,6 +30,14 @@ use tree_sitter::Tree;
 
 pub trait Rule {
     fn check(&self, tree: &Tree, source_code: &str) -> Result<Vec<Issue>, AnalyzerError>;
+    fn check_with_recursion(
+        &self,
+        tree: &Tree,
+        source_code: &str,
+        _recursion: &Recursion,
+    ) -> Result<Vec<Issue>, AnalyzerError> {
+        self.check(tree, source_code)
+    }
 }
 
 pub fn all_rules(

@@ -14,9 +14,12 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
+use crate::recursion::Recursion;
 use crate::tree::{walk_tree, AnalyzerError, NodeVisitor, TreeSitterLocation};
 use std::collections::HashSet;
-use tree_sitter::{Node, Tree};
+use tree_sitter::Node;
+#[cfg(test)]
+use tree_sitter::Tree;
 
 #[allow(dead_code)] // Location is currently only used in tests, so we allow dead code
 pub struct Increment {
@@ -24,30 +27,56 @@ pub struct Increment {
     pub nesting: i32,
 }
 
-pub fn calculate_total_cognitive_complexity(tree: &Tree) -> Result<i32, AnalyzerError> {
-    Ok(calculate_cognitive_complexity(tree.root_node())?
-        .iter()
-        .map(|inc| inc.nesting + 1)
-        .sum())
+#[cfg(test)]
+pub fn calculate_total_cognitive_complexity(
+    tree: &Tree,
+    source_code: &str,
+) -> Result<i32, AnalyzerError> {
+    Ok(
+        calculate_cognitive_complexity(tree.root_node(), source_code)?
+            .iter()
+            .map(|inc| inc.nesting + 1)
+            .sum(),
+    )
 }
 
-pub fn calculate_cognitive_complexity(node: Node<'_>) -> Result<Vec<Increment>, AnalyzerError> {
-    let mut visitor = ComplexityVisitor::default();
+#[cfg(test)]
+pub fn calculate_cognitive_complexity(
+    node: Node<'_>,
+    source_code: &str,
+) -> Result<Vec<Increment>, AnalyzerError> {
+    let mut root = node;
+    while let Some(parent) = root.parent() {
+        root = parent;
+    }
+    let recursion = Recursion::new(root, source_code);
+    calculate_with_recursion(node, &recursion)
+}
 
+pub fn calculate_with_recursion(
+    node: Node<'_>,
+    recursion: &Recursion,
+) -> Result<Vec<Increment>, AnalyzerError> {
+    let mut visitor = ComplexityVisitor {
+        recursion,
+        current_increments: Vec::new(),
+        visited_operators: HashSet::new(),
+        current_nesting: 0,
+        current_enclosing_functions: 0,
+    };
     walk_tree(node, &mut visitor)?;
-
     Ok(visitor.current_increments)
 }
 
-#[derive(Default)]
-struct ComplexityVisitor {
+struct ComplexityVisitor<'a> {
+    recursion: &'a Recursion,
     current_increments: Vec<Increment>,
     visited_operators: HashSet<usize>,
     current_nesting: i32,
     current_enclosing_functions: i32,
 }
 
-impl ComplexityVisitor {
+impl ComplexityVisitor<'_> {
     fn increment_with_nesting(&mut self, location: Node<'_>, nesting_level: i32) {
         self.current_increments.push(Increment {
             location: TreeSitterLocation::from_tree_sitter_node(location),
@@ -63,8 +92,14 @@ impl ComplexityVisitor {
     }
 }
 
-impl NodeVisitor for ComplexityVisitor {
+impl NodeVisitor for ComplexityVisitor<'_> {
     fn enter_node(&mut self, node: Node<'_>) -> Result<(), AnalyzerError> {
+        if let Some(location) = self.recursion.call_location(node) {
+            self.current_increments.push(Increment {
+                location: location.clone(),
+                nesting: 0,
+            });
+        }
         match node.kind() {
             "function_item" => {
                 if self.current_enclosing_functions > 0 {
@@ -135,7 +170,6 @@ impl NodeVisitor for ComplexityVisitor {
             "closure_expression" => {
                 self.current_nesting += 1;
             }
-            // TODO SKUNK-29: Check calls and handle recursion if/when we are able to reliably infer the called function
             _ => {}
         }
 
@@ -217,7 +251,7 @@ fn flatten_operators(node: Node<'_>) -> Result<Vec<Node<'_>>, AnalyzerError> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::tree::parse_rust_code;
+    use crate::tree::{parse_rust_code, NodeIterator};
     use tree_sitter::{Query, QueryCursor, StreamingIterator};
 
     #[derive(Debug, PartialEq)]
@@ -484,15 +518,137 @@ match x { // +1
         );
     }
 
+    #[test]
+    fn direct_recursion_is_counted_once_without_nesting() {
+        check_complexity(
+            r#"
+    if n > 0 { // +1
+        main(n - 1); // +1
+        main(n - 2);
+    }
+"#,
+        );
+        check_complexity("main::<i32>(); // +1");
+        check_complexity("r#main(); // +1");
+    }
+
+    #[test]
+    fn nested_functions_have_independent_recursion() {
+        check_complexity(
+            r#"
+    fn nested() {
+        nested(); // +1
+        main();
+    }
+    main(); // +1
+"#,
+        );
+        check_complexity("fn main() {} main();");
+        check_complexity("main(); fn main() {}");
+    }
+
+    #[test]
+    fn shadowing_bindings_are_not_recursion() {
+        for source in [
+            "let main = || {}; main();",
+            "let (main, _) = callbacks; main();",
+            "let Callbacks { main } = callbacks; main();",
+            "let Callbacks { callback: main } = callbacks; main();",
+            "let bindings!() = callbacks; main();",
+            "for main in callbacks { main(); }",
+            "match callbacks { Some(main) => main(), _ => () }",
+            "if let Some(main) = callback { main(); }",
+            "while let Some(main) = callback { main(); }",
+            "invoke(|main| main());",
+            "invoke(|main: fn()| main());",
+            "struct main; main();",
+            "struct main(u8); main(0);",
+            "const main: fn() = other; main();",
+            "static main: fn() = other; main();",
+            "use other::main; main();",
+            "use other::*; main();",
+            "introduce_bindings!(); main();",
+            "unsafe extern \"C\" { fn main(); } main();",
+        ] {
+            let wrapped = format!("fn main() {{ {source} }}");
+            let tree = parse_rust_code(&wrapped).unwrap();
+            let increments = calculate_cognitive_complexity(tree.root_node(), &wrapped).unwrap();
+            assert!(
+                increments.iter().all(|increment| {
+                    &wrapped[increment.location.start_byte..increment.location.end_byte] != "main"
+                }),
+                "Unexpected recursion for {source}"
+            );
+        }
+        let source = "fn main(main: fn()) { main(); }";
+        let tree = parse_rust_code(source).unwrap();
+        assert_eq!(
+            calculate_total_cognitive_complexity(&tree, source).unwrap(),
+            0
+        );
+    }
+
+    #[test]
+    fn shadowing_respects_let_initializers_and_block_scope() {
+        check_complexity(
+            "let main = main(); // +1
+main();",
+        );
+        check_complexity(
+            "main(); // +1
+let main = other; main();",
+        );
+        check_complexity("{ let main = other; main(); } main(); // +1");
+        check_complexity("invoke(|| main()); // +1");
+    }
+
+    #[test]
+    fn unresolved_calls_are_not_guessed() {
+        check_complexity("other::main(); self.main();");
+        check_complexity("(main)(); // +1");
+        for source in [
+            "impl T { fn main() { main(); Self::main(); } }",
+            "impl T { fn main(&self) { self.main(); } }",
+            "trait T { fn main() { main(); Self::main(); } }",
+            "fn main() { other(); } fn other() {}",
+            "fn main() { mod nested { const X: () = main(); } }",
+            "fn main() { const X: () = main(); }",
+        ] {
+            let tree = parse_rust_code(source).unwrap();
+            assert_eq!(
+                calculate_total_cognitive_complexity(&tree, source).unwrap(),
+                0,
+                "{source}"
+            );
+        }
+    }
+
+    #[test]
+    fn file_metric_and_function_calculation_agree() {
+        let source = "mod m { fn r#recurse() { recurse(); } } fn other() { other(); other(); }";
+        let tree = parse_rust_code(source).unwrap();
+        assert_eq!(
+            calculate_total_cognitive_complexity(&tree, source).unwrap(),
+            2
+        );
+        for function in NodeIterator::new(tree.root_node(), |node| node.kind() == "function_item") {
+            let increments = calculate_cognitive_complexity(function, source).unwrap();
+            assert_eq!(increments.len(), 1);
+            assert_eq!(increments[0].nesting, 0);
+        }
+    }
+
     fn total_complexity(source_code: &str) -> i32 {
-        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
-        calculate_total_cognitive_complexity(&tree).unwrap()
+        let wrapped_source = format!("fn main() {{ {}\n }}", source_code);
+        let tree = parse_rust_code(&wrapped_source).unwrap();
+        calculate_total_cognitive_complexity(&tree, &wrapped_source).unwrap()
     }
 
     fn check_complexity(source_code: &str) {
-        let tree = parse_rust_code(format!("fn main() {{ {} }}", source_code).as_str()).unwrap();
+        let wrapped_source = format!("fn main() {{ {}\n }}", source_code);
+        let tree = parse_rust_code(&wrapped_source).unwrap();
 
-        let increments = calculate_cognitive_complexity(tree.root_node()).unwrap();
+        let increments = calculate_cognitive_complexity(tree.root_node(), &wrapped_source).unwrap();
         let mut expected_increments_by_line = collect_complexity_increments(source_code);
 
         let actual_total: i32 = increments.iter().map(|inc| inc.nesting + 1).sum();
