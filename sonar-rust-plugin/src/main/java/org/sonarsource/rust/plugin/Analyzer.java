@@ -27,6 +27,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.Set;
 import java.util.HashSet;
 import java.util.ArrayList;
@@ -44,7 +45,7 @@ public class Analyzer implements AutoCloseable {
   private final DataInputStream inputStream;
   private final Duration projectTimeout;
 
-  private volatile Set<String> knownCrateRoots = Set.of();
+  private final AtomicReference<Set<String>> knownCrateRoots = new AtomicReference<>(Set.of());
 
   public Analyzer(List<String> command, Map<String, String> parameters) {
     this(new ProcessWrapper(), command, parameters, Duration.ofSeconds(60));
@@ -77,7 +78,7 @@ public class Analyzer implements AutoCloseable {
 
   /** Retain Cargo-confirmed identities when replacing a failed project analyser. */
   public void preserveCrateRootsFrom(Analyzer previous) {
-    knownCrateRoots = previous.knownCrateRoots;
+    knownCrateRoots.set(previous.knownCrateRoots.get());
   }
 
   private static String canonicalPath(String path) {
@@ -90,7 +91,7 @@ public class Analyzer implements AutoCloseable {
   }
 
   public AnalysisResult analyze(String path, String code) throws IOException {
-    writeString(knownCrateRoots.contains(canonicalPath(path)) ? "analyze-root" : "analyze-file");
+    writeString(knownCrateRoots.get().contains(canonicalPath(path)) ? "analyze-root" : "analyze-file");
     writeString(path);
     writeString(code);
     return readAnalysis();
@@ -137,7 +138,7 @@ public class Analyzer implements AutoCloseable {
     for (int i = 0; i < rootCount; i++) {
       roots.add(canonicalPath(readString()));
     }
-    knownCrateRoots = Set.copyOf(roots);
+    knownCrateRoots.set(Set.copyOf(roots));
     if (!"project-ready".equals(readString())) {
       throw new IOException("Unexpected project initialization response");
     }
