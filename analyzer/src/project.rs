@@ -30,6 +30,10 @@ use tree_sitter::Node;
 const MAX_PROJECT_BYTES: usize = 128 * 1024 * 1024;
 const MAX_METADATA_BYTES: u64 = 32 * 1024 * 1024;
 const MAX_MODULE_DEPTH: usize = 64;
+// Leave half of the Java client's 60-second deadline for publishing roots and
+// graph construction. All manifests and metadata retries share this budget.
+const METADATA_DISCOVERY_BUDGET: Duration = Duration::from_secs(30);
+const MAX_METADATA_ATTEMPT: Duration = Duration::from_secs(5);
 
 type Ranges = HashSet<(usize, usize)>;
 
@@ -50,6 +54,23 @@ impl Project {
         overrides: HashMap<String, String>,
         on_roots: impl FnOnce(&[PathBuf]),
     ) -> (Self, Vec<String>) {
+        Self::load_with_metadata(
+            manifests,
+            overrides,
+            on_roots,
+            METADATA_DISCOVERY_BUDGET,
+            cargo_metadata,
+        )
+    }
+
+    fn load_with_metadata(
+        manifests: &[String],
+        overrides: HashMap<String, String>,
+        on_roots: impl FnOnce(&[PathBuf]),
+        budget: Duration,
+        mut metadata: impl FnMut(&Path, bool, Duration) -> Result<Value, String>,
+    ) -> (Self, Vec<String>) {
+        let deadline = Instant::now() + budget;
         let mut warnings = Vec::new();
         let mut packages = HashMap::new();
         let mut workspace = HashSet::new();
@@ -60,11 +81,24 @@ impl Project {
             if !discovered_manifests.insert(path.clone()) {
                 continue;
             }
-            let metadata = match cargo_metadata(&path, false) {
+            let remaining = deadline.saturating_duration_since(Instant::now());
+            if remaining.is_zero() {
+                warnings.push(
+                    "Cargo discovery time budget exhausted; retaining targets already discovered"
+                        .to_owned(),
+                );
+                break;
+            }
+            // Reserve at least half the remaining discovery time for target-only
+            // fallback when full dependency discovery stalls.
+            let timeout = MAX_METADATA_ATTEMPT.min(remaining / 2);
+            let metadata = match metadata(&path, false, timeout) {
                 Ok(metadata) => metadata,
                 Err(error) => {
                     warnings.push(format!("Dependency resolution unavailable for {}: {error}. Using local targets where possible.", path.display()));
-                    match cargo_metadata(&path, true) {
+                    let timeout = MAX_METADATA_ATTEMPT
+                        .min(deadline.saturating_duration_since(Instant::now()));
+                    match metadata(&path, true, timeout) {
                         Ok(metadata) => metadata,
                         Err(error) => {
                             warnings.push(format!(
@@ -386,7 +420,10 @@ fn array(value: &Value) -> impl Iterator<Item = &Value> {
     value.as_array().into_iter().flatten()
 }
 
-fn cargo_metadata(manifest: &Path, no_deps: bool) -> Result<Value, String> {
+fn cargo_metadata(manifest: &Path, no_deps: bool, timeout: Duration) -> Result<Value, String> {
+    if timeout.is_zero() {
+        return Err("Cargo discovery time budget exhausted".to_owned());
+    }
     let mut command = Command::new("cargo");
     command
         .args([
@@ -403,6 +440,10 @@ fn cargo_metadata(manifest: &Path, no_deps: bool) -> Result<Value, String> {
     if no_deps {
         command.arg("--no-deps");
     }
+    run_metadata(command, timeout)
+}
+
+fn run_metadata(mut command: Command, timeout: Duration) -> Result<Value, String> {
     let mut child = command.spawn().map_err(|error| error.to_string())?;
     let stdout = child.stdout.take().ok_or("Cargo stdout unavailable")?;
     let stderr = child.stderr.take().ok_or("Cargo stderr unavailable")?;
@@ -418,13 +459,13 @@ fn cargo_metadata(manifest: &Path, no_deps: bool) -> Result<Value, String> {
         let mut bytes = Vec::new();
         stderr.take(65536).read_to_end(&mut bytes).map(|_| bytes)
     });
-    let started = Instant::now();
+    let deadline = Instant::now() + timeout;
     let status = loop {
         match child.try_wait() {
             Ok(Some(status)) => break Ok(status),
-            Ok(None) if started.elapsed() < Duration::from_secs(60) => {
-                std::thread::sleep(Duration::from_millis(20))
-            }
+            Ok(None) if Instant::now() < deadline => std::thread::sleep(
+                Duration::from_millis(20).min(deadline.saturating_duration_since(Instant::now())),
+            ),
             Ok(None) => {
                 let _ = child.kill();
                 let _ = child.wait();
@@ -888,6 +929,65 @@ mod tests {
         ];
         let project = virtual_project(&files, &[("local", files[0].0, 2021, &[])]);
         assert_eq!(count(&project, files[1].0, files[1].1), 1);
+    }
+
+    #[test]
+    fn metadata_budget_reserves_fallback_and_publishes_roots_before_graph_loading() {
+        let budget = Duration::from_millis(80);
+        let start = Instant::now();
+        let manifests = [
+            "/virtual/one/Cargo.toml",
+            "/virtual/two/Cargo.toml",
+            "/virtual/three/Cargo.toml",
+        ]
+        .map(str::to_owned);
+        let root = PathBuf::from("/virtual/one/lib.rs");
+        let source = "fn a() { crate::a(); }";
+        let mut roots = Vec::new();
+        let mut attempts = Vec::new();
+        let (project, warnings) = Project::load_with_metadata(
+            &manifests,
+            HashMap::from([(root.to_string_lossy().into_owned(), source.to_owned())]),
+            |confirmed| roots = confirmed.to_vec(),
+            budget,
+            |manifest, no_deps, timeout| {
+                attempts.push((manifest.to_path_buf(), no_deps, timeout));
+                if no_deps && manifest == Path::new(&manifests[0]) {
+                    return Ok(serde_json::json!({
+                        "packages": [{"id": "one", "name": "one", "edition": "2021", "manifest_path": manifests[0], "targets": [{"name": "one", "kind": ["lib"], "src_path": root}]}],
+                        "workspace_members": ["one"]
+                    }));
+                }
+                std::thread::sleep(timeout);
+                Err("Cargo metadata timed out".to_owned())
+            },
+        );
+        assert!(start.elapsed() < Duration::from_secs(2));
+        assert_eq!(roots, vec![root]);
+        assert_eq!(count(&project, "/virtual/one/lib.rs", source), 1);
+        assert!(attempts
+            .iter()
+            .any(|(path, no_deps, _)| *no_deps && path == Path::new(&manifests[0])));
+        assert!(attempts
+            .iter()
+            .all(|(_, _, timeout)| *timeout <= budget / 2));
+        assert!(warnings.iter().any(|w| w.contains("budget exhausted")));
+    }
+
+    #[test]
+    #[cfg(unix)]
+    fn stalled_metadata_process_is_killed_within_its_attempt_budget() {
+        let mut command = Command::new("sh");
+        command
+            .args(["-c", "while :; do :; done"])
+            .stdout(Stdio::piped())
+            .stderr(Stdio::piped());
+        let start = Instant::now();
+        assert_eq!(
+            run_metadata(command, Duration::from_millis(30)).unwrap_err(),
+            "Cargo metadata timed out"
+        );
+        assert!(start.elapsed() < Duration::from_secs(2));
     }
 
     #[test]

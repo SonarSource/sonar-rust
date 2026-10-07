@@ -51,15 +51,20 @@ Project initialization has a 60-second deadline, including snapshot transfer and
 Cargo discovery. On timeout, the sensor terminates the analyser and restarts in
 standalone mode, retaining any crate roots already confirmed. Fail-fast mode
 reports the timeout instead of restarting.
+Cargo discovery shares a 30-second budget across manifests and retries. Each
+metadata attempt is capped at five seconds, and full dependency discovery leaves
+time for a target-only retry. Confirmed roots are published before graph loading;
+slow or unavailable dependency discovery may leave cross-crate calls unresolved.
 
 The resolver does not expand macros or generated modules, evaluate `cfg`, load
 standard-library sources, solve generic bounds or specialize generic impls, perform
 user-defined autoderef, or resolve dynamic dispatch and mutable function pointers.
 Unary operator result types and destructured binding types remain unresolved.
 Ambiguous and unsupported calls do not become graph edges.
-Block macros are ignored during name lookup, so logging and assertions do not
-hide recursion. Without macro expansion, names introduced by custom block macros
-may shadow a resolved call; module-level macros still make unknown names ambiguous.
+Known formatting, assertion and qualified logging macros in blocks do not hide
+recursion. Custom block macros and module-level macros remain conservative because
+an unexpanded macro may introduce names. Visible local macro definitions override
+the conventional macro-name assumptions.
 Calls inside closures are attributed to their enclosing function, consistent with the existing
 complexity visitor; closure invocation and reachability are not analyzed.
 
