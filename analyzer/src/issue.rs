@@ -14,6 +14,7 @@
  * You should have received a copy of the Sonar Source-Available License
  * along with this program; if not, see https://sonarsource.com/license/ssal/
  */
+use crate::recursion::Recursion;
 use crate::rules::rule::all_rules;
 use crate::tree::{AnalyzerError, SonarLocation};
 use std::collections::HashMap;
@@ -33,14 +34,15 @@ pub struct SecondaryLocation {
     pub location: SonarLocation,
 }
 
-pub fn find_issues(
+pub fn find_issues_with_recursion(
     tree: &Tree,
     source_code: &str,
     parameters: &HashMap<String, String>,
+    recursion: &Recursion,
 ) -> Result<Vec<Issue>, AnalyzerError> {
     let mut issues = Vec::new();
     for rule in all_rules(parameters)? {
-        issues.extend(rule.check(tree, source_code)?);
+        issues.extend(rule.check_with_recursion(tree, source_code, recursion)?);
     }
     Ok(issues)
 }
