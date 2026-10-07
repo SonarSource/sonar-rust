@@ -282,6 +282,7 @@ struct Resolver<'tree, 'source> {
     implementation_functions: HashMap<(usize, String), Vec<usize>>,
     symbols: HashMap<(usize, String), Vec<Symbol<'tree>>>,
     import_items: HashMap<usize, Vec<Node<'tree>>>,
+    macro_definitions: HashSet<(usize, String)>,
     implementations: Vec<Node<'tree>>,
     implementation_types: RefCell<HashMap<(usize, usize), Option<Node<'tree>>>>,
     implementation_traits: RefCell<HashMap<(usize, usize), Option<Symbol<'tree>>>>,
@@ -308,6 +309,7 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             implementation_functions: HashMap::new(),
             symbols: HashMap::new(),
             import_items: HashMap::new(),
+            macro_definitions: HashSet::new(),
             implementations: Vec::new(),
             implementation_types: RefCell::new(HashMap::new()),
             implementation_traits: RefCell::new(HashMap::new()),
@@ -347,6 +349,13 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
             let Some(parent) = node.parent() else {
                 continue;
             };
+            if node.kind() == "macro_definition" {
+                if let Some(name) = node.child_by_field_name("name") {
+                    resolver
+                        .macro_definitions
+                        .insert((parent.id(), resolver.text(name).to_owned()));
+                }
+            }
             if matches!(
                 node.kind(),
                 "use_declaration"
@@ -982,22 +991,91 @@ impl<'tree, 'source> Resolver<'tree, 'source> {
                 }
             }
         }
-        // Module macros can introduce unknown items. Block macros are ignored:
-        // common logging/assertion calls must not hide otherwise resolved calls.
+        // Module and custom block macros can introduce unknown items. Known
+        // expression-only block macros must not hide otherwise resolved calls.
         let macro_item = item.kind() == "macro_invocation"
             || (item.kind() == "expression_statement"
                 && children(item)
                     .next()
                     .is_some_and(|c| c.kind() == "macro_invocation"));
         if item.kind() == "foreign_mod_item"
-            || (macro_item
-                && item.parent().is_some_and(|scope| {
-                    scope.kind() != "block"
-                        || scope.parent().is_some_and(|p| p.kind() == "mod_item")
-                }))
+            || (macro_item && !self.expression_only_block_macro(item))
         {
             candidates.glob_unknown = true;
         }
+    }
+
+    fn expression_only_block_macro(&self, item: Node<'tree>) -> bool {
+        let Some(scope) = item.parent() else {
+            return false;
+        };
+        if scope.kind() != "block" || scope.parent().is_some_and(|p| p.kind() == "mod_item") {
+            return false;
+        }
+        let invocation = if item.kind() == "macro_invocation" {
+            item
+        } else {
+            let Some(invocation) = children(item).next() else {
+                return false;
+            };
+            invocation
+        };
+        let Some(path) = invocation.child_by_field_name("macro") else {
+            return false;
+        };
+        let segments = path_segments(path, self.source);
+        let Some(name) = segments.last() else {
+            return false;
+        };
+        let standard = matches!(
+            name.as_str(),
+            "print"
+                | "println"
+                | "eprint"
+                | "eprintln"
+                | "format"
+                | "format_args"
+                | "assert"
+                | "assert_eq"
+                | "assert_ne"
+                | "debug_assert"
+                | "debug_assert_eq"
+                | "debug_assert_ne"
+                | "dbg"
+                | "panic"
+                | "todo"
+                | "unreachable"
+                | "unimplemented"
+                | "write"
+                | "writeln"
+        );
+        let logging = matches!(
+            name.as_str(),
+            "trace" | "debug" | "info" | "warn" | "error" | "log" | "event"
+        );
+        let recognized = match segments.as_slice() {
+            [_] => standard,
+            [owner, _] => {
+                (matches!(owner.as_str(), "std" | "core") && standard)
+                    || (matches!(owner.as_str(), "log" | "tracing") && logging)
+            }
+            _ => false,
+        };
+        if !recognized {
+            return false;
+        }
+        // Visible local definitions override conventional macro names.
+        let mut current = Some(scope);
+        while let Some(node) = current {
+            if self
+                .macro_definitions
+                .contains(&(node.id(), segments[0].clone()))
+            {
+                return false;
+            }
+            current = node.parent();
+        }
+        true
     }
 
     fn collect_import(
@@ -1871,11 +1949,18 @@ mod tests {
             "assert!(n > 0);",
             "debug_assert!(n > 0);",
             "log::info!(\"{n}\");",
-            "custom!();",
         ] {
             check(&format!("fn fact(n: u64) -> u64 {{ {invocation} if n == 0 {{ 1 }} else {{ n * fact(n - 1) }} }}"), &["fact"]);
         }
-        check("fn a() { custom!(); b(); } fn b() { a(); }", &["a", "b"]);
+        check(
+            "fn a() { println!(\"a\"); b(); } fn b() { a(); }",
+            &["a", "b"],
+        );
+        check("fn a() { custom!(); a(); }", &[]);
+        check(
+            "macro_rules! println { () => { let a = || {}; } } fn a() { println!(); a(); }",
+            &[],
+        );
         check(
             "custom!(); fn a() { b(); } mod nested { pub fn b() { crate::a(); } } use nested::*;",
             &[],
