@@ -583,6 +583,7 @@ impl Builder {
                 );
                 cursor = body.end_byte() - 1;
             } else {
+                let explicit_path = attribute.is_some();
                 let module_path = match attribute {
                     Some(Ok(p)) => Some(attribute_dir.join(p)),
                     Some(Err(error)) => {
@@ -617,11 +618,12 @@ impl Builder {
                 self.text.push('{');
                 if let Some(child) = module_path {
                     let child = absolute(&child);
-                    let directory = if child.file_name().is_some_and(|n| n == "mod.rs") {
-                        child.parent().unwrap_or(Path::new(".")).to_path_buf()
-                    } else {
-                        child.with_extension("")
-                    };
+                    let directory =
+                        if explicit_path || child.file_name().is_some_and(|n| n == "mod.rs") {
+                            child.parent().unwrap_or(Path::new(".")).to_path_buf()
+                        } else {
+                            child.with_extension("")
+                        };
                     self.text.push('\n');
                     self.load(&child, &directory, depth + 1);
                     self.text.push('\n');
@@ -803,7 +805,7 @@ mod tests {
                 "// ©\nmod next; pub fn récurse() { next::second(); }",
             ),
             (
-                "/virtual/custom/source/next.rs",
+                "/virtual/custom/next.rs",
                 "pub fn second() { super::récurse(); }",
             ),
         ];
@@ -825,6 +827,36 @@ mod tests {
         let location = &output.issues[0].secondary_locations[0].location;
         assert_eq!(location.start_line, 1);
         assert_eq!(location.end_column - location.start_column, 7);
+    }
+
+    #[test]
+    fn inline_path_attributes_use_the_containing_module_directory() {
+        for root in ["/virtual/mod.rs", "/virtual/lib.rs", "/virtual/outer.rs"] {
+            let source = "mod inline { #[path = \"other.rs\"] mod inner; pub fn first() { inner::second(); } }";
+            let child = "/virtual/inline/other.rs";
+            let files = [
+                (root, source),
+                (child, "pub fn second() { super::first(); }"),
+            ];
+            let project = virtual_project(&files, &[("local", root, 2021, &[])]);
+            assert_eq!(count(&project, root, source), 1);
+            assert_eq!(count(&project, child, files[1].1), 1);
+        }
+        let files = [
+            ("/virtual/lib.rs", "mod outer;"),
+            ("/virtual/outer.rs", "mod inline { #[path = \"other.rs\"] mod inner; pub fn first() { inner::second(); } }"),
+            ("/virtual/outer/inline/other.rs", "pub fn second() { super::first(); }"),
+        ];
+        let project = virtual_project(&files, &[("local", files[0].0, 2021, &[])]);
+        assert_eq!(count(&project, files[1].0, files[1].1), 1);
+        assert_eq!(count(&project, files[2].0, files[2].1), 1);
+        let files = [
+            ("/virtual/lib.rs", "#[path = \"thread_files\"] mod thread { #[path = \"tls.rs\"] mod inner; pub fn first() { inner::second(); } }"),
+            ("/virtual/thread_files/tls.rs", "pub fn second() { super::first(); }"),
+        ];
+        let project = virtual_project(&files, &[("local", files[0].0, 2021, &[])]);
+        assert_eq!(count(&project, files[0].0, files[0].1), 1);
+        assert_eq!(count(&project, files[1].0, files[1].1), 1);
     }
 
     #[test]
