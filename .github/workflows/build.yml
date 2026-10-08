@@ -34,7 +34,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
       - name: Install Rust
         run: |
           curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -75,7 +75,7 @@ jobs:
           sudo apt-get clean
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
       - name: Cache cross-compiler
         id: cache-cross-compiler
         uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
@@ -144,7 +144,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
       - name: Setup Rust toolchain
         run: |
           sudo apt-get update
@@ -179,7 +179,7 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
       # Download Darwin artifacts (only if macos_analyzers job succeeded)
       - name: Download Darwin ARM64 artifact
         if: needs.macos_analyzers.result == 'success'
@@ -234,7 +234,7 @@ jobs:
           key-prefix: e2e
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
       - name: Vault
         id: secrets
         uses: SonarSource/vault-action-wrapper@v3
@@ -266,7 +266,7 @@ jobs:
           key-prefix: e2e
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
           # Install only the tools needed by E2E; cargo-about is not used in this job.
           install_args: java rust
       - name: Vault
@@ -310,7 +310,7 @@ jobs:
           key-prefix: e2e
       - uses: jdx/mise-action@7a4e45a543138629540c9a1616d08632b893e492 # v5.0.1
         with:
-          version: 2026.9.15
+          version: 2026.9.18
       - name: Install Clippy
         run: rustup component add clippy
       - name: Vault
