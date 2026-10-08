@@ -1,8 +1,23 @@
-# Code Quality for Rust
+<!-- Sonar Marketing hosts these approved brand assets on its Kentico Kontent CDN (assets-eu-01.kc-usercontent.com). Shared URLs are intentional; consult Marketing before replacing them. -->
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="https://assets-eu-01.kc-usercontent.com/ef593040-b591-0198-9506-ed88b30bc023/a23fc7ba-23f0-489a-829d-ed88c0748521/Sonar_Logo_Dark%20Backgrounds.svg">
+    <img src="https://assets-eu-01.kc-usercontent.com/ef593040-b591-0198-9506-ed88b30bc023/82c13eba-d95c-4bb8-8007-7ce77c14e043/Sonar_Logo_Light%20Backgrounds.svg" alt="Sonar logo" width="400">
+  </picture>
+</p>
 
 [![Build](https://github.com/SonarSource/sonar-rust/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SonarSource/sonar-rust/actions/workflows/build.yml) [![Quality Gate Status](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-rust&metric=alert_status&token=sqb_a062f88ef3aa92cecf9d7a288859fd120a839d0c)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-rust) [![Coverage](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-rust&metric=coverage&token=sqb_a062f88ef3aa92cecf9d7a288859fd120a839d0c)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-rust)
 
-This SonarSource project is a code analyzer for Rust projects to help developers write [Clean Code](https://www.sonarsource.com/solutions/clean-code).
+<!-- sonar-marketing:start -->
+<!-- Marketing maintains this section. For wording changes, consult the relevant Product Marketing Manager (PMM). Repository CODEOWNERS review accuracy and merge changes. -->
+
+# Code quality for Rust
+
+This repository contains the SonarQube analyzer for Rust, including analysis rules, code metrics, and integrations for importing coverage and Clippy reports.
+
+To learn more about Sonar’s Rust analysis, visit the [Sonar website](https://www.sonarsource.com/knowledge/languages/rust/).
+
+<!-- sonar-marketing:end -->
 
 ## Features
 
