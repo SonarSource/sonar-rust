@@ -65,7 +65,7 @@ class RustRulesRepositoryApiTest {
       .setEdition(Edition.ENTERPRISE_LW)
       .activateLicense()
       .useDefaultAdminCredentialsForBuilds(true)
-      .setSonarVersion(System.getProperty("sonar.runtimeVersion", "LATEST_RELEASE"))
+      .setSonarVersion(System.getProperty("sonar.runtimeVersion", "DEV"))
       .addPlugin(OrchestratorHelper.basePluginLocation())
       .addPlugin(FileLocation.of(customPluginJar))
       .build();
