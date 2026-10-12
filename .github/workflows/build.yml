@@ -115,6 +115,8 @@ jobs:
           rustup target add x86_64-unknown-linux-gnu
           rustup target add aarch64-unknown-linux-musl
       - uses: SonarSource/ci-github-actions/config-gradle@v2
+        with:
+          repox-url: https://repox-internal.dev.sonar.build
       - name: Build Rust analyzers
         run: |
           ./gradlew :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --info --stacktrace
@@ -158,6 +160,7 @@ jobs:
           cargo install cargo-llvm-cov
       - uses: SonarSource/ci-github-actions/build-gradle@v2
         with:
+          repox-url: https://repox-internal.dev.sonar.build
           deploy: false
           deploy-pull-request: false
           gradle-args: "-PskipCrossCompile --info --stacktrace"
@@ -212,6 +215,7 @@ jobs:
       - uses: SonarSource/ci-github-actions/build-gradle@v2
         id: build
         with:
+          repox-url: https://repox-internal.dev.sonar.build
           deploy-pull-request: true
           gradle-args: "-PskipAnalyzerBuild --info --stacktrace"
           sonar-platform: 'none' # skip SQ analysis, it's done in analysis job
@@ -242,6 +246,9 @@ jobs:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v2
+        with:
+          repox-url: https://repox-internal.dev.sonar.build
+          artifactory-reader-role: private-reader
       - name: Run E2E tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
@@ -278,6 +285,9 @@ jobs:
       - name: Install Clippy
         run: rustup component add clippy
       - uses: SonarSource/ci-github-actions/config-gradle@v2
+        with:
+          repox-url: https://repox-internal.dev.sonar.build
+          artifactory-reader-role: private-reader
       - name: Run E2E tests
         shell: bash
         env:
