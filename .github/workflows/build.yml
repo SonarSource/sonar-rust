@@ -186,29 +186,29 @@ jobs:
       # Download Darwin artifacts (only if macos_analyzers job succeeded)
       - name: Download Darwin ARM64 artifact
         if: needs.macos_analyzers.result == 'success'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: analyzer-aarch64-apple-darwin
           path: analyzer/target/aarch64-apple-darwin/release/
       - name: Download Darwin x86_64 artifact
         if: needs.macos_analyzers.result == 'success'
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: analyzer-x86_64-apple-darwin
           path: analyzer/target/x86_64-apple-darwin/release/
       # Download Linux/Windows artifacts (always built)
       - name: Download Linux x86_64 analyzer
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: analyzer-x86_64-unknown-linux-musl
           path: analyzer/target/x86_64-unknown-linux-musl/release/
       - name: Download Linux ARM64 analyzer
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: analyzer-aarch64-unknown-linux-musl
           path: analyzer/target/aarch64-unknown-linux-musl/release/
       - name: Download Windows analyzer
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: analyzer-x86_64-pc-windows-gnu
           path: analyzer/target/x86_64-pc-windows-gnu/release/      
