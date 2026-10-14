@@ -233,9 +233,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup orchestrator cache
+        if: github.event_name != 'pull_request'
         uses: ./.github/actions/orchestrator-cache
         with:
-          key-prefix: e2e
+          key-prefix: e2e-production
       - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
         with:
           version: 2026.9.18
@@ -245,13 +246,32 @@ jobs:
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
+            development/artifactory-edge-prod/token/{REPO_OWNER_NAME_DASH}-private-reader access_token | ORCHESTRATOR_ACCESS_TOKEN;
       - uses: SonarSource/ci-github-actions/config-gradle@v2
         with:
           repox-url: https://repox-internal.dev.sonar.build
           artifactory-reader-role: private-reader
+      - &orchestrator-config
+        name: Prepare production Orchestrator configuration
+        id: orchestrator-config
+        shell: bash
+        env:
+          ORCHESTRATOR_ACCESS_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).ORCHESTRATOR_ACCESS_TOKEN }}
+        run: |
+          test -n "$ORCHESTRATOR_ACCESS_TOKEN"
+          umask 077
+          config_path="$RUNNER_TEMP/orchestrator-production-config/orchestrator.properties"
+          mkdir -p "$(dirname "$config_path")"
+          printf 'orchestrator.artifactory.url=https://repox-internal.sonar.build/artifactory\norchestrator.artifactory.accessToken=%s\n' "$ORCHESTRATOR_ACCESS_TOKEN" > "$config_path"
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            config_path="$(cygpath -m "$config_path")"
+          fi
+          echo "config-url=file:///${config_path#/}" >> "$GITHUB_OUTPUT"
       - name: Run E2E tests
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+          ORCHESTRATOR_CONFIG_URL: ${{ steps.orchestrator-config.outputs.config-url }}
+          ORCHESTRATOR_HOME: ${{ github.event_name == 'pull_request' && format('{0}/orchestrator-production', runner.temp) || env.ORCHESTRATOR_HOME }}
         run: |
           ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
 
@@ -268,9 +288,10 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Setup orchestrator cache
+        if: github.event_name != 'pull_request'
         uses: ./.github/actions/orchestrator-cache
         with:
-          key-prefix: e2e
+          key-prefix: e2e-production
       - uses: jdx/mise-action@2d8d4cafcbd33be2ea37d2b6f5ad595363d1f1ca # v5.1.1
         with:
           version: 2026.9.18
@@ -282,16 +303,20 @@ jobs:
         with:
           secrets: |
             development/github/token/licenses-ro token | GITHUB_TOKEN;
+            development/artifactory-edge-prod/token/{REPO_OWNER_NAME_DASH}-private-reader access_token | ORCHESTRATOR_ACCESS_TOKEN;
       - name: Install Clippy
         run: rustup component add clippy
       - uses: SonarSource/ci-github-actions/config-gradle@v2
         with:
           repox-url: https://repox-internal.dev.sonar.build
           artifactory-reader-role: private-reader
+      - *orchestrator-config
       - name: Run E2E tests
         shell: bash
         env:
           GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
+          ORCHESTRATOR_CONFIG_URL: ${{ steps.orchestrator-config.outputs.config-url }}
+          ORCHESTRATOR_HOME: ${{ github.event_name == 'pull_request' && format('{0}/orchestrator-production', runner.temp) || env.ORCHESTRATOR_HOME }}
         run: |
           echo "org.gradle.daemon=false" >> "gradle.properties"
           export PATH=$PATH:$HOME/.cargo/bin
