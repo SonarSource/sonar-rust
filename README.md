@@ -89,18 +89,6 @@ Rule metadata is maintained by hand. To change a rule's description, title, seve
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/rust/S*.json` and `S*.html` for the Rust rules
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/` for the imported Clippy lints, regenerated with [`tools/clippy-metadata`](tools/clippy-metadata) when a new Rust release ships
 
-### Running End-to-End Tests
-
-End-to-end tests verify the entire system from start to finish. These tests involve starting a SonarQube instance, invoking the scanner as a user would, running the sensor, sending issues to the Plugin API, processing them using the SonarQube instance, and finally comparing the outcome to the expected behavior.
-
-To run the end-to-end tests, use the following command:
-
-```
-./gradlew :e2e:test -Pe2e
-```
-
-It executes the end-to-end tests, ensuring that the entire system works as expected.
-
 ### License File Generation
 
 The project automatically generates and validates license files for all runtime dependencies. This ensures compliance and transparency regarding third-party licenses bundled with the plugin.

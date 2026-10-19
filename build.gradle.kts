@@ -50,9 +50,6 @@ val checkLicenseHeaders = tasks.register("checkLicenseHeaders") {
     fileTree("sonar-rust-plugin/src") {
       include("**/*.java")
     },
-    fileTree("e2e/src") {
-      include("**/*.java")
-    },
     fileTree("buildSrc/src/main/kotlin") {
       include("**/*.kt", "**/*.kts")
     }

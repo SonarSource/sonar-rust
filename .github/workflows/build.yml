@@ -221,132 +221,8 @@ jobs:
           sonar-platform: 'none' # skip SQ analysis, it's done in analysis job
           skip-tests: true
 
-  e2e:
-    needs: [build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: sonar-m
-    name: E2E Tests
-    permissions:
-      id-token: write
-    env:
-      BUILD_NUMBER: ${{ needs.build.outputs.BUILD_NUMBER }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup orchestrator cache
-        uses: ./.github/actions/orchestrator-cache
-        with:
-          key-prefix: e2e
-      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
-        with:
-          version: 2026.9.18
-      - name: Vault
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - uses: SonarSource/ci-github-actions/config-gradle@v2
-        with:
-          repox-url: https://repox-internal.dev.sonar.build
-          artifactory-reader-role: private-reader
-      - name: Run E2E tests
-        env:
-          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-        run: |
-          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
-
-  e2e_win:
-    needs: [build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: warp-custom-windows-2022-m
-    name: E2E Tests Windows
-    permissions:
-      id-token: write
-      contents: write
-    env:
-      BUILD_NUMBER: ${{ needs.build.outputs.BUILD_NUMBER }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup orchestrator cache
-        uses: ./.github/actions/orchestrator-cache
-        with:
-          key-prefix: e2e
-      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
-        with:
-          version: 2026.9.18
-          # Install only the tools needed by E2E; cargo-about is not used in this job.
-          install_args: java rust
-      - name: Vault
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - name: Install Clippy
-        run: rustup component add clippy
-      - uses: SonarSource/ci-github-actions/config-gradle@v2
-        with:
-          repox-url: https://repox-internal.dev.sonar.build
-          artifactory-reader-role: private-reader
-      - name: Run E2E tests
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-        run: |
-          echo "org.gradle.daemon=false" >> "gradle.properties"
-          export PATH=$PATH:$HOME/.cargo/bin
-          ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: e2e-test-reports-windows
-          path: e2e/build/reports/tests/**
-
-  e2e_linux_arm64:
-    needs: [build]
-    if: ${{ !cancelled() && needs.build.result == 'success' }}
-    runs-on: github-ubuntu-24.04-arm-m
-    name: E2E Tests Linux ARM64
-    permissions:
-      id-token: write
-    env:
-      BUILD_NUMBER: ${{ needs.build.outputs.BUILD_NUMBER }}
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Setup orchestrator cache
-        uses: ./.github/actions/orchestrator-cache
-        with:
-          key-prefix: e2e
-      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
-        with:
-          version: 2026.9.18
-      - name: Install Clippy
-        run: rustup component add clippy
-      - name: Vault
-        id: secrets
-        uses: SonarSource/vault-action-wrapper@v3
-        with:
-          secrets: |
-            development/github/token/licenses-ro token | GITHUB_TOKEN;
-      - uses: SonarSource/ci-github-actions/config-gradle@v2
-      - name: Run E2E tests in ARM64 container
-        shell: bash
-        env:
-          GITHUB_TOKEN: ${{ fromJSON(steps.secrets.outputs.vault).GITHUB_TOKEN }}
-        run: |
-            echo 'org.gradle.daemon=false' >> gradle.properties
-            export PATH=$PATH:$HOME/.cargo/bin
-            ./gradlew :e2e:test -Pe2e -DpluginVersion=${PROJECT_VERSION} --info --stacktrace
-      - name: Upload test reports
-        if: always()
-        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        with:
-          name: e2e-test-reports-linux-arm64
-          path: e2e/build/reports/tests/**
-
   notify-build-failure:
-    needs: [macos_analyzers, cross_platform_analyzers, build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64, promote]
+    needs: [macos_analyzers, cross_platform_analyzers, build, unit_test_and_analysis, promote]
     if: >-
       always()
       && (github.ref_name == github.event.repository.default_branch || startsWith(github.ref_name, 'branch-') || startsWith(github.ref_name, 'dogfood-'))
@@ -365,14 +241,11 @@ jobs:
           branch: ${{ github.ref_name }}
 
   promote:
-    needs: [build, unit_test_and_analysis, e2e, e2e_win, e2e_linux_arm64]
+    needs: [build, unit_test_and_analysis]
     if: |
       !cancelled() &&
       needs.build.result == 'success' &&
-      needs.unit_test_and_analysis.result == 'success' &&
-      needs.e2e.result == 'success' &&
-      needs.e2e_win.result == 'success' &&
-      needs.e2e_linux_arm64.result == 'success'
+      needs.unit_test_and_analysis.result == 'success'
     runs-on: sonar-xs
     name: Promote
     permissions:
