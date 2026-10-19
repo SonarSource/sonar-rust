@@ -6,7 +6,7 @@
   </picture>
 </p>
 
-[![Build](https://github.com/SonarSource/sonar-rust/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/SonarSource/sonar-rust/actions/workflows/build.yml) [![Quality Gate Status](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-rust&metric=alert_status&token=sqb_a062f88ef3aa92cecf9d7a288859fd120a839d0c)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-rust) [![Coverage](https://next.sonarqube.com/sonarqube/api/project_badges/measure?project=SonarSource_sonar-rust&metric=coverage&token=sqb_a062f88ef3aa92cecf9d7a288859fd120a839d0c)](https://next.sonarqube.com/sonarqube/dashboard?id=SonarSource_sonar-rust)
+[![CI](https://github.com/SonarQubeCommunity/sonar-rust/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SonarQubeCommunity/sonar-rust/actions/workflows/ci.yml)
 
 <!-- sonar-marketing:start -->
 <!-- Marketing maintains this section. For wording changes, consult the relevant Product Marketing Manager (PMM). Repository CODEOWNERS review accuracy and merge changes. -->
@@ -26,9 +26,13 @@ To learn more about Sonar’s Rust analysis, visit the [Sonar website](https://w
 - Import of [test coverage reports](https://docs.sonarsource.com/sonarqube-cloud/enriching/test-coverage/overview/)
 - Import of [external Clippy reports](https://docs.sonarsource.com/sonarqube-cloud/enriching/external-analyzer-reports/)
 
-## Feedback
+## Community Maintenance
 
-We welcome your feedback and feature requests to help improve the Rust analyzer. To share your thoughts or request new features, please visit the [Sonar Community Forum](https://community.sonarsource.com/). 
+This analyzer was developed by SonarSource and is now maintained by the community in the [SonarQubeCommunity](https://github.com/SonarQubeCommunity) organization. It is the Rust 1.x analyzer: SonarQube Community Build bundles it in versions before 26.11, and from 26.11 on it is installed separately from the SonarQube Marketplace.
+
+## Feedback and Contributions
+
+Report bugs and request features in [GitHub issues](https://github.com/SonarQubeCommunity/sonar-rust/issues). Contributions are welcome: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Building the Project
 
@@ -89,6 +93,14 @@ Rule metadata is maintained by hand. To change a rule's description, title, seve
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/rust/S*.json` and `S*.html` for the Rust rules
 - `sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/` for the imported Clippy lints, regenerated with [`tools/clippy-metadata`](tools/clippy-metadata) when a new Rust release ships
 
+### Releasing
+
+Releases are published from GitHub:
+
+1. Create and publish a GitHub release with a tag such as `v1.9.0`.
+2. The [Release](.github/workflows/release.yml) workflow builds the native analyzers for every platform, packages the plugin with the version from the tag, and attaches the JAR and its SHA-256 checksum to the release.
+3. Set `version` in `gradle.properties` to the next development version, such as `1.9.1-SNAPSHOT`.
+
 ### License File Generation
 
 The project automatically generates and validates license files for all runtime dependencies. This ensures compliance and transparency regarding third-party licenses bundled with the plugin.
@@ -121,7 +133,7 @@ Both Java and Rust license validations run as part of the `check` task. If depen
 Copyright 2025 SonarSource.
 
 SonarQube analyzers released after November 29, 2024, including patch fixes for prior versions,
-are published under the [Sonar Source-Available License Version 1 (SSALv1)](LICENSE).
+are published under the [Sonar Source-Available License Version 1 (SSALv1)](LICENSE.txt).
 
 See individual files for details that specify the license applicable to each file.
 Files subject to the SSALv1 will be noted in their headers.
