@@ -8,18 +8,35 @@ The `clippy-metadata` tool maintains the checked-in Clippy resources used by the
 
 The tool is implemented in Python and intentionally has no Node.js dependency.
 
-## Scheduled Update
+## Updating for a New Rust Release
 
-The repository includes a scheduled GitHub Actions workflow at `.github/workflows/update-clippy-metadata.yml`.
+The update is run by hand when a new Rust release ships:
 
-That workflow:
+1. Check whether a newer Rust release exists:
 
-- checks whether a newer published Rust release exists
-- sparsely checks out the Clippy lint sources for that release
-- regenerates `metadata.json`, `rules.json`, `upstream.json`, and the checked-in rule-count assertion in `ClippyRulesDefinitionTest`
-- opens or updates a draft PR against `master` when the generated files change
+   ```sh
+   python3 tools/clippy-metadata/clippy_metadata.py check-release \
+     --upstream-state sonar-rust-plugin/src/main/resources/org/sonar/l10n/rust/rules/clippy/upstream.json
+   ```
 
-The local CLI documented below is the implementation used by that scheduled job.
+2. Sparsely check out the Clippy lint sources for that release:
+
+   ```sh
+   git clone --depth 1 --filter=blob:none --branch <release-tag> https://github.com/rust-lang/rust.git /tmp/rust-source
+   git -C /tmp/rust-source sparse-checkout init --cone
+   git -C /tmp/rust-source sparse-checkout set src/tools/clippy/clippy_lints/src
+   ```
+
+3. Regenerate the files, passing the release tag and its publication timestamp reported by `check-release`:
+
+   ```sh
+   python3 tools/clippy-metadata/clippy_metadata.py update \
+     --clippy-source-dir /tmp/rust-source/src/tools/clippy/clippy_lints/src \
+     --rust-release-tag <release-tag> \
+     --rust-release-published-at <published-at>
+   ```
+
+4. Review the diff, run `./gradlew build`, and open a pull request.
 
 ## Commands
 
