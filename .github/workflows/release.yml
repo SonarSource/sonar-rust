@@ -1,0 +1,127 @@
+name: Release
+# Builds the plugin for every supported platform and attaches the JAR to the GitHub release.
+# Publish a GitHub release with a tag such as v1.9.0 to trigger it.
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+env:
+  MUSL_CROSS_MAKE_COMMIT: 6f3701d08137496d5aac479e3a3977b5ae993c1f
+
+jobs:
+  macos_analyzers:
+    runs-on: macos-latest
+    name: macOS Analyzers Build
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          version: 2026.9.18
+      - name: Setup Rust toolchain
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: Build Rust analyzers
+        run: ./gradlew :analyzer:compileRustDarwin :analyzer:compileRustDarwinX86 --no-daemon --console=plain
+      - name: Upload Darwin ARM64 analyzer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: analyzer-aarch64-apple-darwin
+          path: analyzer/target/aarch64-apple-darwin/release/analyzer.xz
+      - name: Upload Darwin x86_64 analyzer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: analyzer-x86_64-apple-darwin
+          path: analyzer/target/x86_64-apple-darwin/release/analyzer.xz
+
+  cross_platform_analyzers:
+    runs-on: ubuntu-24.04
+    name: Cross-Platform Analyzers Build
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get -y install autoconf build-essential gcc-mingw-w64 git libtool musl-dev musl-tools pkg-config
+          sudo apt-get clean
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          version: 2026.9.18
+      - name: Cache cross-compiler
+        id: cache-cross-compiler
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: cross-compiler-output
+          key: musl-cross-compiler-aarch64-${{ env.MUSL_CROSS_MAKE_COMMIT }}
+      - name: Build cross-compiler
+        if: steps.cache-cross-compiler.outputs.cache-hit != 'true'
+        run: |
+          # Build the aarch64-linux-musl cross-compiler, based on https://github.com/cross-rs/cross/blob/main/docker/musl.sh
+          git clone https://github.com/richfelker/musl-cross-make.git
+          cd musl-cross-make
+          # Check out a specific commit to guarantee reproducibility (tags can be moved)
+          git checkout "$MUSL_CROSS_MAKE_COMMIT"
+          echo -e "TARGET = aarch64-linux-musl\nOUTPUT = $PWD/../cross-compiler-output\n" >> config.mak
+          make
+          make install
+      - name: Install cross-compiler
+        run: sudo cp -r --preserve=mode cross-compiler-output/* /usr/local/
+      - name: Setup Rust toolchain
+        run: rustup target add x86_64-pc-windows-gnu x86_64-unknown-linux-musl aarch64-unknown-linux-musl
+      - name: Build Rust analyzers
+        run: ./gradlew :analyzer:compileRustLinuxMusl :analyzer:compileRustLinuxArm :analyzer:compileRustWin --no-daemon --console=plain
+      - name: Upload Linux x86_64 analyzer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: analyzer-x86_64-unknown-linux-musl
+          path: analyzer/target/x86_64-unknown-linux-musl/release/analyzer.xz
+      - name: Upload Linux ARM64 analyzer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: analyzer-aarch64-unknown-linux-musl
+          path: analyzer/target/aarch64-unknown-linux-musl/release/analyzer.xz
+      - name: Upload Windows analyzer
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: analyzer-x86_64-pc-windows-gnu
+          path: analyzer/target/x86_64-pc-windows-gnu/release/analyzer.exe.xz
+
+  package:
+    needs: [macos_analyzers, cross_platform_analyzers]
+    runs-on: ubuntu-latest
+    name: Package and Attach to Release
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: jdx/mise-action@08ae2a091c038e1e05ec6f5115dc5c69d5a2a6b8 # v5.1.2
+        with:
+          version: 2026.9.18
+      - name: Download analyzers
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: analyzer-*
+          path: downloaded
+      - name: Place analyzers where the plugin build expects them
+        run: |
+          for target in aarch64-apple-darwin x86_64-apple-darwin x86_64-unknown-linux-musl aarch64-unknown-linux-musl x86_64-pc-windows-gnu; do
+            mkdir -p "analyzer/target/$target/release"
+            cp downloaded/analyzer-$target/* "analyzer/target/$target/release/"
+          done
+      - name: Build the plugin
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          VERSION="${TAG#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          ./gradlew :sonar-rust-plugin:shadowJar -PskipAnalyzerBuild -Pversion="$VERSION" --no-daemon --console=plain
+      - name: Attach the JAR and its checksum to the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          cd sonar-rust-plugin/build/libs
+          JAR="sonar-rust-plugin-$VERSION.jar"
+          sha256sum "$JAR" > "$JAR.sha256"
+          gh release upload "$TAG" "$JAR" "$JAR.sha256" --repo "$GITHUB_REPOSITORY"

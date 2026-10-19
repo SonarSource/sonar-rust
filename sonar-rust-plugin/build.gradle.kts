@@ -1,14 +1,11 @@
 import org.gradle.internal.os.OperatingSystem
-import org.jfrog.gradle.plugin.artifactory.dsl.ArtifactoryPluginConvention
 
 plugins {
   id("java")
   id("jacoco")
   `maven-publish`
-  signing
   id("com.diffplug.spotless") version "8.10.4"
   id("org.sonarqube")
-  id("com.jfrog.artifactory")
   id("com.gradleup.shadow") version "9.6.1"
   id("license-file-generator")
 }
@@ -197,15 +194,6 @@ repositories {
   mavenCentral()
 }
 
-signing {
-  val signingKeyId: String? by project
-  val signingKey: String? by project
-  val signingPassword: String? by project
-  useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-  sign(publishing.publications)
-  setRequired { gradle.taskGraph.hasTask(":artifactoryPublish") }
-}
-
 val projectTitle: String by project
 
 publishing {
@@ -241,43 +229,6 @@ publishing {
       }
       artifact(tasks.named("javadocJar"))
       artifact(tasks.named("sourcesJar"))
-    }
-  }
-}
-
-configure<ArtifactoryPluginConvention> {
-  clientConfig.info.buildName = "sonar-rust"
-  clientConfig.info.buildNumber = System.getenv("BUILD_NUMBER")
-  clientConfig.isIncludeEnvVars = true
-  clientConfig.envVarsExcludePatterns =
-    "*password*,*PASSWORD*,*secret*,*MAVEN_CMD_LINE_ARGS*,sun.java.command,*token*,*TOKEN*,*LOGIN*,*login*,*key*,*KEY*,*PASSPHRASE*,*signing*"
-
-  // Define the artifacts to be deployed to https://binaries.sonarsource.com on releases
-  clientConfig.info.addEnvironmentProperty("ARTIFACTS_TO_PUBLISH", "${project.group}:sonar-rust-plugin:jar")
-  // The name of this variable is important because it's used by the delivery process when extracting version from Artifactory build info.
-  clientConfig.info.addEnvironmentProperty("PROJECT_VERSION", version.toString())
-
-  setContextUrl(System.getenv("ARTIFACTORY_URL"))
-  publish {
-    repository {
-      repoKey = System.getenv("ARTIFACTORY_DEPLOY_REPO")
-      username = System.getenv("ARTIFACTORY_DEPLOY_USERNAME")
-      password = System.getenv("ARTIFACTORY_DEPLOY_PASSWORD")
-    }
-    defaults {
-      setProperties(
-        mapOf(
-          "build.name" to "sonar-rust",
-          "build.number" to project.ext["buildNumber"].toString(),
-          "pr.branch.target" to System.getenv("PULL_REQUEST_BRANCH_TARGET"),
-          "pr.number" to System.getenv("PULL_REQUEST_NUMBER"),
-          "vcs.branch" to System.getenv("GIT_BRANCH"),
-          "vcs.revision" to System.getenv("GIT_COMMIT"),
-          "version" to project.version.toString()
-        )
-      )
-      publications("mavenJava")
-      setPublishIvy(false) // Publish generated Ivy descriptor files to Artifactory (true by default)
     }
   }
 }
