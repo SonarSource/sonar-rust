@@ -9,7 +9,7 @@
 [![CI](https://github.com/SonarQubeCommunity/sonar-rust/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SonarQubeCommunity/sonar-rust/actions/workflows/ci.yml)
 
 <!-- sonar-marketing:start -->
-<!-- Marketing maintains this section. For wording changes, consult the relevant Product Marketing Manager (PMM). Repository CODEOWNERS review accuracy and merge changes. -->
+<!-- Marketing maintains this section. For wording changes, consult the relevant Product Marketing Manager (PMM). The repository maintainers review accuracy and merge changes. -->
 
 # Code quality for Rust
 
