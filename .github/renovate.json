@@ -3,9 +3,6 @@
   "extends": [
     "github>SonarSource/renovate-config:quality-corelang-squad"
   ],
-  "ignorePaths": [
-    "e2e/src/test/resources/**"
-  ],
   "packageRules": [
     {
       "description": "Refresh Gradle lockfiles and verification metadata after dependency updates",
@@ -22,8 +19,8 @@
         },
         "commands": [
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies --update-locks {{{packageName}}} :e2e:dependencies --configuration testCompileClasspath :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --update-locks {{{packageName}}} :e2e:dependencies --configuration testRuntimeClasspath :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies --update-locks {{{packageName}}} :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --update-locks {{{packageName}}} :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --no-configure-on-demand :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
@@ -52,8 +49,8 @@
         "commands": [
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :wrapper --gradle-version {{{newValue}}}",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 properties",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies :e2e:dependencies --configuration testCompileClasspath :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
-          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :e2e:dependencies --configuration testRuntimeClasspath :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --refresh-dependencies :sonar-rust-plugin:dependencies --configuration testCompileClasspath",
+          "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration testRuntimeClasspath",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAgent",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 :sonar-rust-plugin:dependencies --configuration jacocoAnt",
           "./gradlew --no-daemon --console=plain --write-locks --write-verification-metadata sha256 --no-configure-on-demand :sonar-rust-plugin:jacocoTestReport -x :sonar-rust-plugin:test"
