@@ -32,7 +32,7 @@ public class FileLocator {
 
   private static class ReversePathTree {
 
-    private Node root = new Node();
+    private final Node root = new Node();
 
     void index(InputFile inputFile, String[] path) {
       Node currentNode = root;
